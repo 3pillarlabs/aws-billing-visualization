@@ -1,7 +1,7 @@
 var elasticsearch = require('elasticsearch');
 
 var elasticClient = new elasticsearch.Client({  
-    host: 'http://172.20.36.122:9200/',
+    host: 'http://172.20.38.132:9200/',
     log: 'info'
 });
 
@@ -44,62 +44,65 @@ function initMapping(indexName, typeName) {
         type: typeName,
         body: {
             properties: {
-                InvoiceID: { type: "integer" },
-                PayerAccountId: { type: "integer" },
-                LinkedAccountId: { type: "integer" },
-                RecordType: { type: "text" },
-                RecordId: { type: "long" },
-                ProductName: { type: "text" },
-                RateId: { type: "integer" },
-                SubscriptionId: { type: "integer" },
-                PricingPlanId: { type: "integer" },
-                UsageType: { type: "text" },
-                Operation: { type: "text" },
-                AvailabilityZone: { type: "text" },
-                ReservedInstance: { type: "text" },
-                ItemDescription: { type: "text" },
-                UsageStartDate: { type: "date" },
-                UsageEndDate: { type: "date" },
-                UsageQuantity: { type: "double" },
-                BlendedRate: { type: "double" },
-                BlendedCost: { type: "double" },
-                UnBlendedRate: { type: "double" },
-                UnBlendedCost: {type: "text"},
-                ResourceId: { type: "text" }
+                "invoice_id":{  "type": "text" },
+                "payer_account_id":{ "type": "text" },
+                "linked_account_id":{ "type": "text" },
+                "record_type": { "type": "text" },
+                "record_id": { "type": "text" },
+                "product_name": { "type": "text" },
+                "rate_id": {  "type": "integer" },
+                "subscription_id": { "type": "integer" },
+                "pricing_plan_id": { "type": "integer" },
+                "usage_type": { "type": "text" },
+                "operation": {  "type": "text" },
+                "availability_zone": {  "type": "keyword"},
+                "reserved_instance": { "type": "text" },
+                "item_description": { "type": "text" },
+                "usage_start_date": { "type": "date", "format": "yyy-MM-dd HH:mm:ss" },
+                "usage_end_date": { "type": "date","format": "yyy-MM-dd HH:mm:ss" },
+                "usage_quantity": { "type": "double" },
+                "blended_rate": { "type": "double" },
+                "blended_cost": { "type": "double" },
+                "un_blended_rate": { "type": "double" },
+                "un_blended_cost": { "type": "double" },
+                "resource_id": { "type": "text" }
             }
         }
     });
 }
 exports.initMapping = initMapping;
 
-function addDocument(indexName, typeName, document) {  
-    return elasticClient.index({
-        index: indexName,
-        type: typeName,
-        body: {
-            "InvoiceID": data['InvoiceID'],
-            "PayerAccountId": data['PayerAccountId'],
-            "LinkedAccountId": data['LinkedAccountId'],
-            "RecordType": data['RecordType'],
-            "RecordId": data['RecordId'],
-            "ProductName": data['ProductName'],
-            "RateId": data['RateId'],
-            "SubscriptionId": data['SubscriptionId'],
-            "PricingPlanId": data['PricingPlanId'],
-            "UsageType": data['UsageType'],
-            "Operation": data['Operation'],
-            "AvailabilityZone": data['AvailabilityZone'],
-            "ReservedInstance": data['ReservedInstance'],
-            "ItemDescription": data['ItemDescription'],
-            "UsageStartDate": data['UsageStartDate'],
-            "UsageEndDate": data['UsageEndDate'],
-            "UsageQuantity": data['UsageQuantity'],
-            "BlendedRate": data['BlendedRate'],
-            "BlendedCost": data['BlendedCost'],
-            "UnBlendedRate": data['UnBlendedRate'],
-            "UnBlendedCost":data['UnBlendedCost'],
-            "ResourceId": data['ResourceId']
-        }
-    });
+function addDocument(indexName, typeName, document) {
+    if(document['AvailabilityZone']){
+        return elasticClient.index({
+            index: indexName,
+            type: typeName,
+            body: {
+                "invoice_id": document['InvoiceID'],
+                "payer_account_id": document['PayerAccountId'],
+                "linked_account_id": document['LinkedAccountId'],
+                "record_type": document['RecordType'],
+                "record_id": document['RecordId'],
+                "product_name": document['ProductName'],
+                "rate_id": document['RateId'],
+                "subscription_id": document['SubscriptionId'],
+                "pricing_plan_id": document['PricingPlanId'],
+                "usage_type": document['UsageType'],
+                "operation": document['Operation'],
+                "availability_zone": document['AvailabilityZone'],
+                "reserved_instance": document['ReservedInstance'],
+                "item_description": document['ItemDescription'],
+                "usage_start_date": document['UsageStartDate'],
+                "usage_end_date": document['UsageEndDate'],
+                "usage_quantity": document['UsageQuantity'],
+                "blended_rate": document['BlendedRate'],
+                "blended_cost": document['BlendedCost'],
+                "un_blended_rate": document['UnBlendedRate'],
+                "un_blended_cost":document['UnBlendedCost'],
+                "resource_id": document['ResourceId']
+            }
+        });
+    }  
+    
 }
 exports.addDocument = addDocument;
