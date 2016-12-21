@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <div class="col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+    <div class="col-xs-12 col-md-10  col-lg-12">
         <div class="row">
             <h2 class="col-xs-6"></h2>
             <div class="col-xs-2">
@@ -17,10 +17,10 @@
                 <div class="col-xs-6">
                     <div class="row">
                         <select class="form-control input-sm" [(ngModel)]="sortBy">
-                            <option ngValue="name">Name</option>
-                            <option ngValue="email">Email</option>
-                            <option ngValue="age">Age</option>
-                            <option [ngValue]="sortByWordLength">City</option>
+                            <option ngValue="blended_cost">Blended Cost</option>
+                            <option ngValue="usage_start_date">Usage Start Date</option>
+                            <option ngValue="usage_end_date">Usage End Date</option>
+                            <option [ngValue]="operation">Operation</option>
                         </select>
                     </div>
                 </div>
@@ -36,47 +36,49 @@
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">User information</div>
+            <!--<div class="panel-heading">User information</div>-->
 
             <table class="table table-striped" [mfData]="data | dataFilter : filterQuery" #mf="mfDataTable"
                    [mfRowsOnPage]="rowsOnPage" [(mfSortBy)]="sortBy" [(mfSortOrder)]="sortOrder">
                 <thead>
                 <tr>
-                    <th style="width: 10%"></th>
-                    <th style="width: 20%">
-                        <mfDefaultSorter by="name">Name</mfDefaultSorter>
-                    </th>
-                    <th style="width: 40%">
-                        <mfDefaultSorter by="email">Email</mfDefaultSorter>
-                    </th>
-                    <th style="width: 10%">
-                        <mfDefaultSorter by="age">Age</mfDefaultSorter>
-                    </th>
-                    <th style="width: 20%">
-                        <mfDefaultSorter [by]="sortByWordLength">City</mfDefaultSorter>
-                    </th>
+                    <th>Record Id</th>
+                    <th>Resource Id</th>
+                    <th>Product Name</th>
+                    <th><mfDefaultSorter [by]="operation">Operation</mfDefaultSorter></th>
+                    <th>Item Description</th>
+                    <th>Availability Zone</th>
+                    <th>Usage Quantity</th>
+                    <th><mfDefaultSorter by="blended_cost">Blended Cost</mfDefaultSorter></th>
+                    <th><mfDefaultSorter by="usage_start_date">Usage Start Date</mfDefaultSorter></th>
+                    <th><mfDefaultSorter by="usage_end_date">Usage End Date</mfDefaultSorter></th>
+
+                    
                 </tr>
                 <tr>
                     <th colspan="5">
-                        Filter by name:
+                        Filter by Operation:
                         <input class="form-control" [(ngModel)]="filterQuery"/>
                     </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr *ngFor="let item of mf.data">
-                    <td>
-                        <button (click)="remove(item)" class="btn btn-danger">x</button>
-                    </td>
-                    <td>{{item.name}}</td>
-                    <td>{{item.email}}</td>
-                    <td class="text-right">{{item.age}}</td>
-                    <td>{{item.city | uppercase}}</td>
+                    <td scope="row">{{item.record_id}}</td>
+                    <td>{{item.resource_id}}</td>
+                    <td>{{item.product_name}}</td>
+                    <td>{{item.operation}}</td>
+                    <td>{{item.item_description}}</td>
+                    <td>{{item.availability_zone}}</td>
+                    <td>{{item.usage_quantity}}</td>
+                    <td>{{item.blended_cost}}</td>
+                    <td>{{item.usage_start_date}}</td>
+                    <td>{{item.usage_end_date}}</td>
                 </tr>
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="10">
                         <mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>
                     </td>
                 </tr>

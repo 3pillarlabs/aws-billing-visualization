@@ -1,15 +1,41 @@
-<div>
-	<div class="col-xs-2">      
-	    <select class="form-control"  required (change)="yearChange($event.target.value)">
-	            <option  *ngFor="let y of years" value="{{y}}" [selected]="yy === y ">{{y}}</option>    
-	    </select>
-    </div>
-    <div class="col-xs-2">      
-		<select class="form-control"  required (change)="monthChange($event.target.value)">
-		        <option  *ngFor="let p of months" value="{{p.val}}"  [selected]="mm === p.val ">{{p.name}}</option>    
-		</select>
-    </div>
-
+<div class="container-fluid">
+	<div class="page-header" [ngStyle]="{'text-align':'center'}">
+		<h1>AWS Visualization</h1>
+	</div>
+	<div lass="row">
+		<div class="col-lg-12">
+			<div class="row">
+				<form class="form-horizontal">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="control-label col-sm-3">Start Date:</label>
+							<div class="col-sm-9">
+								<input type="date" name="startdate" class="form-control" [value]="startdate" (change)="startdatechange($event.target.value)">
+							</div>
+							
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-3">End Date:</label>
+							<div class="col-sm-9">
+								<input type="date" name="enddate" class="form-control" [value]="enddate" (change)="enddatechange($event.target.value)">
+							</div>
+							
+						</div>
+						
+						
+						
+					</div>
+					<div class="col-lg-6"><aws-billing-heatmap [startdate]="startdate" [enddate]="enddate"></aws-billing-heatmap></div>
+					
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-12">
+			<aws-billing-datatable [startdate]="startdate" [enddate]="enddate"></aws-billing-datatable>
+		</div>
+	</div>
 </div>
-<aws-billing-heatmap></aws-billing-heatmap>
-<aws-billing-datatable></aws-billing-datatable>
+<!--<aws-billing-loader></aws-billing-loader>-->
