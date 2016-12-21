@@ -1,4 +1,5 @@
 import { Component,OnInit } from '@angular/core';
+import { AwsdataService } from './../../services/awsdata.service';
 declare var google: any;
 
 @Component({
@@ -7,40 +8,119 @@ declare var google: any;
     templateUrl: 'heatmap.component.html',
     styles: [`#map {
 				   	height: 300px;
-				   	width:500px;
+				   	width:600px;
 				    }
-      		`]
+      		`],
+    inputs: ['startdate','enddate']
 })
 
 export class HeatmapComponent implements OnInit{
-    zoom: number = 1;
+	startdate:any;
+	enddate:any;
+	company:string='tpg';
+	
+	zoom: number = 1;
 	lat: number = -34.397;
   	lng: number = 150.644;
-
-    ngOnInit(){
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: this.zoom,
-            center: {lat: this.lat, lng: this.lng}
+  	
+	map:any;
+  	heatmap: any;
+  	
+  	heatmapdata:any=[];
+	markers:any=[];
+  	heatmaps:any=[];
+  	constructor(private _awsregions:AwsdataService){}
+	
+	ngOnInit(){
+		this.map = new google.maps.Map(document.getElementById('map'), {
+          zoom: this.zoom,
+          center: {lat: this.lat, lng: this.lng}
         });
 
-        var heatmap = new google.maps.visualization.HeatmapLayer({
-            data: this.getPoints(),
-            map: map
-        });
+		var awsdata = {
+    		company: this.company,
+    		strdate: this.startdate,
+    		enddate: this.enddate
+		};
+
+		this.drawHeatmapAndMarker(awsdata);
+		
     }
 
-    getPoints(){
-        return [
-	          {location:new google.maps.LatLng(1.338659, 103.647403),weight: 0.5},
-	          {location:new google.maps.LatLng(37.566535, 126.977969),weight: 5},
-	          {location:new google.maps.LatLng(32.780106, -92.412277),weight: 8000},
-	          {location:new google.maps.LatLng(-33.86882, 151.209296),weight: 10},
-	          {location:new google.maps.LatLng(-23.55052, -46.633309),weight: 20},
-	          {location:new google.maps.LatLng(50.109492, 8.673965),weight: 500},
-	          {location:new google.maps.LatLng(43.804133, -120.554201),weight: 2},
-	          {location:new google.maps.LatLng(40.694654, -80.953948),weight: 600},
-	          {location:new google.maps.LatLng(35.689487, 139.691706),weight: 200},
-	          {location:new google.maps.LatLng(37.431573, -78.656894),weight: 400}
-          ];
-      };
+    drawHeatmapAndMarker(awsdata:any){
+		this._awsregions.getAwsRegions(awsdata).subscribe((data)=>{
+			console.log(data);
+			
+			if(data.length > 0){
+				var maxintensity = data[0].totalcost; // Set Max intensity on the basis of region total cost
+				
+				for(let region of data){
+					//console.log(region);
+					if(region.totalcost > 0){
+						var heatmaplatlong = {location:new google.maps.LatLng(region.lat, region.lng),weight: region.totalcost};
+						this.heatmapdata.push(heatmaplatlong);
+						this.addMarker(region);
+					}
+					
+			    }
+
+				this.addHeatmap(maxintensity);
+				
+			}else{
+				console.log('else');
+				this.removeHeatmap();
+				this.removeMarker();
+				
+			}
+			
+		});
+    }
+
+    
+
+    addHeatmap(maxintensity:any){
+    	this.heatmap = new google.maps.visualization.HeatmapLayer({
+          data: this.heatmapdata,
+          map: this.map,
+          radius: 20,
+          maxIntensity: maxintensity
+       });
+
+		this.heatmaps.push(this.heatmap);
+    }
+
+    removeHeatmap(){
+    	for (var i = 0; i < this.heatmaps.length; i++) {
+          this.heatmaps[i].setMap(null);
+        }
+    }
+
+    addMarker(region:any){
+    	if(region){
+    		var marker = new google.maps.Marker({
+	          position: {lat: region.lat, lng: region.lng},
+	          map: this.map,
+	          title: region.name,
+	          code: region.code
+	        });
+
+        	this.markers.push(marker);
+
+        	var infowindowcontent='<div id="content"><p><label>Region:</label>'+region.name+'</p><p><label>Total Resouces:</label>'+region.totalresource+'</p><p><label>Total Cost:</label>'+region.totalcost+'</p></div>';
+	    	var infowindow = new google.maps.InfoWindow({
+				          content: infowindowcontent
+				        });
+		 	marker.addListener('click', function() {
+			         infowindow.open(this.map, marker);
+			});
+    	}
+    	
+    	
+    }
+
+    removeMarker(){
+    	for (var i = 0; i < this.markers.length; i++) {
+          this.markers[i].setMap(null);
+        }
+    }
 }

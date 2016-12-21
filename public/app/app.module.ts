@@ -8,10 +8,13 @@ import { HeatmapComponent }   from './components/heatmap/heatmap.component';
 import { DataTableModule } from "angular2-datatable";
 import { DataFilterPipe } from "./components/datatable/data-filter.pipe";
 import { DatatableComponent } from "./components/datatable/datatable.component";
+import { AwsdataService } from "./services/awsdata.service";
+import { LoaderComponent } from './components/loader/loader.component';
 
 @NgModule({
   imports:      [ BrowserModule,HttpModule,FormsModule,DataTableModule ],
-  declarations: [ AppComponent,HeatmapComponent,DatatableComponent,DataFilterPipe ],
+  declarations: [ AppComponent,HeatmapComponent,DatatableComponent,DataFilterPipe,LoaderComponent ],
+  providers: [ AwsdataService ],
   bootstrap:    [ AppComponent ]
 })
 

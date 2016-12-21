@@ -1,4 +1,6 @@
-import { Component,OnInit } from '@angular/core';
+import { Component,ViewChild } from '@angular/core';
+import { HeatmapComponent } from './components/heatmap/heatmap.component';
+import { DatatableComponent } from './components/datatable/datatable.component';
 
 @Component({
   moduleId: module.id,
@@ -6,52 +8,56 @@ import { Component,OnInit } from '@angular/core';
   templateUrl: 'app.component.html'
 })
 
-export class AppComponent implements OnInit { 
-  mm : number;
-	years: number[] =[];
-	yy : number;
+export class AppComponent{ 
+	@ViewChild(HeatmapComponent) Heatmap: HeatmapComponent;
+	@ViewChild(DatatableComponent) Datatable: DatatableComponent;
+	startdate:any;
+	enddate:any;
 	
-	months = [
-	        { val: 1,  name: 'Jan' },
-	        { val: 2,  name: 'Feb' },
-	        { val: 3,  name: 'Mar' },
-	        { val: 4,  name: 'Apr' },
-	        { val: 5,  name: 'May' },
-	        { val: 6,  name: 'Jun' },
-	        { val: 7,  name: 'Jul' },
-	        { val: 8,  name: 'Aug' },
-	        { val: 9,  name: 'Sep' },
-	        { val: 10,  name: 'Oct' },
-	        { val: 11,  name: 'Nov' },
-	        { val: 12,  name: 'Dec' }
-	    ];
+	company:string='tpg';
+	constructor(){
+		let today = new Date();
+		let year=today.getFullYear();
+		let month=today.getMonth()+1;
+		let day=new Date(year, month, 0).getDate();
+		this.startdate=year+'-'+month+'-'+today.getDate();
+		this.enddate = year+'-'+month+'-'+day;
+	}
+	
+	
 
-    ngOnInit() {  
-    	this.getMonth(); 
-    	this.getYear();
-    	
-    } 
-
-    getMonth(){
-    	var today = new Date();
-	    this.mm = today.getMonth()+1; 
-	   
-	  }
-
-    getYear(){
-        var today = new Date();
-        this.yy = today.getFullYear();        
-        for(var i = (this.yy-100); i <= this.yy; i++){
-        this.years.push(i);}
+    getAwsdata(){
+    	var awsdata = {
+    		company: this.company,
+    		strdate: this.startdate,
+    		enddate: this.enddate
+		};
+    	this.Heatmap.drawHeatmapAndMarker(awsdata);
     }
 
-    yearChange(year:any){
-    	this.yy = year;
-    	
-    }
+	getAwsResourcedata(){
+		var awsdata = {
+    		company: this.company,
+    		strdate: this.startdate,
+    		enddate: this.enddate
+		};
+		this.Datatable.getAllAwsResourcedata(awsdata);
+	}
 
-    monthChange(month:any){
-    	this.mm = month;
-    } 
+	startdatechange(stdate:any){
+		this.startdate=stdate;
+		console.log(this.startdate);
+		this.getAwsdata();
+		this.getAwsResourcedata();
+	}
+
+	enddatechange(endate:any){
+		this.enddate=endate;
+
+		console.log(this.enddate);
+		this.getAwsdata();
+		this.getAwsResourcedata();
+	}
+
 
 }
