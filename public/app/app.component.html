@@ -25,17 +25,16 @@
 						
 						
 					</div>
-					<div class="col-lg-6"><aws-billing-heatmap [startdate]="startdate" [enddate]="enddate"></aws-billing-heatmap></div>
+					<div class="col-lg-6"><aws-billing-heatmap [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event"></aws-billing-heatmap></div>
 					
 				</form>
 			</div>
 		</div>
 	</div>
-	
-	<div class="row">
-		<div class="col-lg-12">
-			<aws-billing-datatable [startdate]="startdate" [enddate]="enddate"></aws-billing-datatable>
+	<div class="row" >
+		<div class="col-lg-12" [ngStyle]="{'margin-top':20}">
+			<aws-billing-datatable [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event"></aws-billing-datatable>
 		</div>
 	</div>
 </div>
-<!--<aws-billing-loader></aws-billing-loader>-->
+<aws-billing-loader [isloading]="isloading"></aws-billing-loader>

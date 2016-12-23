@@ -5,7 +5,8 @@ import { DatatableComponent } from './components/datatable/datatable.component';
 @Component({
   moduleId: module.id,
   selector: 'my-app',
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
+  inputs:['isloading']
 })
 
 export class AppComponent{ 
@@ -13,6 +14,7 @@ export class AppComponent{
 	@ViewChild(DatatableComponent) Datatable: DatatableComponent;
 	startdate:any;
 	enddate:any;
+	isloading:boolean;
 	
 	company:string='tpg';
 	constructor(){
@@ -20,8 +22,9 @@ export class AppComponent{
 		let year=today.getFullYear();
 		let month=today.getMonth()+1;
 		let day=new Date(year, month, 0).getDate();
-		this.startdate=year+'-'+month+'-'+today.getDate();
+		this.startdate=year+'-'+month+'-01';
 		this.enddate = year+'-'+month+'-'+day;
+		this.isloading=false;
 	}
 	
 	
@@ -45,16 +48,15 @@ export class AppComponent{
 	}
 
 	startdatechange(stdate:any){
+		this.isloading=true;
 		this.startdate=stdate;
-		console.log(this.startdate);
 		this.getAwsdata();
 		this.getAwsResourcedata();
 	}
 
 	enddatechange(endate:any){
+		this.isloading=true;
 		this.enddate=endate;
-
-		console.log(this.enddate);
 		this.getAwsdata();
 		this.getAwsResourcedata();
 	}
