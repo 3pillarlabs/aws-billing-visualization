@@ -10,10 +10,11 @@ import { DataFilterPipe } from "./components/datatable/data-filter.pipe";
 import { DatatableComponent } from "./components/datatable/datatable.component";
 import { AwsdataService } from "./services/awsdata.service";
 import { LoaderComponent } from './components/loader/loader.component';
+import { PaginationDirective } from './directives/pagination.directive';
 
 @NgModule({
   imports:      [ BrowserModule,HttpModule,FormsModule,DataTableModule ],
-  declarations: [ AppComponent,HeatmapComponent,DatatableComponent,DataFilterPipe,LoaderComponent ],
+  declarations: [ AppComponent,HeatmapComponent,DatatableComponent,DataFilterPipe,LoaderComponent,PaginationDirective ],
   providers: [ AwsdataService ],
   bootstrap:    [ AppComponent ]
 })

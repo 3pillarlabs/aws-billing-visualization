@@ -1,4 +1,4 @@
-import { Component,OnInit } from '@angular/core';
+import { Component,OnInit,EventEmitter } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
 declare var google: any;
 
@@ -11,7 +11,8 @@ declare var google: any;
 				   	width:600px;
 				    }
       		`],
-    inputs: ['startdate','enddate']
+    inputs: ['startdate','enddate'],
+	outputs:['isloading']
 })
 
 export class HeatmapComponent implements OnInit{
@@ -19,6 +20,8 @@ export class HeatmapComponent implements OnInit{
 	enddate:any;
 	company:string='tpg';
 	
+	isloading=new EventEmitter();
+
 	zoom: number = 1;
 	lat: number = -34.397;
   	lng: number = 150.644;
@@ -73,6 +76,7 @@ export class HeatmapComponent implements OnInit{
 				
 			}
 			
+			this.isloading.emit(false);
 		});
     }
 
