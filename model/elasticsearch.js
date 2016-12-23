@@ -185,11 +185,25 @@ function getAllData(data){
     var indexName=data.company;
     var startdate=data.strdate;
 	var enddate=data.enddate;
-
+    var from =0;
+    if(data.currentpage){
+        from=((data.currentpage-1) * 10);
+    }
+    
+    var size =10;
+    if(data.size){
+        size=data.size;
+    }
+    var filter={};
+    if(data.filter){
+         filter={   "match_phrase_prefix" : {   "operation" : data.filter } };
+    }
         
     return elasticClient.search({
         index: indexName,
         body: {
+            "from" : from, 
+            "size" : size,
             "query" : {
                 "bool": {
     		            "must": [
@@ -217,7 +231,9 @@ function getAllData(data){
 			                            "gt": 0
 			                        }
 			                    }
-			                }
+			                },
+                            filter
+                            
 			            ]
                     
 			        }
