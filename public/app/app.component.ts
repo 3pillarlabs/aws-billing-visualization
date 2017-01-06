@@ -1,6 +1,5 @@
-import { Component,ViewChild } from '@angular/core';
-import { HeatmapComponent } from './components/heatmap/heatmap.component';
-import { DatatableComponent } from './components/datatable/datatable.component';
+import { Component } from '@angular/core';
+import { ConfigService } from './services/config.service';
 
 @Component({
   moduleId: module.id,
@@ -10,56 +9,35 @@ import { DatatableComponent } from './components/datatable/datatable.component';
 })
 
 export class AppComponent{ 
-	@ViewChild(HeatmapComponent) Heatmap: HeatmapComponent;
-	@ViewChild(DatatableComponent) Datatable: DatatableComponent;
 	startdate:any;
 	enddate:any;
 	isloading:boolean;
-	
-	company:string='tpg';
-	constructor(){
+	selectedRegion: string = "";	
+	company:string;
+
+	constructor(private _config:ConfigService){
+		this.company = this._config.company;
 		let today = new Date();
-		let year=today.getFullYear();
-		let month=today.getMonth()+1;
-		let day=new Date(year, month, 0).getDate();
-		this.startdate=year+'-'+month+'-01';
+		let year = today.getFullYear();
+		let month = ("0"+today.getMonth()+1).slice(-2);
+		let day = new Date(year, +month, 0).getDate();
+		this.startdate = year+'-'+month+'-01';
 		this.enddate = year+'-'+month+'-'+day;
-		this.isloading=false;
+		this.isloading = false;
 	}
 	
-	
-
-    getAwsdata(){
-    	var awsdata = {
-    		company: this.company,
-    		strdate: this.startdate,
-    		enddate: this.enddate
-		};
-    	this.Heatmap.drawHeatmapAndMarker(awsdata);
-    }
-
-	getAwsResourcedata(){
-		var awsdata = {
-    		company: this.company,
-    		strdate: this.startdate,
-    		enddate: this.enddate
-		};
-		this.Datatable.getAllAwsResourcedata(awsdata);
-	}
 
 	startdatechange(stdate:any){
 		this.isloading=true;
 		this.startdate=stdate;
-		this.getAwsdata();
-		this.getAwsResourcedata();
 	}
 
 	enddatechange(endate:any){
 		this.isloading=true;
 		this.enddate=endate;
-		this.getAwsdata();
-		this.getAwsResourcedata();
 	}
 
-
+	onSelectRegion(region: string): void {
+        this.selectedRegion = region;
+    }
 }

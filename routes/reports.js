@@ -1,31 +1,16 @@
 var express = require('express');  
 var router = express.Router();
-
 var elastic = require('../model/elasticsearch');
-var awssdk = require('../model/awssdk');
 
-
-/* Create index with indexname if not exist */
-router.get('/addindex/:indexname', function(req, res, next){
-    elastic.initIndex(req.params.indexname)
-        .then(function(result){
-            res.json(result);
-        })
-})
-
-/* get data from s3 bucket */
-router.get('/getcsvdata/:year/:month', function(req, res, next){   
-    awssdk.getAwsData(req.params.year,req.params.month)
-        .then(function(result){
-            res.json(result);
-        })
-})
-
-/* get regions from elastic search */
+/**
+ * Get AWS resources cost aggregated on regions
+ * @param: @Path: string
+ * @param: @callback
+ * @return: json
+ */
 router.post('/regions',function(req,res,next){
 	var data=req.body;
-    elastic.getRegions(data).then(function(result){
-        console.log(result);
+    elastic.getRegionsBillingCost(data).then(function(result){
         res.json(result);
     },function(error){
         res.send(400);
@@ -41,10 +26,30 @@ router.post('/regions',function(req,res,next){
  */
 router.post('/getalldata', function(req, res, next){
     var data=req.body;   
-    elastic.getAllData(data)
-        .then(function(result){
-            res.json(result);
-        })
+    elastic.getResourcesData(data).then(function(result){
+        res.json(result);
+    },function(error){
+        res.send(400);
+        res.error(error);
+    });
+})
+
+/* get product wise data from elastic search */
+/**
+ * Get AWS resources cost aggregated on products
+ * @param: @Path: string
+ * @param: @callback
+ * @return: json
+ */
+router.post('/getProductWiseData',function(req,res,next){
+	var data=req.body;
+    elastic.getProductWiseData(data).then(function(result){
+        console.log(result);
+        res.json(result);
+    },function(error){
+        res.send(400);
+        res.error(error);
+    });
 })
 
 module.exports = router;

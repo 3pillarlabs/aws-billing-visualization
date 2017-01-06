@@ -1,5 +1,6 @@
-import { Component,OnInit,EventEmitter } from '@angular/core';
+import { Component,OnInit,OnChanges,EventEmitter } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
+import { ConfigService } from './../../services/config.service';
 declare var google: any;
 
 @Component({
@@ -11,16 +12,17 @@ declare var google: any;
 				   	width:600px;
 				    }
       		`],
-    inputs: ['startdate','enddate'],
-	outputs:['isloading']
+    inputs: ['startdate','enddate','selectedRegion'],
+	outputs:['isloading','selectRegion']
 })
 
-export class HeatmapComponent implements OnInit{
+export class HeatmapComponent implements OnInit,OnChanges{
 	startdate:any;
 	enddate:any;
-	company:string='tpg';
+	company:string;
 	
 	isloading=new EventEmitter();
+	selectRegion=new EventEmitter();
 
 	zoom: number = 1;
 	lat: number = -34.397;
@@ -28,18 +30,23 @@ export class HeatmapComponent implements OnInit{
   	
 	map:any;
   	heatmap: any;
+	selectedRegion:string;
   	
   	heatmapdata:any=[];
 	markers:any=[];
   	heatmaps:any=[];
-  	constructor(private _awsregions:AwsdataService){}
+  	constructor(private _awsregions:AwsdataService,private _config:ConfigService){
+		this.company=this._config.company;
+	}
 	
 	ngOnInit(){
 		this.map = new google.maps.Map(document.getElementById('map'), {
           zoom: this.zoom,
           center: {lat: this.lat, lng: this.lng}
         });
+	}
 
+	ngOnChanges(){
 		var awsdata = {
     		company: this.company,
     		strdate: this.startdate,
@@ -47,8 +54,7 @@ export class HeatmapComponent implements OnInit{
 		};
 
 		this.drawHeatmapAndMarker(awsdata);
-		
-    }
+	}
 
     drawHeatmapAndMarker(awsdata:any){
 		this._awsregions.getAwsRegions(awsdata).subscribe((data)=>{
@@ -110,16 +116,18 @@ export class HeatmapComponent implements OnInit{
 
         	this.markers.push(marker);
 
-        	var infowindowcontent='<div id="content"><p><label>Region:</label>'+region.name+'</p><p><label>Total Resouces:</label>'+region.totalresource+'</p><p><label>Total Cost:</label>'+region.totalcost+'</p></div>';
+        	var infowindowcontent='<div id="content"><p><label>Region:</label>'+region.name+'</p><p><p><label>Code:</label>'+region.code+'</p><p><label>Total Resouces:</label>'+region.totalresource+'</p><p><label>Total billing Cost:</label>$'+region.totalcost+'</p></div>';
 	    	var infowindow = new google.maps.InfoWindow({
 				          content: infowindowcontent
 				        });
-		 	marker.addListener('click', function() {
-			         infowindow.open(this.map, marker);
+			
+			
+		 	marker.addListener('click',() => {
+					 this.isloading.emit(true);
+					 this.selectRegion.emit(marker.code);
+					 infowindow.open(this.map, marker);
 			});
     	}
-    	
-    	
     }
 
     removeMarker(){

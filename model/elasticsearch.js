@@ -1,15 +1,32 @@
 var elasticsearch = require('elasticsearch');
+var fs    = require('fs');
+var nconf = require('nconf');
 
-//create elsaticsearch client
+// Setup nconf to use (in-order): 
+//   1. Command-line arguments 
+//   2. Environment variables 
+//   3. A file located at 'path/to/config.json' 
+nconf.argv().env().file({ file: '../config/config.json' });
+var env = nconf.get('NODE_ENV') || "development";
+
+//console.log(nconf.get(env).elasticsearch.host);
+
 var elasticClient = new elasticsearch.Client({  
-    host: 'http://172.20.38.132:9200/'
+    host: "http://172.20.36.122:9200/"
 });
 
-//var indexName = "randomindex";
+function getConfig(){
+    console.log(env);
+    console.log(nconf.get(env));
+    return nconf.get(env);
+}
+exports.getConfig = getConfig;
 
 /**
-* create the index
-*/
+ * Create an index
+ * @param: @string indexName
+ * @returns: @object
+ */
 function initIndex(indexName) {  
     console.log("index : "+indexName);
     return elasticClient.indices.create({
@@ -19,8 +36,10 @@ function initIndex(indexName) {
 exports.initIndex = initIndex;
 
 /**
-* Delete an existing index
-*/
+ * Delete an index
+ * @param: @string indexName
+ * @returns: @object
+ */
 function deleteIndex(indexName) {  
     return elasticClient.indices.delete({
         index: indexName
@@ -29,16 +48,24 @@ function deleteIndex(indexName) {
 exports.deleteIndex = deleteIndex;
 
 /**
-* check if the index exists
-*/
-function indexExists(indexName) {  
+ * Checks an index exist or not
+ * @param: @string indexName
+ * @returns: @boolean
+ */
+function isIndexExists(indexName) {  
     return elasticClient.indices.exists({
         index: indexName
     });
 }
-exports.indexExists = indexExists;
+exports.isIndexExists = isIndexExists;
 
-function initMapping(indexName, typeName) {  
+/**
+ * Set the mapping of index type 
+ * @param: @string indexName
+ * @param: @string typeName
+ * @returns: @object
+ */
+function setMapping(indexName, typeName) {  
     return elasticClient.indices.putMapping({
         index: indexName,
         type: typeName,
@@ -49,13 +76,14 @@ function initMapping(indexName, typeName) {
                 linked_account_id: { type: "text" },
                 record_type: { type: "text" },
                 record_id: { type: "text" },
-                product_name: { type: "text" },
+                product_name: { type: "keyword" },
                 rate_id: { type: "integer" },
                 subscription_id: { type: "integer" },
                 pricing_plan_id: { type: "integer" },
                 usage_type: { type: "text" },
                 operation: { type: "text" },
                 availability_zone: { type: "keyword" },
+                availability_region: { type: "keyword" },
                 reserved_instance: { type: "text" },
                 item_description: { type: "text" },
                 usage_start_date: { type: "date", "format": "yyy-MM-dd HH:mm:ss" },
@@ -70,8 +98,14 @@ function initMapping(indexName, typeName) {
         }
     });
 }
-exports.initMapping = initMapping;
+exports.setMapping = setMapping;
 
+/**
+ * Get the mapping of index type 
+ * @param: @string indexName
+ * @param: @string typeName
+ * @returns: @object
+ */
 function getMapping(indexName, typeName) {  
     return elasticClient.indices.getMapping({
         index: indexName,
@@ -80,7 +114,16 @@ function getMapping(indexName, typeName) {
 }
 exports.getMapping = getMapping;
 
+/**
+ * Add document in index 
+ * @param: @string indexName
+ * @param: @string typeName
+ * @param: @object data
+ * @param: @number pid
+ * @returns: @object
+ */
 function addDocument(indexName, typeName, data, pid) {
+    let availability_region_val = data['AvailabilityZone'].replace(/[a-z]$/, '');
     return elasticClient.index({
         index: indexName,
         id: pid,
@@ -98,6 +141,7 @@ function addDocument(indexName, typeName, data, pid) {
             "usage_type": data['UsageType'],
             "operation": data['Operation'],
             "availability_zone": data['AvailabilityZone'],
+            "availability_region": availability_region_val,
             "reserved_instance": data['ReservedInstance'],
             "item_description": data['ItemDescription'],
             "usage_start_date": data['UsageStartDate'],
@@ -113,90 +157,100 @@ function addDocument(indexName, typeName, data, pid) {
 }
 exports.addDocument = addDocument;
 
-function getAllRegionsCost(indexName, typeName){
-    return elasticClient.search({
+/**
+ * Calculate resource cost aggregated on regions within a date range filter
+ * @param: @Object data - contains index, start date, end date
+ * @return: @Object
+ */
+function getRegionsBillingCost(data){
+    var startDate = data.strdate;
+    var endDate = data.enddate;
+    var indexName = data.company;
+
+    return elasticClient.search({  
         index: indexName,
-        type: typeName,
+        size: 0,
         body: {
-            "size": 0,
-            "aggs": {
-                "availability_zone": {
-                    "terms": {
-                        "field": "availability_zone",
-                         "order": { "blended_cost": "desc" }
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "range": {
+                                "usage_start_date": {
+                                    "gte": startDate,
+                                    "lte": endDate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "usage_end_date": {
+                                    "gte": startDate,
+                                    "lte": endDate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "blended_cost": {
+                                    "gt": 0
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "aggs":{
+                "availability_zone":{
+                    "terms":{
+                        "field":"availability_region",
+                        "order":{"total_blended_cost":"desc"} 
                     },
-                    "aggs": {
-                        "blended_cost": {
-                            "sum": {
-                                "field": "blended_cost"
+                    "aggs":{
+                        "total_blended_cost":{
+                            "sum":{
+                                "field":"blended_cost"
                             }
                         }
                     }
                 }
-            }
+            }                
         }
-        
     });
 }
-exports.getAllRegionsCost = getAllRegionsCost;
 
-function getRegionData(indexName, typeName, regionName){
-    return elasticClient.search({
-        index: indexName,
-        type: typeName,
-        body: {
-            "query" : {
-                "constant_score" : { 
-                    "filter" : {
-                        "bool" : {
-                        "should" : { 
-                            "term" : {"availability_zone" : regionName}
-                        },
-                        "must_not" : {
-                            "term" : {"blended_cost" : 0} 
-                        }
-                    }
-                    }
-                }
-            },
-            "_source": [
-                "record_id", 
-                "product_name", 
-                "subscription_id",
-                "pricing_plan_id",
-                "usage_type",
-                "availability_zone",
-                "item_description",
-                "usage_start_date",
-                "usage_end_date",
-                "usage_quantity",
-                "blended_rate",
-                "blended_cost",
-                "resource_id",
-                "operation"
-                ]
-        }
-    })
+exports.getRegionsBillingCost = getRegionsBillingCost;
 
-}
-exports.getRegionData = getRegionData;
-
-function getAllData(data){
+/**
+ * Get resources data within a date range filter
+ * @param: @Object data contains index, start date, end date, filter, region etc
+ * @return: @Object
+ */
+function getResourcesData(data){
     var indexName=data.company;
     var startdate=data.strdate;
 	var enddate=data.enddate;
     var from =0;
-    if(data.currentpage){
-        from=((data.currentpage-1) * 10);
-    }
-    
     var size =10;
+    var filter={};
+    var regionfilter = {};
+
     if(data.size){
         size=data.size;
     }
-    var filter={};
+
+    if(data.currentpage){
+        from=((data.currentpage-1) * size);
+    }
+    
     if(data.filter){
-         filter={   "match_phrase_prefix" : {   "operation" : data.filter } };
+         filter = { "match_phrase_prefix" : { "operation" : data.filter } };
+    }
+
+    if(data.region!=""){
+        regionfilter = { "match" : { "availability_region" : data.region } };
     }
         
     return elasticClient.search({
@@ -232,7 +286,8 @@ function getAllData(data){
 			                        }
 			                    }
 			                },
-                            filter
+                            filter,
+                            regionfilter
                             
 			            ]
                     
@@ -245,6 +300,7 @@ function getAllData(data){
                 "pricing_plan_id",
                 "usage_type",
                 "availability_zone",
+                "availability_region",
                 "item_description",
                 "usage_start_date",
                 "usage_end_date",
@@ -258,23 +314,23 @@ function getAllData(data){
     })
 
 }
-exports.getAllData = getAllData;
+exports.getResourcesData = getResourcesData;
 
 /**
- * @Purpose: Return regions wise totla cost and resouces
- * @Param : postdata obj e.g: awsdata = {
-    		company: 'tpg',
-    		year: year,
-    		month: month
-		};
+ * Calculate resource cost aggregated on products within a date range filter
+ * @param: @Object data contains index, start date, end date, filter, region etc
+ * @return: @Object 
  */
-
-function getRegions(postdata){
+function getProductWiseData(postdata){
         var data=postdata;
 		var startdate=data.strdate;
 		var enddate=data.enddate;
-
         var indexval=data.company;
+        var regionfilter = {};
+
+        if(data.region!=""){
+            regionfilter = { "match" : { "availability_region" : data.region } };
+        }
 
 		return elasticClient.search({  
 		  index: indexval,
@@ -300,14 +356,22 @@ function getRegions(postdata){
 			                            "format": "yyyy-MM-dd"
 			                        }
 			                    }
-			                }
+			                },
+                            {
+    		                    "range": {
+			                        "blended_cost": {
+			                            "gt": 0
+			                        }
+			                    }
+			                },
+                            regionfilter
 			            ]
 			        }
 			    },
 			    "aggs":{
-		       		"availability_zone":{
+		       		"product_name":{
 			           "terms":{
-			               "field":"availability_zone",
+			               "field":"product_name",
 			               "order":{"total_blended_cost":"desc"} 
 
 			           },
@@ -324,5 +388,4 @@ function getRegions(postdata){
 			  }
 			});
 }
-
-exports.getRegions = getRegions;
+exports.getProductWiseData = getProductWiseData;

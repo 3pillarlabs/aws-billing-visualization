@@ -24,7 +24,7 @@ export class AwsdataService{
   						'code': region.key,
   						'lat' : latlonginfo.lat,
   						'lng': latlonginfo.lng,
-  						'totalcost': Math.round(region.total_blended_cost.value),
+  						'totalcost': parseFloat(region.total_blended_cost.value).toFixed(2),
   						'totalresource': region.doc_count
   					}
   					regiondata.push(regiondoc);
@@ -35,6 +35,31 @@ export class AwsdataService{
         });
 	}
 
+	getRegionsData(data:any){
+		let regionData = {};
+		var headers= new Headers();
+        headers.append('Content-Type','application/json');
+		let maxval = 0;
+        return this._http.post('/reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
+        	var data= res.json();
+        	for (let region of data.aggregations.availability_zone.buckets) {				
+  				if(region.total_blended_cost.value > 0){
+					  if(maxval < region.total_blended_cost.value){
+						  maxval = Math.ceil(region.total_blended_cost.value);
+					  }
+					  regionData[region.key] = {
+						  name: region.key,
+						  totalcost: parseFloat(region.total_blended_cost.value).toFixed(2),
+						  totalresource: region.doc_count,
+						  color: "red"
+					  }  					
+  				}
+			}
+			regionData['maxval'] = maxval;
+			console.log(regionData);
+			return regionData;
+        });
+	}
 
     getLatLongFromRegions(region:string){
 
@@ -62,5 +87,26 @@ export class AwsdataService{
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
 		return this._http.post('/reports/getalldata',JSON.stringify(awsdata),{headers:headers}).map(data=>data.json());
+	}
+
+	getUniqueProduct(data:any){
+		var productdata:any = [];
+		var headers= new Headers();
+        headers.append('Content-Type','application/json');
+        return this._http.post('/reports/getProductWiseData',JSON.stringify(data),{headers:headers}).map((res)=>{
+        	var data= res.json();
+        	for (let product of data.aggregations.product_name.buckets) {
+  				if(product.total_blended_cost.value > 0){
+  					var productdoc = {
+  						'name': product.key,
+  						'totalcost': Math.round(product.total_blended_cost.value),
+  						'totalresource': product.doc_count
+  					}
+  					productdata.push(productdoc);
+  					
+  				}
+			}
+			return productdata;
+        });
 	}
 }
