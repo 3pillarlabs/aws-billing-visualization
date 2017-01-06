@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit} from "@angular/core";
+import {Component, Input, Output, EventEmitter, OnChanges} from "@angular/core";
 import {NgModel, ControlValueAccessor} from "@angular/forms";
 //import {NgIf, NgFor, NgClass} from "@angular/common";
 
@@ -18,7 +18,7 @@ import {NgModel, ControlValueAccessor} from "@angular/forms";
 
 `
 })
-export class PaginationDirective implements ControlValueAccessor, OnInit{
+export class PaginationDirective implements ControlValueAccessor, OnChanges{
   @Input("previous-text") previousText:string;
   @Input("next-text") nextText:string;
   @Input("first-text") firstText:string;
@@ -42,7 +42,7 @@ export class PaginationDirective implements ControlValueAccessor, OnInit{
     this.pageChangedNgModel.valueAccessor = this;
    
   }
-  ngOnInit() {
+  ngOnChanges() {
     this.doPaging();
   }
   doPaging() {
@@ -50,7 +50,14 @@ export class PaginationDirective implements ControlValueAccessor, OnInit{
      var i:number,count:number;
      this.seletedPage = this.currentpage;
      var remaining = this.totalItems % this.pageSize;
+
+
+     console.log(this.totalItems);
+     console.log(this.pageSize);
+     console.log(remaining);
+
     var totalSize =((this.totalItems-remaining) / this.pageSize)+(remaining ===0 ? 0 : 1);
+    console.log(totalSize);
     for (i = (this.currentpage), count=0; i<= totalSize && count<this.pageSize; i++, count++) {
       this.pageList.push(i);
     }

@@ -12,10 +12,23 @@ import { AwsdataService } from "./services/awsdata.service";
 import { LoaderComponent } from './components/loader/loader.component';
 import { PaginationDirective } from './directives/pagination.directive';
 
+import { D3mapComponent } from './components/d3map/d3map.component';
+import { ChartComponent } from "./components/chart/chart.component";
+import { ConfigService } from "./services/config.service";
+
 @NgModule({
   imports:      [ BrowserModule,HttpModule,FormsModule,DataTableModule ],
-  declarations: [ AppComponent,HeatmapComponent,DatatableComponent,DataFilterPipe,LoaderComponent,PaginationDirective ],
-  providers: [ AwsdataService ],
+  declarations: [ 
+    AppComponent,
+    HeatmapComponent,
+    DatatableComponent,
+    DataFilterPipe,
+    LoaderComponent,
+    PaginationDirective,
+    D3mapComponent,
+    ChartComponent
+     ],
+  providers: [ AwsdataService, ConfigService ],
   bootstrap:    [ AppComponent ]
 })
 

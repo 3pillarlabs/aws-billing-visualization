@@ -3,12 +3,13 @@ var csv = require('fast-csv');
 var unzip = require('unzip');
 var elastic = require('../model/elasticsearch');
 
+var config = elastic.getConfig();
 
 
 //update AWS instance with config
 AWS.config.update({
-  accessKeyId: 'AKIAJLX65J62ZYSKJDFA',
-  secretAccessKey: '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'
+  accessKeyId: config.aws.accesskeyid,
+  secretAccessKey: config.aws.secretaccesskey
 });
 
 //create S3 object
@@ -18,22 +19,22 @@ var s3 = new AWS.S3();
 var today = new Date();
 today.setDate(today.getDate()-1);
 var currentYear = today.getFullYear();
-var currentMonth = today.getMonth()+1;
+var currentMonth = ("0"+today.getMonth()+1).slice(-2);
 
 
 //elastic index config
-var accountId = 356967975209;
-var indexName = "atg";
+var accountId = config.aws.accountid;
+var indexName = config.aws.company;
 var typeName = `${currentYear}-${currentMonth}`;
-var year = 2016;
-var month = 12;
+var year = currentYear;
+var month = currentMonth;
 var bucketName = 'report-aws-billing';
 var bucketKeyName = accountId+'-aws-billing-detailed-line-items-with-resources-and-tags-'+year+'-'+month+'.csv.zip';
 
 console.log(currentYear+" == "+currentMonth+" == "+today);
 console.log(indexName+" == "+typeName+" == "+bucketKeyName);
 
-elastic.indexExists(indexName).then(function (exists) {
+elastic.isIndexExists(indexName).then(function (exists) {
   console.log(`index exist : ${exists}`);
   if (!exists) {
       console.log("idex creation initiated");
@@ -50,7 +51,7 @@ elastic.indexExists(indexName).then(function (exists) {
         console.log("in getmapping method");
         if(Object.keys(getMappingResult).length===0){
             console.log("mapping initiated");
-            return elastic.initMapping(indexName, typeName);
+            return elastic.setMapping(indexName, typeName);
         }
         else{
             console.log("mapping already exist");
@@ -96,11 +97,6 @@ elastic.indexExists(indexName).then(function (exists) {
             }
 
         });
-
-
-
-
-
 
     })
 })

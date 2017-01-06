@@ -1,19 +1,21 @@
-import { Component,OnInit,EventEmitter }  from '@angular/core';
+import { Component,EventEmitter,OnChanges }  from '@angular/core';
 import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
+import { ConfigService } from './../../services/config.service';
 
 @Component({
 	moduleId: module.id,
 	selector : 'aws-billing-datatable',
 	templateUrl: 'datatable.component.html',
 	styleUrls: ['datatable.component.css'],
-    inputs: ['startdate','enddate'],
+    inputs: ['startdate','enddate','selectedRegion'],
     outputs:['isloading']
 })
-export class DatatableComponent implements OnInit{
+export class DatatableComponent implements OnChanges{
     startdate:any;
 	enddate:any;
-    company:string = 'tpg';
+    company:string;
+    selectedRegion: string;
 
     isloading=new EventEmitter();
     
@@ -30,16 +32,19 @@ export class DatatableComponent implements OnInit{
 
     
 
-    constructor(private http: Http,private _awsdata:AwsdataService) { }
+    constructor(private http: Http,private _awsdata:AwsdataService,private _config:ConfigService) {
+        this.company=this._config.company;
+    }
 
-    ngOnInit(): void {
+    ngOnChanges(): void {
         let awsdata={
             company: this.company,
             strdate: this.startdate,
             enddate: this.enddate,
             currentpage: this.currentPage,
             size:   this.rowsOnPage,
-            filter: this.filter
+            filter: this.filter,
+            region: this.selectedRegion
         };
         this.getAllAwsResourcedata(awsdata);
     }
@@ -72,7 +77,8 @@ export class DatatableComponent implements OnInit{
             enddate: this.enddate,
             currentpage: this.currentPage,
             size:   this.rowsOnPage,
-            filter: this.filter
+            filter: this.filter,
+            region: this.selectedRegion
         };
         this.isloading.emit(true);
         this.getAllAwsResourcedata(awsdata);
@@ -93,11 +99,12 @@ export class DatatableComponent implements OnInit{
             enddate: this.enddate,
             currentpage: this.currentPage,
             size:   this.rowsOnPage,
-            filter: this.filter
+            filter: this.filter,
+            region: this.selectedRegion
         };
         this.isloading.emit(true);
         this.currentPage= event.itemsPerPage;
-         this.getAllAwsResourcedata(awsdata);
+        this.getAllAwsResourcedata(awsdata);
     };
 
 }
