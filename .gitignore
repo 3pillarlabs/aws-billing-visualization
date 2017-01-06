@@ -9,3 +9,7 @@ node_modules
 # other directory
 .vagrant
 .vscode
+
+#exclude .js and .map files in app folder
+public/app/**/*.js
+public/app/**/*.map
