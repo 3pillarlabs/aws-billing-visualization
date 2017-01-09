@@ -109,6 +109,8 @@ export class ChartComponent implements OnChanges{
     this.svg = this.host.append('svg')
                 .attr('width', this.width)
                 .attr('height', this.height)
+                .style('display','block')
+                .style('margin','auto')
                 .append('g').attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
 
 
