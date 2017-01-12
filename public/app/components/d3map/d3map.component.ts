@@ -19,7 +19,7 @@ export class D3mapComponent implements OnInit, OnChanges{
     private margin = {top: 20, right: 50, bottom: 30, left: 50};
     private width: number;
     private height: number;
-    private rotate: number = 60;
+    private rotate: number = 0;//60;
     private maxlat: number = 83;
     private svg: any;
     private path: any;
@@ -41,17 +41,12 @@ export class D3mapComponent implements OnInit, OnChanges{
     }
 
     ngOnInit(): void{
-        console.log("initialised");
-        //this.getRegionsData();
         this.initSvg();
         this.getPath();
-        this.getTooltip();  
-        //this.drawMap();      
+        this.getTooltip();     
     }
 
     ngOnChanges(): void {
-        console.log("on changes");
-        console.log("=== "+this.startdate+" = "+this.enddate);
         this.getRegionsData();
     }
 
@@ -61,11 +56,7 @@ export class D3mapComponent implements OnInit, OnChanges{
     		strdate: this.startdate,
     		enddate: this.enddate
 		};
-        console.log("config data === ");
-        console.log(JSON.stringify(awsdata));
         this._awsService.getRegionsData(awsdata).subscribe((regionsData)=>{
-            console.log("region data");
-            console.log(regionsData);
             this.drawMap(regionsData);
             
         })
@@ -83,7 +74,6 @@ export class D3mapComponent implements OnInit, OnChanges{
                 .attr("width", this.width)
                 .attr("height", this.height);
         }
-        console.log(this.parentNativeElement);
     }
 
     getPath(): void{
@@ -150,7 +140,6 @@ export class D3mapComponent implements OnInit, OnChanges{
                      })
                      .attr("stroke", "#fff")
                      .on( "click", (d) => {
-                         //alert(d.id);
                          this.isloading.emit(true);
                          this.selectRegion.emit(d.id);
                      })
@@ -170,13 +159,12 @@ export class D3mapComponent implements OnInit, OnChanges{
                      })
                      .on("mousemove", (d) => {
                          return this.tooltipGroup
-                                    .style("top", (d3.event.pageY-200)+"px")
+                                    .style("top", (d3.event.pageY-80)+"px")
                                     .style("left",(d3.event.pageX-100)+"px");
                      })
                      .on("mouseout", (d) => {
                          return this.tooltipGroup.style("visibility", "hidden");
                      })                         
-            console.log("map created/update wwww");
         })
     }
     

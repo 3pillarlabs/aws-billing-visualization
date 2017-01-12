@@ -58,13 +58,11 @@ export class HeatmapComponent implements OnInit,OnChanges{
 
     drawHeatmapAndMarker(awsdata:any){
 		this._awsregions.getAwsRegions(awsdata).subscribe((data)=>{
-			console.log(data);
 			
 			if(data.length > 0){
 				var maxintensity = data[0].totalcost; // Set Max intensity on the basis of region total cost
 				
 				for(let region of data){
-					//console.log(region);
 					if(region.totalcost > 0){
 						var heatmaplatlong = {location:new google.maps.LatLng(region.lat, region.lng),weight: region.totalcost};
 						this.heatmapdata.push(heatmaplatlong);
@@ -76,7 +74,6 @@ export class HeatmapComponent implements OnInit,OnChanges{
 				this.addHeatmap(maxintensity);
 				
 			}else{
-				console.log('else');
 				this.removeHeatmap();
 				this.removeMarker();
 				
