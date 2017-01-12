@@ -56,7 +56,6 @@ export class AwsdataService{
   				}
 			}
 			regionData['maxval'] = maxval;
-			console.log(regionData);
 			return regionData;
         });
 	}

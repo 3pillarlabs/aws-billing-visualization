@@ -51,13 +51,8 @@ export class PaginationDirective implements ControlValueAccessor, OnChanges{
      this.seletedPage = this.currentpage;
      var remaining = this.totalItems % this.pageSize;
 
-
-     console.log(this.totalItems);
-     console.log(this.pageSize);
-     console.log(remaining);
-
     var totalSize =((this.totalItems-remaining) / this.pageSize)+(remaining ===0 ? 0 : 1);
-    console.log(totalSize);
+
     for (i = (this.currentpage), count=0; i<= totalSize && count<this.pageSize; i++, count++) {
       this.pageList.push(i);
     }
@@ -77,7 +72,6 @@ export class PaginationDirective implements ControlValueAccessor, OnChanges{
     }
   }
   setCurrentPage(pageNo:number) {
-    console.log(pageNo);
     this.seletedPage = pageNo;
     this.currentpage = pageNo;
     this.pageChangedNgModel.viewToModelUpdate(pageNo);

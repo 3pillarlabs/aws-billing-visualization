@@ -44,7 +44,6 @@ router.post('/getalldata', function(req, res, next){
 router.post('/getProductWiseData',function(req,res,next){
 	var data=req.body;
     elastic.getProductWiseData(data).then(function(result){
-        console.log(result);
         res.json(result);
     },function(error){
         res.send(400);
