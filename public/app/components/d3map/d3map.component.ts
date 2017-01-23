@@ -40,7 +40,7 @@ export class D3mapComponent implements OnInit, OnChanges {
         private _config: ConfigService) {
         this.company = this._config.company;
         this.parentNativeElement = element.nativeElement;
-        this.width = 700 - this.margin.left - this.margin.right;
+        this.width = 650 - this.margin.left - this.margin.right;
         this.height = 400 - this.margin.top - this.margin.bottom;
     }
 
@@ -204,11 +204,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                         .style("opacity", .9);
                     this.tooltipGroup.html(tooltext)
                         .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
+                        .style("top", (d3.event.pageY - 150) + "px");
                 })
                 .on("mousemove", (d) => {
                     this.tooltipGroup
-                        .style("top", (d3.event.pageY - 80) + "px")
+                        .style("top", (d3.event.pageY - 150) + "px")
                         .style("left", (d3.event.pageX - 100) + "px");
                 })
                 .on("mouseout", (d) => {

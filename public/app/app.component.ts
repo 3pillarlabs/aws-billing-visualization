@@ -26,15 +26,14 @@ export class AppComponent {
 		this.isloading = false;
 	}
 
-
-	startdatechange(stdate: any) {
-		this.isloading = true;
-		this.startdate = stdate;
-	}
-
-	enddatechange(endate: any) {
-		this.isloading = true;
-		this.enddate = endate;
+	searchAwsData(startDate: any, endDate: any) {
+		if (startDate && endDate) {
+			this.startdate = startDate;
+			this.enddate = endDate;
+			this.isloading = true;
+		}else{
+			//alert()
+		}
 	}
 
 	onSelectRegion(region: string): void {
