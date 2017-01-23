@@ -110,7 +110,7 @@ export class ChartComponent implements OnChanges {
    * Basically we get the dom element size and build the container 
    **/
   private setup(): void {
-    this.width = 550;
+    this.width = 600;
     this.height = 300;
     this.radius = Math.min(this.width, this.height) / 2;
     this.color = D3.scaleOrdinal(D3.schemeCategory20);
@@ -118,32 +118,6 @@ export class ChartComponent implements OnChanges {
     this.labelArc = D3.arc().outerRadius(this.radius - 40).innerRadius(this.radius - 40);
     this.pie = D3.pie().value(function (d) { return d.totalcost; }).sort(null);
 
-  }
-
-  wrap(text, width) {
-    //console.log(text, 'text');
-    text.each(function () {
-      var text = D3.select(this),
-        words = text.text().split(/\s+/).reverse(),
-        word,
-        line = [],
-        lineNumber = 0,
-        lineHeight = 1.1, // ems
-        x = text.attr("x"),
-        y = text.attr("y"),
-        dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
-      while (word = words.pop()) {
-        line.push(word);
-        tspan.text(line.join(" "));
-        if (tspan.node().getComputedTextLength() > width) {
-          line.pop();
-          tspan.text(line.join(" "));
-          line = [word];
-          tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-        }
-      }
-    });
   }
 
   /**
@@ -159,11 +133,11 @@ export class ChartComponent implements OnChanges {
 
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height);
-      let groupArc = this.svg.append('g').attr("transform", "translate(" + ((this.width / 2) - 35) + "," + this.height / 2 + ")");
+        .attr('height', this.height+140)
+        .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
 
 
-      this.g = groupArc.selectAll("g")
+      this.g = this.svg.selectAll("g")
         .data(this.pie(this.dataset))
         .enter()
         .append("g")
@@ -172,19 +146,19 @@ export class ChartComponent implements OnChanges {
       this.g.append("path")
         .attr("d", this.arc)
         .attr('fill', (d) => { return this.color(d.data.totalcost); });
-      /*.on("mouseover", (d, i) => {
-          groupArc.append("text")
+        /*.on("mouseover", (d, i) => {
+          this.svg.append("text")
             .attr("dy", ".5em")
             .style("text-anchor", "middle")
             .style("font-size", 15)
-            .attr("class","label")
-            .style("fill", function(d,i){return "black";})
+            .attr("class", "label")
+            .style("fill", function (d, i) { return "black"; })
             .text(d.data.name);
-          
-      })
-      .on("mouseout", (d) => {
-        groupArc.select(".label").remove();
-      })*/
+
+        })
+        .on("mouseout", (d) => {
+          this.svg.select(".label").remove();
+        })*/
 
 
       var legend = this.svg.selectAll('.legend')
@@ -196,8 +170,8 @@ export class ChartComponent implements OnChanges {
 
           var height = this.legendRectSize + this.legendSpacing;
           var offset = height * this.color.domain().length / 2;
-          var horz = (9 * this.legendRectSize) + 240;
-          var vert = (i * height - (offset + 20)) + 150;
+          var horz = 9 * this.legendRectSize;
+          var vert = i * height - (offset + 20);
           return 'translate(' + horz + ',' + vert + ')';
         });
 
@@ -209,11 +183,9 @@ export class ChartComponent implements OnChanges {
 
       legend.append('text')
         .attr('x', this.legendRectSize + this.legendSpacing)
-        .attr('y', this.legendSpacing)
-        .attr("dy", ".35em")
+        .attr('y', this.legendRectSize - this.legendSpacing)
         .style('font-size', '11px')
-        .text((d, i) => { return this.dataset[i].name; })
-        .call(this.wrap, 150);
+        .text((d, i) => { return this.dataset[i].name; });
 
 
       this.g.append("text")
@@ -232,15 +204,6 @@ export class ChartComponent implements OnChanges {
         .append("text")
         .attr("dy", ".35em")
         .text(this.msg);
-
     }
-
-
-
-
   }
-
-
-
-
 }
