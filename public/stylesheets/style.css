@@ -1,3 +1,28 @@
+.navbar-brand {
+    padding: 0px;
+		margin: 0px;
+}
+
+.navbar-brand > img {
+  height: 100%;
+  width: auto;
+  padding: 6px 0px 6px 15px;
+	margin-top: 6px;
+}
+
+.navbar-text{
+	margin-top: 19px;
+}
+
+.navbar-text strong{
+  color: #000;
+  font-size: 18px;
+}
+
+.aws-app-container{
+  padding-top: 80px;
+}
+
 div.tooltipcss {   
  	position: absolute;           
 	text-align: center;           
@@ -14,4 +39,8 @@ div.tooltipcss {
 .resource-region:hover{
   fill: orange;
   fill-opacity: .7;
+}
+
+.right-extra-pad{
+	padding-right: 8px;
 }
