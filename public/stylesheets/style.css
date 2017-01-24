@@ -41,6 +41,14 @@ div.tooltipcss {
   fill-opacity: .7;
 }
 
+.well{
+	margin: 0 15px 15px 15px;
+}
+
 .right-extra-pad{
 	padding-right: 8px;
+}
+
+.input-group-addon{
+	cursor: pointer;
 }
