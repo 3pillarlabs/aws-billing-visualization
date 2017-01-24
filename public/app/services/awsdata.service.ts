@@ -54,86 +54,8 @@ export class AwsdataService{
 						  color: "red"
 					  }  					
   				}
-			}
-			regionData['us-east-2'] = {
-				name: 'us-east-2',
-				totalcost: 200,
-				totalresource: 200,
-				color: "red"
-			}
-			regionData['us-west-2'] = {
-				name: 'us-west-2',
-				totalcost: 400,
-				totalresource: 300,
-				color: "red"
-			}
-			regionData['us-west-1'] = {
-				name: 'us-west-1',
-				totalcost: 600,
-				totalresource: 400,
-				color: "red"
-			}
-			regionData['ca-central-1'] = {
-				name: 'ca-central-1',
-				totalcost: 800,
-				totalresource: 500,
-				color: "red"
-			} 
-			regionData['sa-east-1'] = {
-				name: 'sa-east-1',
-				totalcost: 1000,
-				totalresource: 600,
-				color: "red"
-			}
-			regionData['eu-west-1'] = {
-				name: 'eu-west-1',
-				totalcost: 1200,
-				totalresource: 700,
-				color: "red"
-			}
-			regionData['eu-west-2'] = {
-				name: 'eu-west-2',
-				totalcost: 1400,
-				totalresource: 800,
-				color: "red"
-			}
-			regionData['eu-central-1'] = {
-				name: 'eu-central-1',
-				totalcost: 1600,
-				totalresource: 900,
-				color: "red"
-			}
-			regionData['ap-northeast-1'] = {
-				name: 'ap-northeast-1',
-				totalcost: 1800,
-				totalresource: 1000,
-				color: "red"
-			}
-			regionData['ap-northeast-2'] = {
-				name: 'ap-northeast-2',
-				totalcost: 2000,
-				totalresource: 1100,
-				color: "red"
-			}
-			regionData['ap-southeast-1'] = {
-				name: 'ap-southeast-1',
-				totalcost: 2200,
-				totalresource: 1200,
-				color: "red"
-			}
-			regionData['ap-southeast-2'] = {
-				name: 'ap-southeast-2',
-				totalcost: 2400,
-				totalresource: 1400,
-				color: "red"
-			}
-			regionData['ap-south-1'] = {
-				name: 'ap-south-1',
-				totalcost: 2600,
-				totalresource: 1600,
-				color: "red"
-			}
-			regionData['maxval'] = 3000;//maxval;
+			}			
+			regionData['maxval'] = maxval;
 			return regionData;
         });
 	}
