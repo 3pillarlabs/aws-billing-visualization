@@ -1,87 +1,52 @@
-<div class="container-fluid">
-    <div class="col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-        <div class="row">
-            <h2 class="col-xs-6"></h2>
-            <div class="col-xs-2">
-                <label class="label-control">Rows on page</label>
-                <select class="form-control input-sm" [(ngModel)]="rowsOnPage">
-                    <option [ngValue]="5">5</option>
-                    <option [ngValue]="10">10</option>
-                    <option [ngValue]="15">15</option>
-                </select>
-            </div>
-            <div class="col-xs-4">
-                <div class="row">
-                    <label class="col-xs-12 label-control">Sort by</label>
-                </div>
-                <div class="col-xs-6">
-                    <div class="row">
-                        <select class="form-control input-sm" [(ngModel)]="sortBy">
-                            <option ngValue="name">Name</option>
-                            <option ngValue="email">Email</option>
-                            <option ngValue="age">Age</option>
-                            <option [ngValue]="sortByWordLength">City</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-xs-6">
-                    <div class="row">
-                        <select class="form-control input-sm" [(ngModel)]="sortOrder">
-                            <option ngValue="asc">Ascending</option>
-                            <option ngValue="desc">Descending</option>
-                            <option ngValue="badValue">Bad value</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">User information</div>
-
-            <table class="table table-striped" [mfData]="data | dataFilter : filterQuery" #mf="mfDataTable"
-                   [mfRowsOnPage]="rowsOnPage" [(mfSortBy)]="sortBy" [(mfSortOrder)]="sortOrder">
-                <thead>
+        <div class="panel panel-default table-responsive">
+            <table class="table table-striped table-bordered" [mfData]="data" #mf="mfDataTable">
+            <thead class="thead-default">
                 <tr>
-                    <th style="width: 10%"></th>
-                    <th style="width: 20%">
-                        <mfDefaultSorter by="name">Name</mfDefaultSorter>
-                    </th>
-                    <th style="width: 40%">
-                        <mfDefaultSorter by="email">Email</mfDefaultSorter>
-                    </th>
-                    <th style="width: 10%">
-                        <mfDefaultSorter by="age">Age</mfDefaultSorter>
-                    </th>
-                    <th style="width: 20%">
-                        <mfDefaultSorter [by]="sortByWordLength">City</mfDefaultSorter>
+                    <th colspan="10">
+                        Filter by Operation:
+                        <input class="form-control" (keyup)="filterbyOperation($event.target.value)"/>
                     </th>
                 </tr>
                 <tr>
-                    <th colspan="5">
-                        Filter by name:
-                        <input class="form-control" [(ngModel)]="filterQuery"/>
-                    </th>
+                    <th>Record Id</th>
+                    <th>Resource Id</th>
+                    <th>Product Name</th>
+                    <th>Operation</th>
+                    <th>Item Description</th>
+                    <th>Region</th>
+                    <th>Usage Quantity</th>
+                    <th>Blended Cost</th>
+                    <th>Usage Start Date</th>
+                    <th>Usage End Date</th> 
                 </tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                 <tr *ngFor="let item of mf.data">
-                    <td>
-                        <button (click)="remove(item)" class="btn btn-danger">x</button>
+                    <td>{{item.record_id}}</td>
+                    <td>{{item.resource_id}}</td>
+                    <td>{{item.product_name}}</td>
+                    <td>{{item.operation}}</td>
+                    <td>{{item.item_description}}</td>
+                    <td>{{item.availability_region}}</td>
+                    <td>{{item.usage_quantity}}</td>
+                    <td>{{item.blended_cost}}</td>
+                    <td>{{item.usage_start_date}}</td>
+                    <td>{{item.usage_end_date}}</td>
+                </tr>    
+                <tr *ngIf="data.length == 0">
+                    <td colspan="10" [ngStyle]="{'text-align':'center'}">
+                        <h3>No Date For Selected Date Range</h3>
                     </td>
-                    <td>{{item.name}}</td>
-                    <td>{{item.email}}</td>
-                    <td class="text-right">{{item.age}}</td>
-                    <td>{{item.city | uppercase}}</td>
-                </tr>
-                </tbody>
-                <tfoot>
+                </tr>            
+            </tbody>
+            <tfoot>
                 <tr>
-                    <td colspan="5">
-                        <mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>
+                    <td colspan="10">
+                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true" (pageChanged)="pageChanged($event)"
+    previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First" last-text="Last"></ng-pagination>
+                        <!--<mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>-->
                     </td>
                 </tr>
-                </tfoot>
+            </tfoot>
             </table>
         </div>
-    </div>
-</div>

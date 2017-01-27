@@ -1,57 +1,43 @@
-import { Component,OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { ConfigService } from './services/config.service';
 
 @Component({
   moduleId: module.id,
   selector: 'my-app',
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
+  inputs:['isloading']
 })
 
-export class AppComponent implements OnInit { 
-  mm : number;
-	years: number[] =[];
-	yy : number;
+export class AppComponent{ 
+	startdate:any;
+	enddate:any;
+	isloading:boolean;
+	selectedRegion: string = "";	
+	company:string;
+
+	constructor(private _config:ConfigService){
+		this.company = this._config.company;
+		let today = new Date();
+		let year = today.getFullYear();
+		let month = ("0"+today.getMonth()+1).slice(-2);
+		let day = new Date(year, +month, 0).getDate();
+		this.startdate = year+'-'+month+'-01';
+		this.enddate = year+'-'+month+'-'+day;
+		this.isloading = false;
+	}
 	
-	months = [
-	        { val: 1,  name: 'Jan' },
-	        { val: 2,  name: 'Feb' },
-	        { val: 3,  name: 'Mar' },
-	        { val: 4,  name: 'Apr' },
-	        { val: 5,  name: 'May' },
-	        { val: 6,  name: 'Jun' },
-	        { val: 7,  name: 'Jul' },
-	        { val: 8,  name: 'Aug' },
-	        { val: 9,  name: 'Sep' },
-	        { val: 10,  name: 'Oct' },
-	        { val: 11,  name: 'Nov' },
-	        { val: 12,  name: 'Dec' }
-	    ];
 
-    ngOnInit() {  
-    	this.getMonth(); 
-    	this.getYear();
-    	
-    } 
+	startdatechange(stdate:any){
+		this.isloading=true;
+		this.startdate=stdate;
+	}
 
-    getMonth(){
-    	var today = new Date();
-	    this.mm = today.getMonth()+1; 
-	   
-	  }
+	enddatechange(endate:any){
+		this.isloading=true;
+		this.enddate=endate;
+	}
 
-    getYear(){
-        var today = new Date();
-        this.yy = today.getFullYear();        
-        for(var i = (this.yy-100); i <= this.yy; i++){
-        this.years.push(i);}
+	onSelectRegion(region: string): void {
+        this.selectedRegion = region;
     }
-
-    yearChange(year:any){
-    	this.yy = year;
-    	
-    }
-
-    monthChange(month:any){
-    	this.mm = month;
-    } 
-
 }
