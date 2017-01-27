@@ -1,52 +1,53 @@
-        <div class="panel panel-default table-responsive">
-            <table class="table table-striped table-bordered" [mfData]="data" #mf="mfDataTable">
-            <thead class="thead-default">
-                <tr>
-                    <th colspan="10">
-                        Filter by Operation:
-                        <input class="form-control" (keyup)="filterbyOperation($event.target.value)"/>
-                    </th>
-                </tr>
-                <tr>
-                    <th>Record Id</th>
-                    <th>Resource Id</th>
-                    <th>Product Name</th>
-                    <th>Operation</th>
-                    <th>Item Description</th>
-                    <th>Region</th>
-                    <th>Usage Quantity</th>
-                    <th>Blended Cost</th>
-                    <th>Usage Start Date</th>
-                    <th>Usage End Date</th> 
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of mf.data">
-                    <td>{{item.record_id}}</td>
-                    <td>{{item.resource_id}}</td>
-                    <td>{{item.product_name}}</td>
-                    <td>{{item.operation}}</td>
-                    <td>{{item.item_description}}</td>
-                    <td>{{item.availability_region}}</td>
-                    <td>{{item.usage_quantity}}</td>
-                    <td>{{item.blended_cost}}</td>
-                    <td>{{item.usage_start_date}}</td>
-                    <td>{{item.usage_end_date}}</td>
-                </tr>    
-                <tr *ngIf="data.length == 0">
-                    <td colspan="10" [ngStyle]="{'text-align':'center'}">
-                        <h3>No Date For Selected Date Range</h3>
-                    </td>
-                </tr>            
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="10">
-                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true" (pageChanged)="pageChanged($event)"
-    previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First" last-text="Last"></ng-pagination>
-                        <!--<mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>-->
-                    </td>
-                </tr>
-            </tfoot>
-            </table>
-        </div>
+<div class="panel panel-default table-responsive">
+    <table class="table table-striped table-bordered" [mfData]="data" #mf="mfDataTable">
+        <thead class="thead-default">
+            <tr>
+                <th colspan="10">
+                    Filter by Operation:
+                    <input class="form-control" (keyup)="filterbyOperation($event.target.value)" />
+                </th>
+            </tr>
+            <tr>
+                <th>Record Id</th>
+                <th>Resource Id</th>
+                <th>Product Name</th>
+                <th>Operation</th>
+                <th>Item Description</th>
+                <th>Region</th>
+                <th>Usage Quantity</th>
+                <th>Blended Cost</th>
+                <th>Usage Start Date</th>
+                <th>Usage End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of mf.data">
+                <td>{{item.record_id}}</td>
+                <td>{{item.resource_id}}</td>
+                <td>{{item.product_name}}</td>
+                <td>{{item.operation}}</td>
+                <td>{{item.item_description}}</td>
+                <td>{{item.availability_region}}</td>
+                <td>{{item.usage_quantity| number:'1.0-2'}}</td>
+                <td>{{item.blended_cost | currency:'USD':true:'1.0-2'}}</td>
+                <td>{{item.usage_start_date | date:'short'}}</td>
+                <td>{{item.usage_end_date | date:'short'}}</td>
+            </tr>
+            <tr *ngIf="data.length == 0">
+                <td colspan="10" [ngStyle]="{'text-align':'center'}">
+                    <h3>No Date For Selected Date Range</h3>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="10">
+                    <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
+                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
+                        last-text="Last"></ng-pagination>
+                    <!--<mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>-->
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

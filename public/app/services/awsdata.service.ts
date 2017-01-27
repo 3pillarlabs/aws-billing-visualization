@@ -54,7 +54,7 @@ export class AwsdataService{
 						  color: "red"
 					  }  					
   				}
-			}
+			}			
 			regionData['maxval'] = maxval;
 			return regionData;
         });
