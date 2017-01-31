@@ -108,4 +108,8 @@ export class AwsdataService{
 			return productdata;
         });
 	}
+
+	getMinMaxDateRange(index:string){
+		return this._http.get('/reports/getMinMaxDate/'+index).map((res)=>res.json());
+	}
 }
