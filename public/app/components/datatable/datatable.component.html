@@ -10,7 +10,7 @@
             <form class="form-inline">
                 <div class="form-group detailed-report-filter">
                     <label class="right-extra-pad" for="email">Search :</label>
-                    <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or operation or cost"/>
+                    <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or Availability Zone or Operation or Usage Type "/>
                 </div>
             </form>
         </div>
@@ -32,15 +32,16 @@
         <tbody>
             <tr *ngFor="let item of data">
 
-                <td>{{item.product_name}}</td>
-                <td>{{item.operation}}</td>
-                <td>{{item.item_description}}</td>
-                <td>{{item.resource_id}}</td>
-                <td>{{item.availability_region}}</td>
-                <td>{{item.usage_quantity| number:'1.0-2'}}</td>
-                <td>{{item.blended_cost | currency:'USD':true:'1.0-2'}}</td>
+                <td>{{item.ProductName}}</td>
+                <td>{{item.AvailabilityZone}}</td>
+                <td>{{item.Operation}}</td>
+                <td>{{item.ItemDescription}}</td>
+                <td>{{item.UsageType}}</td>
+                <td>{{item.UsageQuantity | number:'1.0-2'}}</td>
+                <td>{{item.BlendedRate  | currency:'USD':true:'1.0-2'}}</td>
+                <td>{{item.BlendedCost  | currency:'USD':true:'1.0-2'}}</td>
                 <!--<td>{{item.usage_start_date | date:'short'}}</td>-->
-                <td>{{item.usage_start_date | date:'short'}} - {{item.usage_end_date | date:'shortTime'}}</td>
+                <td>{{item.UsageStartDate | date:'short'}} - {{item.UsageEndDate | date:'shortTime'}}</td>
             </tr>
             <tr *ngIf="data.length == 0">
                 <td colspan="10" [ngStyle]="{'text-align':'center'}">
