@@ -12,6 +12,9 @@
   <!-- Bootstrap core CSS -->
   <link href="scripts/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Fontawesome -->
+  <link href="scripts/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
   <!-- Bootstrap-datepicker core CSS -->
   <link href="scripts/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
@@ -48,65 +51,10 @@
 
 <body>
 
-  <!-- Fixed navbar -->
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
-          aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        <a class="navbar-brand" href="http://www.3pillarglobal.com/" target="_blank">
-          <img class="img-responsive" src="images/3pg.logo.png">
-        </a>
-        <span class="navbar-text"><strong>AWS Billing Visualization</strong></span>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <!--<ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li>
-          </ul>-->
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <button type="button" id="startdemohelp" class="btn btn-default navbar-text">
-                <span class="glyphicon glyphicon-question-sign"></span>
-                  Help 
-            </button>
-          </li>
-        </ul>
-      </div>
-      <!--/.nav-collapse -->
-    </div>
-  </nav>
 
-  <!-- Begin page content -->
-  <div class="container-fluid aws-app-container">
-    <!-- 3. Display the application -->
-    <my-app>Loading...</my-app>
-  </div>
 
-  <footer class="footer">
-    <div class="container-fluid">
-      <p class="text-muted">© 2017 - ATG Portal | 3Pillar Advanced Technology Group</p>
-    </div>
-  </footer>
 
+  <my-app>Loading...</my-app>
 
   <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -117,50 +65,7 @@
   <script src="javascripts/ie10-viewport-bug-workaround.js"></script>
   <script src="scripts/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
   <script src="scripts/bootstrap-tour/build/js/bootstrap-tour.min.js"></script>
-  <script>
 
-    $('#startdemohelp').click(function () {
-      var tour = new Tour({
-        steps: [
-          {
-            element: "#datefilter",
-            title: "Date Filters",
-            placement: "bottom",
-            content: "Select a date range to filter the data and simply hit \"Go\"."
-          },
-          {
-            element: "#d3map",
-            title: "Regional usage distribution",
-            placement: "right",
-            content: "In the selected date range, show the usage in each geographical region. A region in green represent low usage whereas red is the region with high usage of resoruces."
-          },
-          {
-            element: "#d3piechart",
-            title: "Usage by product categories",
-            placement: "left",
-            content: "In selected date range and for selected region (if clicked from geographical map), represents usage distribution among various products."
-          },
-          {
-            element: "#datatable",
-            title: "Detailed Report",
-            placement: "top",
-            content: "Detailed report of usage using date range and selected region (if selected from geographical map). You can also filter by operation to see more specific records only."
-          }
-
-        ],
-        backdrop: true,
-        autoscroll: true,
-        storage: false
-      });
-
-
-      // Initialize the tour
-      tour.init();
-      tour.start(true);
-
-    })
-
-  </script>
 </body>
 
 </html>

@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { ConfigService } from './services/config.service';
+import { AwsdataService } from './services/awsdata.service';
+declare var $:any;
+
 
 @Component({
 	moduleId: module.id,
@@ -8,14 +11,17 @@ import { ConfigService } from './services/config.service';
 	inputs: ['isloading']
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit{
 	startdate: any;
 	enddate: any;
 	isloading: boolean;
 	selectedRegion: string = "";
 	company: string;
 
-	constructor(private _config: ConfigService) {
+	public calstartDate:string;
+	public calendDate:string;
+
+	constructor(private _config: ConfigService,private _awsdata:AwsdataService) {
 		this.company = this._config.company;
 		let today = new Date();
 		let year = today.getFullYear();
@@ -24,13 +30,32 @@ export class AppComponent {
 		this.startdate = year + '-' + month + '-01';
 		this.enddate = year + '-' + month + '-' + day;
 		this.isloading = false;
+
+
+	}
+
+	ngOnInit(){
+		this._awsdata.getMinMaxDateRange(this.company).subscribe((data)=>{
+            if(data){
+                this.calstartDate=data.aggregations.min_date.value_as_string;
+                this.calendDate=data.aggregations.max_date.value_as_string;
+
+				$('.datepicker').datepicker({
+					format: 'yyyy-mm-dd',
+					autoclose:true,
+					startDate:this.calstartDate,
+					endDate:this.calendDate
+				});
+            }
+        })
+
+		
 	}
 
 	searchAwsData(startDate: any, endDate: any) {
 		if (startDate && endDate) {
 			this.startdate = startDate;
 			this.enddate = endDate;
-			this.isloading = true;
 		}else{
 			//alert()
 		}

@@ -1,5 +1,5 @@
 var elasticsearch = require('elasticsearch');
-var fs    = require('fs');
+var fs = require('fs');
 var nconf = require('nconf');
 
 // Setup nconf to use (in-order): 
@@ -11,11 +11,11 @@ var env = nconf.get('NODE_ENV') || "development";
 
 //console.log(nconf.get(env).elasticsearch.host);
 
-var elasticClient = new elasticsearch.Client({  
-    host: "http://172.20.36.122:9200/"
+var elasticClient = new elasticsearch.Client({
+    host: "http://172.20.38.132:9200/"
 });
 
-function getConfig(){
+function getConfig() {
     console.log(env);
     console.log(nconf.get(env));
     return nconf.get(env);
@@ -27,8 +27,8 @@ exports.getConfig = getConfig;
  * @param: @string indexName
  * @returns: @object
  */
-function initIndex(indexName) {  
-    console.log("index : "+indexName);
+function initIndex(indexName) {
+    console.log("index : " + indexName);
     return elasticClient.indices.create({
         index: indexName
     });
@@ -40,7 +40,7 @@ exports.initIndex = initIndex;
  * @param: @string indexName
  * @returns: @object
  */
-function deleteIndex(indexName) {  
+function deleteIndex(indexName) {
     return elasticClient.indices.delete({
         index: indexName
     });
@@ -52,7 +52,7 @@ exports.deleteIndex = deleteIndex;
  * @param: @string indexName
  * @returns: @boolean
  */
-function isIndexExists(indexName) {  
+function isIndexExists(indexName) {
     return elasticClient.indices.exists({
         index: indexName
     });
@@ -65,7 +65,7 @@ exports.isIndexExists = isIndexExists;
  * @param: @string typeName
  * @returns: @object
  */
-function setMapping(indexName, typeName) {  
+function setMapping(indexName, typeName) {
     return elasticClient.indices.putMapping({
         index: indexName,
         type: typeName,
@@ -92,7 +92,7 @@ function setMapping(indexName, typeName) {
                 blended_rate: { type: "double" },
                 blended_cost: { type: "double" },
                 un_blended_rate: { type: "double" },
-                un_blended_cost: {type: "double"},
+                un_blended_cost: { type: "double" },
                 resource_id: { type: "text" }
             }
         }
@@ -106,7 +106,7 @@ exports.setMapping = setMapping;
  * @param: @string typeName
  * @returns: @object
  */
-function getMapping(indexName, typeName) {  
+function getMapping(indexName, typeName) {
     return elasticClient.indices.getMapping({
         index: indexName,
         type: typeName
@@ -150,7 +150,7 @@ function addDocument(indexName, typeName, data, pid) {
             "blended_rate": data['BlendedRate'],
             "blended_cost": data['BlendedCost'],
             "un_blended_rate": data['UnBlendedRate'],
-            "un_blended_cost":data['UnBlendedCost'],
+            "un_blended_cost": data['UnBlendedCost'],
             "resource_id": data['ResourceId']
         }
     });
@@ -162,12 +162,12 @@ exports.addDocument = addDocument;
  * @param: @Object data - contains index, start date, end date
  * @return: @Object
  */
-function getRegionsBillingCost(data){
+function getRegionsBillingCost(data) {
     var startDate = data.strdate;
     var endDate = data.enddate;
     var indexName = data.company;
 
-    return elasticClient.search({  
+    return elasticClient.search({
         index: indexName,
         size: 0,
         body: {
@@ -178,7 +178,6 @@ function getRegionsBillingCost(data){
                             "range": {
                                 "usage_start_date": {
                                     "gte": startDate,
-                                    "lte": endDate,
                                     "format": "yyyy-MM-dd"
                                 }
                             }
@@ -186,7 +185,6 @@ function getRegionsBillingCost(data){
                         {
                             "range": {
                                 "usage_end_date": {
-                                    "gte": startDate,
                                     "lte": endDate,
                                     "format": "yyyy-MM-dd"
                                 }
@@ -202,21 +200,21 @@ function getRegionsBillingCost(data){
                     ]
                 }
             },
-            "aggs":{
-                "availability_zone":{
-                    "terms":{
-                        "field":"availability_region",
-                        "order":{"total_blended_cost":"desc"} 
+            "aggs": {
+                "availability_zone": {
+                    "terms": {
+                        "field": "availability_region",
+                        "order": { "total_blended_cost": "desc" }
                     },
-                    "aggs":{
-                        "total_blended_cost":{
-                            "sum":{
-                                "field":"blended_cost"
+                    "aggs": {
+                        "total_blended_cost": {
+                            "sum": {
+                                "field": "blended_cost"
                             }
                         }
                     }
                 }
-            }                
+            }
         }
     });
 }
@@ -228,74 +226,76 @@ exports.getRegionsBillingCost = getRegionsBillingCost;
  * @param: @Object data contains index, start date, end date, filter, region etc
  * @return: @Object
  */
-function getResourcesData(data){
-    var indexName=data.company;
-    var startdate=data.strdate;
-	var enddate=data.enddate;
-    var from =0;
-    var size =10;
-    var filter={};
+function getResourcesData(data) {
+    var indexName = data.company;
+    var startdate = data.strdate;
+    var enddate = data.enddate;
+    var from = 0;
+    var size = 10;
+    var filter = {};
     var regionfilter = {};
+    var sorting_order=data.shortingorder;
+    var sorting_field=data.sortingfield;
 
-    if(data.size){
-        size=data.size;
-    }
-
-    if(data.currentpage){
-        from=((data.currentpage-1) * size);
-    }
-    
-    if(data.filter){
-         filter = { "match_phrase_prefix" : { "operation" : data.filter } };
+    if (data.size) {
+        size = data.size;
     }
 
-    if(data.region!=""){
-        regionfilter = { "match" : { "availability_region" : data.region } };
+    if (data.currentpage) {
+        from = ((data.currentpage - 1) * size);
     }
-        
+
+    if (data.filter) {
+        filter = { "match_phrase_prefix": { "operation": data.filter } };
+    }
+
+    if (data.region != "") {
+        regionfilter = { "match": { "availability_region": data.region } };
+    }
+    var sort={};
+    sort[sorting_field]={ "order" : sorting_order };
     return elasticClient.search({
         index: indexName,
         body: {
-            "from" : from, 
-            "size" : size,
-            "query" : {
+            "from": from,
+            "size": size,
+            "sort" : [  sort ],
+            "query": {
                 "bool": {
-    		            "must": [
-    		                {
-    		                    "range": {
-			                        "usage_start_date": {
-			                            "gte": startdate,
-			                            "lte": enddate,
-			                            "format": "yyyy-MM-dd"
-			                        }
-			                    }
-			                },
-			                {
-			                    "range": {
-			                        "usage_end_date": {
-			                            "gte": startdate,
-			                            "lte": enddate,
-			                            "format": "yyyy-MM-dd"
-			                        }
-			                    }
-			                },
-                            {
-    		                    "range": {
-			                        "blended_cost": {
-			                            "gt": 0
-			                        }
-			                    }
-			                },
-                            filter,
-                            regionfilter
-                            
-			            ]
-                    
-			        }
+                    "must": [
+                        {
+                            "range": {
+                                "usage_start_date": {
+                                    "gte": startdate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "usage_end_date": {
+                                    "lte": enddate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "blended_cost": {
+                                    "gt": 0
+                                }
+                            }
+                        },
+                        filter,
+                        regionfilter
+
+                    ]
+
+                }
             },
             "_source": [
-                "record_id", 
-                "product_name", 
+                "record_id",
+                "product_name",
                 "subscription_id",
                 "pricing_plan_id",
                 "usage_type",
@@ -309,7 +309,7 @@ function getResourcesData(data){
                 "blended_cost",
                 "resource_id",
                 "operation"
-                ]
+            ]
         }
     })
 
@@ -321,71 +321,87 @@ exports.getResourcesData = getResourcesData;
  * @param: @Object data contains index, start date, end date, filter, region etc
  * @return: @Object 
  */
-function getProductWiseData(postdata){
-        var data=postdata;
-		var startdate=data.strdate;
-		var enddate=data.enddate;
-        var indexval=data.company;
-        var regionfilter = {};
+function getProductWiseData(postdata) {
+    var data = postdata;
+    var startdate = data.strdate;
+    var enddate = data.enddate;
+    var indexval = data.company;
+    var regionfilter = {};
 
-        if(data.region!=""){
-            regionfilter = { "match" : { "availability_region" : data.region } };
+    if (data.region != "") {
+        regionfilter = { "match": { "availability_region": data.region } };
+    }
+
+    return elasticClient.search({
+        index: indexval,
+        size: 0,
+        body: {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "range": {
+                                "usage_start_date": {
+                                    "gte": startdate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "usage_end_date": {
+                                    "lte": enddate,
+                                    "format": "yyyy-MM-dd"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                "blended_cost": {
+                                    "gt": 0
+                                }
+                            }
+                        },
+                        regionfilter
+                    ]
+                }
+            },
+            "aggs": {
+                "product_name": {
+                    "terms": {
+                        "field": "product_name",
+                        "order": { "total_blended_cost": "desc" }
+
+                    },
+                    "aggs": {
+                        "total_blended_cost": {
+                            "sum": {
+                                "field": "blended_cost"
+                            }
+                        }
+                    }
+                }
+            }
+
         }
-
-		return elasticClient.search({  
-		  index: indexval,
-		  size: 0,
-		  body: {
-		  		"query": {
-			        "bool": {
-			            "must": [
-			                {
-			                    "range": {
-			                        "usage_start_date": {
-			                            "gte": startdate,
-			                            "lte": enddate,
-			                            "format": "yyyy-MM-dd"
-			                        }
-			                    }
-			                },
-			                {
-			                    "range": {
-			                        "usage_end_date": {
-			                            "gte": startdate,
-			                            "lte": enddate,
-			                            "format": "yyyy-MM-dd"
-			                        }
-			                    }
-			                },
-                            {
-    		                    "range": {
-			                        "blended_cost": {
-			                            "gt": 0
-			                        }
-			                    }
-			                },
-                            regionfilter
-			            ]
-			        }
-			    },
-			    "aggs":{
-		       		"product_name":{
-			           "terms":{
-			               "field":"product_name",
-			               "order":{"total_blended_cost":"desc"} 
-
-			           },
-           				"aggs":{
-		               		"total_blended_cost":{
-		                   		"sum":{
-		                       		"field":"blended_cost"
-		                   		}
-		                	}
-		          		 }
-		       		}
-		   		}
-				    
-			  }
-			});
+    });
 }
 exports.getProductWiseData = getProductWiseData;
+
+
+function getMinMaxDate(indexval) {
+    return elasticClient.search({
+        index: indexval,
+        size: 0,
+        body: {
+            "aggs": {
+                "max_date": { "max": { "field": "usage_end_date","format": "YYYY-MM-dd" } },
+                "min_date": { "min": { "field": "usage_start_date","format": "YYYY-MM-dd" } },
+                "last_created": { "max": { "field": "__createDate" } }
+            }
+
+        }
+    });
+}
+
+exports.getMinMaxDate = getMinMaxDate;
