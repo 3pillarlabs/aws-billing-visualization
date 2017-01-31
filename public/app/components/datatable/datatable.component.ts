@@ -32,51 +32,56 @@ export class DatatableComponent implements OnChanges {
 
 
     columns: any[] = [
-       
+
         {
             display: 'Product Name',
-            variable: 'product_name',
-            sortable: true
-        },
-        {
-            display: 'Operation',
-            variable: 'operation',
-            sortable: false
-        },
-        {
-            display: 'Item Description',
-            variable: 'item_description',
-            sortable: false
-        },
-        {
-            display: 'Resource Id',
-            variable: 'resource_id',
+            variable: 'ProductName',
             sortable: true
         },
         {
             display: 'Availability Zone',
-            variable: 'availability_zone',
+            variable: 'AvailabilityZone',
             sortable: true
         },
         {
+            display: 'Operation',
+            variable: 'Operation',
+            sortable: false
+        },
+        {
+            display: 'Usage Description',
+            variable: 'ItemDescription',
+            sortable: false
+        },
+        {
+            display: 'Usage Type',
+            variable: 'UsageType',
+            sortable: false
+        },
+        {
             display: 'Usage Quantity',
-            variable: 'usage_quantity',
+            variable: 'UsageQuantity',
+            sortable: false
+        },
+        {
+            display: 'Blended Rate',
+            variable: 'BlendedRate',
             sortable: false
         },
         {
             display: 'Blended Cost',
-            variable: 'blended_cost',
-            sortable: true
+            variable: 'BlendedCost',
+            sortable: false
         },
         {
             display: 'Usage Duration',
-            variable: 'usage_start_date',
-            sortable: true
+            variable: 'UsageStartDate',
+            sortable: false
         }
     ];
 
     sorting: any = {
-        column: 'product_name', //to match the variable of one of the columns
+        column: 'ProductName', //to match the variable of one of the columns
         descending: false
     };
 
@@ -88,7 +93,7 @@ export class DatatableComponent implements OnChanges {
 
     ngOnChanges(): void {
         this.isloading.emit(true);
-        this.currentPage = 0;
+        this.currentPage = 1;
         let awsdata = {
             company: this.company,
             strdate: this.startdate,
@@ -103,12 +108,12 @@ export class DatatableComponent implements OnChanges {
 
     getAllAwsResourcedata(awsdata: any) {
         var jsondata: any = [];
-        var shortingorder='asc';
-        awsdata.sortingfield=this.sorting.column;
-        if(this.sorting.descending){
-            shortingorder='desc';
+        var shortingorder = 'asc';
+        awsdata.sortingfield = this.sorting.column;
+        if (this.sorting.descending) {
+            shortingorder = 'desc';
         }
-        awsdata.shortingorder=shortingorder;
+        awsdata.shortingorder = shortingorder;
         console.log(awsdata);
 
         this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
@@ -168,7 +173,7 @@ export class DatatableComponent implements OnChanges {
     };
 
 
-    selectedClass(columnName): string{
+    selectedClass(columnName): string {
         return columnName == this.sorting.column ? 'sort-' + this.sorting.descending : 'false';
     }
 
@@ -180,7 +185,7 @@ export class DatatableComponent implements OnChanges {
             sort.column = columnName;
             sort.descending = false;
         }
-        
+
         this.currentPage = 1;
         let awsdata = {
             company: this.company,
