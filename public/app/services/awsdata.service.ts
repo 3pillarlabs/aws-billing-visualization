@@ -42,7 +42,7 @@ export class AwsdataService{
 		let maxval = 0;
         return this._http.post('/reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
-        	for (let region of data.aggregations.AvailabilityZone.buckets) {				
+        	for (let region of data.aggregations.AvailabilityRegion.buckets) {				
   				if(region.TotalBlendedCost.value > 0){
 					  if(maxval < region.TotalBlendedCost.value){
 						  maxval = Math.ceil(region.TotalBlendedCost.value);

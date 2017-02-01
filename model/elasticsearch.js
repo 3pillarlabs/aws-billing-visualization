@@ -13,11 +13,10 @@ var env = nconf.get('NODE_ENV') || "development";
 
 var elasticClient = new elasticsearch.Client({
     host: "http://atg.3pillarglobal.com/es/"
+    //host:"http://172.20.38.132:9200/"
 });
 
 function getConfig() {
-    console.log(env);
-    console.log(nconf.get(env));
     return nconf.get(env);
 }
 exports.getConfig = getConfig;
@@ -28,7 +27,6 @@ exports.getConfig = getConfig;
  * @returns: @object
  */
 function initIndex(indexName) {
-    console.log("index : " + indexName);
     return elasticClient.indices.create({
         index: indexName
     });
@@ -198,9 +196,9 @@ function getRegionsBillingCost(data) {
             }
         },
         "aggs": {
-            "AvailabilityZone": {
+            "AvailabilityRegion": {
                 "terms": {
-                    "field": "AvailabilityZone",
+                    "field": "__AvailabilityRegion",
                     "order": { "TotalBlendedCost": "desc" }
                 },
                 "aggs": {
@@ -252,14 +250,14 @@ function getResourcesData(data) {
         filter = {
             "multi_match": {
                 "query": data.filter,
-                "fields": ["Operation", "ProductName","AvailabilityZone","UsageType"],
+                "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
                 "type": "phrase_prefix"
             }
         };
     }
 
     if (data.region != "") {
-        regionfilter = { "match": { "AvailabilityZone": data.region } };
+        regionfilter = { "match": { "__AvailabilityRegion": data.region } };
     }
     var sort = {};
     sort[sorting_field] = { "order": sorting_order };
@@ -304,7 +302,7 @@ function getResourcesData(data) {
         "_source": [
             "ProductName",
             "UsageType",
-            "AvailabilityZone",
+            "__AvailabilityRegion",
             "ItemDescription",
             "UsageStartDate",
             "UsageEndDate",
@@ -315,7 +313,7 @@ function getResourcesData(data) {
         ]
     };
 
-    console.log('-------------' + JSON.stringify(query));
+
     return elasticClient.search({
         index: indexName,
         body: query
@@ -337,58 +335,58 @@ function getProductWiseData(postdata) {
     var regionfilter = {};
 
     if (data.region != "") {
-        regionfilter = { "match": { "AvailabilityZone": data.region } };
+        regionfilter = { "match": { "__AvailabilityRegion": data.region } };
     }
 
-    var query={
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "range": {
-                                "UsageStartDate": {
-                                    "gte": startdate,
-                                    "format": "yyyy-MM-dd"
-                                }
+    var query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "UsageStartDate": {
+                                "gte": startdate,
+                                "format": "yyyy-MM-dd"
                             }
-                        },
-                        {
-                            "range": {
-                                "UsageEndDate": {
-                                    "lte": enddate,
-                                    "format": "yyyy-MM-dd"
-                                }
-                            }
-                        },
-                        {
-                            "range": {
-                                "BlendedCost": {
-                                    "gt": 0
-                                }
-                            }
-                        },
-                        regionfilter
-                    ]
-                }
-            },
-            "aggs": {
-                "product_name": {
-                    "terms": {
-                        "field": "ProductName",
-                        "order": { "TotalBlendedCost": "desc" }
-
+                        }
                     },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
+                    {
+                        "range": {
+                            "UsageEndDate": {
+                                "lte": enddate,
+                                "format": "yyyy-MM-dd"
                             }
+                        }
+                    },
+                    {
+                        "range": {
+                            "BlendedCost": {
+                                "gt": 0
+                            }
+                        }
+                    },
+                    regionfilter
+                ]
+            }
+        },
+        "aggs": {
+            "product_name": {
+                "terms": {
+                    "field": "ProductName",
+                    "order": { "TotalBlendedCost": "desc" }
+
+                },
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
                         }
                     }
                 }
             }
+        }
 
-        };
+    };
 
     return elasticClient.search({
         index: indexval,
@@ -407,7 +405,7 @@ function getMinMaxDate(indexval) {
             "aggs": {
                 "max_date": { "max": { "field": "UsageEndDate", "format": "YYYY-MM-dd" } },
                 "min_date": { "min": { "field": "UsageStartDate", "format": "YYYY-MM-dd" } },
-                "last_created": { "max": { "field": "__createDate" } }
+                "last_created": { "max": { "field": "__CreatedDate" } }
             }
 
         }
@@ -415,3 +413,8 @@ function getMinMaxDate(indexval) {
 }
 
 exports.getMinMaxDate = getMinMaxDate;
+
+function debugQuery(query) {
+    console.log('--------------------Query Log-------------------------------');
+    console.log(JSON.stringify(query));
+}
