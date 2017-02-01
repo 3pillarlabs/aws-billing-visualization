@@ -7,14 +7,14 @@ import 'rxjs/add/operator/map';
 export class AwsdataService{
 
     constructor(private _http:Http){
-        console.log('awsservice data initalized');
+        console.log('aws-service data initialized');
     }
 
     getAwsRegions(data:any){
 		var regiondata:any = [];
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
-        return this._http.post('/reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
+        return this._http.post('reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
         	for (let region of data.aggregations.availability_zone.buckets) {
   				if(region.total_blended_cost.value > 0){
@@ -40,7 +40,7 @@ export class AwsdataService{
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
 		let maxval = 0;
-        return this._http.post('/reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
+        return this._http.post('reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
         	for (let region of data.aggregations.AvailabilityRegion.buckets) {				
   				if(region.TotalBlendedCost.value > 0){
@@ -85,14 +85,14 @@ export class AwsdataService{
 	getAllAwsResource(awsdata:any){
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
-		return this._http.post('/reports/getalldata',JSON.stringify(awsdata),{headers:headers}).map(data=>data.json());
+		return this._http.post('reports/getalldata',JSON.stringify(awsdata),{headers:headers}).map(data=>data.json());
 	}
 
 	getUniqueProduct(data:any){
 		var productdata:any = [];
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
-        return this._http.post('/reports/getProductWiseData',JSON.stringify(data),{headers:headers}).map((res)=>{
+        return this._http.post('reports/getProductWiseData',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
         	for (let product of data.aggregations.product_name.buckets) {
   				if(product.TotalBlendedCost.value > 0){
@@ -100,7 +100,7 @@ export class AwsdataService{
   						'name': product.key,
   						'totalcost': Math.round(product.TotalBlendedCost.value),
   						'totalresource': product.doc_count
-  					}
+  					};
   					productdata.push(productdoc);
   					
   				}
@@ -110,6 +110,6 @@ export class AwsdataService{
 	}
 
 	getMinMaxDateRange(index:string){
-		return this._http.get('/reports/getMinMaxDate/'+index).map((res)=>res.json());
+		return this._http.get('reports/getMinMaxDate/'+index).map((res)=>res.json());
 	}
 }
