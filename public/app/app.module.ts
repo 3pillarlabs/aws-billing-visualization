@@ -15,6 +15,8 @@ import { PaginationDirective } from './directives/pagination.directive';
 import { D3mapComponent } from './components/d3map/d3map.component';
 import { ChartComponent } from "./components/chart/chart.component";
 import { ConfigService } from "./services/config.service";
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
   imports:      [ BrowserModule,HttpModule,FormsModule,DataTableModule ],
@@ -26,7 +28,9 @@ import { ConfigService } from "./services/config.service";
     LoaderComponent,
     PaginationDirective,
     D3mapComponent,
-    ChartComponent
+    ChartComponent,
+    HeaderComponent,
+    FooterComponent
      ],
   providers: [ AwsdataService, ConfigService ],
   bootstrap:    [ AppComponent ]

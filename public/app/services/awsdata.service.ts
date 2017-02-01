@@ -42,14 +42,14 @@ export class AwsdataService{
 		let maxval = 0;
         return this._http.post('/reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
-        	for (let region of data.aggregations.availability_zone.buckets) {				
-  				if(region.total_blended_cost.value > 0){
-					  if(maxval < region.total_blended_cost.value){
-						  maxval = Math.ceil(region.total_blended_cost.value);
+        	for (let region of data.aggregations.AvailabilityRegion.buckets) {				
+  				if(region.TotalBlendedCost.value > 0){
+					  if(maxval < region.TotalBlendedCost.value){
+						  maxval = Math.ceil(region.TotalBlendedCost.value);
 					  }
 					  regionData[region.key] = {
 						  name: region.key,
-						  totalcost: parseFloat(region.total_blended_cost.value).toFixed(2),
+						  totalcost: parseFloat(region.TotalBlendedCost.value).toFixed(2),
 						  totalresource: region.doc_count,
 						  color: "red"
 					  }  					
@@ -95,10 +95,10 @@ export class AwsdataService{
         return this._http.post('/reports/getProductWiseData',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
         	for (let product of data.aggregations.product_name.buckets) {
-  				if(product.total_blended_cost.value > 0){
+  				if(product.TotalBlendedCost.value > 0){
   					var productdoc = {
   						'name': product.key,
-  						'totalcost': Math.round(product.total_blended_cost.value),
+  						'totalcost': Math.round(product.TotalBlendedCost.value),
   						'totalresource': product.doc_count
   					}
   					productdata.push(productdoc);
@@ -107,5 +107,9 @@ export class AwsdataService{
 			}
 			return productdata;
         });
+	}
+
+	getMinMaxDateRange(index:string){
+		return this._http.get('/reports/getMinMaxDate/'+index).map((res)=>res.json());
 	}
 }

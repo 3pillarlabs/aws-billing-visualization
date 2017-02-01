@@ -41,7 +41,7 @@ div.tooltipcss {
   fill-opacity: .7;
 }
 
-.well{
+.well-padding{
 	margin: 0 15px 15px 15px;
 }
 
@@ -51,4 +51,12 @@ div.tooltipcss {
 
 .input-group-addon{
 	cursor: pointer;
+}
+
+.detailed-report-filter{
+	width: 100%;
+}
+
+.detailed-report-filter input{
+	width: 30% !important;
 }
