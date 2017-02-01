@@ -25,7 +25,7 @@ export class AppComponent implements OnInit{
 		this.company = this._config.company;
 		let today = new Date();
 		let year = today.getFullYear();
-		let month = ("0" + today.getMonth() + 1).slice(-2);
+		let month = ("0" + (today.getMonth() + 1)).slice(-2);
 		let day = new Date(year, +month, 0).getDate();
 		this.startdate = year + '-' + month + '-01';
 		this.enddate = year + '-' + month + '-' + day;

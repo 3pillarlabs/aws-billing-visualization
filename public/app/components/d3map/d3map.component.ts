@@ -144,7 +144,6 @@ export class D3mapComponent implements OnInit, OnChanges {
     }
 
     drawMap(data): void {
-        console.log('------------------'+data);
         d3.json(this.worldMapJson, (error, collection) => {
             if (error) throw error;
 

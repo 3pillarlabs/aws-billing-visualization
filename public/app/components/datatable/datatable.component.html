@@ -10,7 +10,7 @@
             <form class="form-inline">
                 <div class="form-group detailed-report-filter">
                     <label class="right-extra-pad" for="email">Search :</label>
-                    <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or Availability Zone or Operation or Usage Type "/>
+                    <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or Availability Region or Operation or Usage Type "/>
                 </div>
             </form>
         </div>
@@ -33,7 +33,7 @@
             <tr *ngFor="let item of data">
 
                 <td>{{item.ProductName}}</td>
-                <td>{{item.AvailabilityZone}}</td>
+                <td>{{item.__AvailabilityRegion}}</td>
                 <td>{{item.Operation}}</td>
                 <td>{{item.ItemDescription}}</td>
                 <td>{{item.UsageType}}</td>
