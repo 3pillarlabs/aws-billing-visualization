@@ -51,4 +51,23 @@ router.post('/getProductWiseData',function(req,res,next){
     });
 })
 
+
+
+
+/* get Min Max date and totoal record with last created date from elastic search */
+ /** @param: @Path: 
+ * @param: @callback
+ * @return: json
+ */
+router.get('/getMinMaxDate/:index',function(req,res){
+    elastic.getMinMaxDate(req.params.index).then(function(result){
+        res.json(result);
+    },function(error){
+        res.send(400);
+        res.error(error);
+    });
+})
+
+
 module.exports = router;
+

@@ -63,6 +63,7 @@ export class D3mapComponent implements OnInit, OnChanges {
             enddate: this.enddate
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
+            console.log(regionsData);
             this.drawMap(regionsData);
 
         })

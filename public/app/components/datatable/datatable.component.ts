@@ -31,12 +31,69 @@ export class DatatableComponent implements OnChanges {
     filter: string = '';
 
 
+    columns: any[] = [
+
+        {
+            display: 'Product Name',
+            variable: 'ProductName',
+            sortable: true
+        },
+        {
+            display: 'Availability Region',
+            variable: '__AvailabilityRegion',
+            sortable: true
+        },
+        {
+            display: 'Operation',
+            variable: 'Operation',
+            sortable: false
+        },
+        {
+            display: 'Usage Description',
+            variable: 'ItemDescription',
+            sortable: false
+        },
+        {
+            display: 'Usage Type',
+            variable: 'UsageType',
+            sortable: false
+        },
+        {
+            display: 'Usage Quantity',
+            variable: 'UsageQuantity',
+            sortable: false
+        },
+        {
+            display: 'Blended Rate',
+            variable: 'BlendedRate',
+            sortable: false
+        },
+        {
+            display: 'Blended Cost',
+            variable: 'BlendedCost',
+            sortable: false
+        },
+        {
+            display: 'Usage Duration',
+            variable: 'UsageStartDate',
+            sortable: false
+        }
+    ];
+
+    sorting: any = {
+        column: 'ProductName', //to match the variable of one of the columns
+        descending: false
+    };
+
+
 
     constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
         this.company = this._config.company;
     }
 
     ngOnChanges(): void {
+        this.isloading.emit(true);
+        this.currentPage = 1;
         let awsdata = {
             company: this.company,
             strdate: this.startdate,
@@ -51,6 +108,13 @@ export class DatatableComponent implements OnChanges {
 
     getAllAwsResourcedata(awsdata: any) {
         var jsondata: any = [];
+        var shortingorder = 'asc';
+        awsdata.sortingfield = this.sorting.column;
+        if (this.sorting.descending) {
+            shortingorder = 'desc';
+        }
+        awsdata.shortingorder = shortingorder;
+
         this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
             if (data.hits.total) {
 
@@ -106,5 +170,33 @@ export class DatatableComponent implements OnChanges {
         this.currentPage = event.itemsPerPage;
         this.getAllAwsResourcedata(awsdata);
     };
+
+
+    selectedClass(columnName): string {
+        return columnName == this.sorting.column ? 'sort-' + this.sorting.descending : 'false';
+    }
+
+    changeSorting(columnName): void {
+        var sort = this.sorting;
+        if (sort.column == columnName) {
+            sort.descending = !sort.descending;
+        } else {
+            sort.column = columnName;
+            sort.descending = false;
+        }
+
+        this.currentPage = 1;
+        let awsdata = {
+            company: this.company,
+            strdate: this.startdate,
+            enddate: this.enddate,
+            currentpage: this.currentPage,
+            size: this.rowsOnPage,
+            filter: this.filter,
+            region: this.selectedRegion
+        };
+        this.isloading.emit(true);
+        this.getAllAwsResourcedata(awsdata);
+    }
 
 }
