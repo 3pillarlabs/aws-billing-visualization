@@ -39,8 +39,8 @@ export class DatatableComponent implements OnChanges {
             sortable: true
         },
         {
-            display: 'Availability Zone',
-            variable: 'AvailabilityZone',
+            display: 'Availability Region',
+            variable: '__AvailabilityRegion',
             sortable: true
         },
         {
@@ -114,7 +114,6 @@ export class DatatableComponent implements OnChanges {
             shortingorder = 'desc';
         }
         awsdata.shortingorder = shortingorder;
-        console.log(awsdata);
 
         this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
             if (data.hits.total) {
