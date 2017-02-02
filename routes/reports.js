@@ -8,7 +8,7 @@ var elastic = require('../model/elasticsearch');
  * @param: @callback
  * @return: json
  */
-router.post('aws-billing/regions',function(req,res,next){
+router.post('/regions',function(req,res,next){
 	var data=req.body;
     elastic.getRegionsBillingCost(data).then(function(result){
         res.json(result);
@@ -24,7 +24,7 @@ router.post('aws-billing/regions',function(req,res,next){
 @Param : @index: companyname e.g:atg ,@type:year_month  
 @Return: json of all data
  */
-router.post('aws-billing/getalldata', function(req, res, next){
+router.post('/getalldata', function(req, res, next){
     var data=req.body;   
     elastic.getResourcesData(data).then(function(result){
         res.json(result);
@@ -41,7 +41,7 @@ router.post('aws-billing/getalldata', function(req, res, next){
  * @param: @callback
  * @return: json
  */
-router.post('aws-billing/getProductWiseData',function(req,res,next){
+router.post('/getProductWiseData',function(req,res,next){
 	var data=req.body;
     elastic.getProductWiseData(data).then(function(result){
         res.json(result);
@@ -59,7 +59,7 @@ router.post('aws-billing/getProductWiseData',function(req,res,next){
  * @param: @callback
  * @return: json
  */
-router.get('aws-billing/getMinMaxDate/:index',function(req,res){
+router.get('/getMinMaxDate/:index',function(req,res){
     elastic.getMinMaxDate(req.params.index).then(function(result){
         res.json(result);
     },function(error){
