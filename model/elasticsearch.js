@@ -1,61 +1,45 @@
 var elasticsearch = require('elasticsearch');
-var fs = require('fs');
-var nconf = require('nconf');
-
-// Setup nconf to use (in-order): 
-//   1. Command-line arguments 
-//   2. Environment variables 
-//   3. A file located at 'path/to/config.json' 
-nconf.argv().env().file({ file: '../config/config.json' });
-var env = nconf.get('NODE_ENV') || "development";
-
-//console.log(nconf.get(env).elasticsearch.host);
 
 var elasticClient = new elasticsearch.Client({
     host: "http://atg.3pillarglobal.com/es/"
     //host:"http://172.20.38.132:9200/"
 });
 
-function getConfig() {
-    return nconf.get(env);
-}
-exports.getConfig = getConfig;
-
 /**
  * Create an index
  * @param: @string indexName
  * @returns: @object
  */
-function initIndex(indexName) {
+/*function initIndex(indexName) {
     return elasticClient.indices.create({
         index: indexName
     });
 }
-exports.initIndex = initIndex;
+exports.initIndex = initIndex;*/
 
 /**
  * Delete an index
  * @param: @string indexName
  * @returns: @object
  */
-function deleteIndex(indexName) {
+/*function deleteIndex(indexName) {
     return elasticClient.indices.delete({
         index: indexName
     });
 }
-exports.deleteIndex = deleteIndex;
+exports.deleteIndex = deleteIndex;*/
 
 /**
  * Checks an index exist or not
  * @param: @string indexName
  * @returns: @boolean
  */
-function isIndexExists(indexName) {
+/*function isIndexExists(indexName) {
     return elasticClient.indices.exists({
         index: indexName
     });
 }
-exports.isIndexExists = isIndexExists;
+exports.isIndexExists = isIndexExists;*/
 
 /**
  * Set the mapping of index type 
@@ -69,29 +53,30 @@ exports.isIndexExists = isIndexExists;
         type: typeName,
         body: {
             properties: {
-                invoice_id: { type: "text" },
-                payer_account_id: { type: "text" },
-                linked_account_id: { type: "text" },
-                record_type: { type: "text" },
-                record_id: { type: "text" },
-                product_name: { type: "keyword" },
-                rate_id: { type: "integer" },
-                subscription_id: { type: "integer" },
-                pricing_plan_id: { type: "integer" },
-                usage_type: { type: "text" },
-                operation: { type: "text" },
-                AvailabilityZone: { type: "keyword" },
-                AvailabilityZone: { type: "keyword" },
-                reserved_instance: { type: "text" },
-                item_description: { type: "text" },
+                InvoiceID: { type: "string" },
+                PayerAccountId: { type: "string" },
+                LinkedAccountId: { type: "string" },
+                RecordType: { type: "string" },
+                RecordId: { type: "string" },
+                ProductName: { type: "string", "index": "not_analyzed" },
+                RateId: { type: "integer" },
+                SubscriptionId: { type: "integer" },
+                PricingPlanId: { type: "integer" },
+                UsageType: { type: "string" },
+                Operation: { type: "string" },
+                AvailabilityZone: { type: "string", "index": "not_analyzed" },                
+                ReservedInstance: { type: "string" },
+                ItemDescription: { type: "string" },
                 UsageStartDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" },
                 UsageEndDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" },
-                usage_quantity: { type: "double" },
-                blended_rate: { type: "double" },
+                UsageQuantity: { type: "double" },
+                BlendedRate: { type: "double" },
                 BlendedCost: { type: "double" },
-                un_blended_rate: { type: "double" },
-                un_BlendedCost: { type: "double" },
-                resource_id: { type: "text" }
+                UnBlendedRate: { type: "double" },
+                UnBlendedCost: { type: "double" },
+                ResourceId: { type: "string" },
+                __AvailabilityRegion: { type: "string", "index": "not_analyzed" },
+                __CreatedDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" }
             }
         }
     });
@@ -120,36 +105,37 @@ exports.getMapping = getMapping;*/
  * @param: @number pid
  * @returns: @object
  */
-/*function addDocument(indexName, typeName, data, pid) {
-    let AvailabilityZone_val = data['AvailabilityZone'].replace(/[a-z]$/, '');
+/*function addDocument(indexName, typeName, data, pid, updatedDate) {
+    let availabilityRegion = data['AvailabilityZone'].replace(/[a-z]$/, '');
     return elasticClient.index({
         index: indexName,
         id: pid,
         type: typeName,
         body: {
-            "invoice_id": data['InvoiceID'],
-            "payer_account_id": data['PayerAccountId'],
-            "linked_account_id": data['LinkedAccountId'],
-            "record_type": data['RecordType'],
-            "record_id": data['RecordId'],
-            "product_name": data['ProductName'],
-            "rate_id": data['RateId'],
-            "subscription_id": data['SubscriptionId'],
-            "pricing_plan_id": data['PricingPlanId'],
-            "usage_type": data['UsageType'],
-            "operation": data['Operation'],
-            "AvailabilityZone": data['AvailabilityZone'],
-            "AvailabilityZone": AvailabilityZone_val,
-            "reserved_instance": data['ReservedInstance'],
-            "item_description": data['ItemDescription'],
+            "InvoiceID": data['InvoiceID'],
+            "PayerAccountId": data['PayerAccountId'],
+            "LinkedAccountId": data['LinkedAccountId'],
+            "RecordType": data['RecordType'],
+            "RecordId": data['RecordId'],
+            "ProductName": data['ProductName'],
+            "RateId": data['RateId'],
+            "SubscriptionId": data['SubscriptionId'],
+            "PricingPlanId": data['PricingPlanId'],
+            "UsageType": data['UsageType'],
+            "Operation": data['Operation'],
+            "AvailabilityZone": data['AvailabilityZone'],            
+            "ReservedInstance": data['ReservedInstance'],
+            "ItemDescription": data['ItemDescription'],
             "UsageStartDate": data['UsageStartDate'],
             "UsageEndDate": data['UsageEndDate'],
-            "usage_quantity": data['UsageQuantity'],
-            "blended_rate": data['BlendedRate'],
+            "UsageQuantity": data['UsageQuantity'],
+            "BlendedRate": data['BlendedRate'],
             "BlendedCost": data['BlendedCost'],
-            "un_blended_rate": data['UnBlendedRate'],
-            "un_BlendedCost": data['UnBlendedCost'],
-            "resource_id": data['ResourceId']
+            "UnBlendedRate": data['UnBlendedRate'],
+            "UnBlendedCost": data['UnBlendedCost'],
+            "ResourceId": data['ResourceId'],
+            "__AvailabilityRegion": availabilityRegion,
+            __CreatedDate: updatedDate
         }
     });
 }
