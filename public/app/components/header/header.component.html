@@ -35,16 +35,16 @@
           </ul>-->
         <ul class="nav navbar-nav navbar-right">
           <li>
-            <button type="button" id="startdemohelp" class="btn btn-default navbar-text" (click)="bootstrapTour()">
+            <button type="button" id="startdemohelp" class="btn btn-default" (click)="bootstrapTour()">
                 <span class="glyphicon glyphicon-question-sign"></span>
                   Help 
             </button>
           </li>
         </ul>
 
-        <div class="navbar-right">
-            <span class="navbar-text"><strong>Last updated: {{lastupdated | date:'short' }}</strong></span>
-            <span class="navbar-text"><strong>Total Record: {{totalRecord}}</strong></span>
+        <div class="navbar-right record-info">
+            <span class="navbar-text"><label>Last Updated:</label> {{lastupdated | date:'short' }}</span>
+            <span class="navbar-text"><label>Records:</label> {{totalRecord}}</span>
         </div>
       </div>
       <!--/.nav-collapse -->
