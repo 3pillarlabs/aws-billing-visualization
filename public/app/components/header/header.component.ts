@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
 
@@ -10,23 +10,14 @@ declare var Tour:any;
     templateUrl: 'header.component.html'
 })
 
-export class HeaderComponent implements OnInit {
-    public totalRecord:number;
-    public lastupdated:string;
+export class HeaderComponent {
+    @Input() totalRecord:number;
+    @Input() lastupdated:string;
     public company:string;
 
     constructor(private _awsdata: AwsdataService,private _config:ConfigService) { 
 
          this.company = this._config.company;
-    }
-
-    ngOnInit() {
-        this._awsdata.getMinMaxDateRange(this.company).subscribe((data)=>{
-            if(data){
-                this.totalRecord=data.hits.total;
-                this.lastupdated=data.aggregations.last_created.value_as_string;
-            }
-        })
     }
 
     bootstrapTour(): void {
