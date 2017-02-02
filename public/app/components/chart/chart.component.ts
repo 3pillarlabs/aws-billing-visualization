@@ -133,7 +133,7 @@ export class ChartComponent implements OnChanges {
 
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height+140)
+        .attr('height', this.height+60)
         .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
 
 
