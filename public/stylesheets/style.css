@@ -47,11 +47,10 @@ code {
   height: 100%;
   width: auto;
   padding: 6px 0px 6px 15px;
-	margin-top: 6px;
 }
 
 .navbar-text{
-	margin-top: 19px;
+	margin-bottom: 0px !important;
 }
 
 .navbar-text strong{
@@ -60,7 +59,7 @@ code {
 }
 
 .aws-app-container{
-  padding-top: 80px;
+  padding-top: 65px;
 }
 
 div.tooltipcss {   
@@ -99,4 +98,12 @@ div.tooltipcss {
 
 .detailed-report-filter input{
 	width: 30% !important;
+}
+
+.form-control[readonly]{
+      background-color: #fff !important;
+}
+
+#startdemohelp{
+    margin: 10px 15px 0px 20px;
 }
