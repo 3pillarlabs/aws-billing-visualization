@@ -17,8 +17,6 @@ export class AppComponent implements OnInit{
 	isloading: boolean;
 	selectedRegion: string = "";
 	company: string;
-	totalRecord: number;
-	lastupdated: string;
 
 	public calstartDate:string;
 	public calendDate:string;
@@ -36,13 +34,16 @@ export class AppComponent implements OnInit{
 
 	}
 
+
+
 	ngOnInit(){
 		this._awsdata.getMinMaxDateRange(this.company).subscribe((data)=>{
             if(data){
                 this.calstartDate=data.aggregations.min_date.value_as_string;
                 this.calendDate=data.aggregations.max_date.value_as_string;
-				this.totalRecord=data.hits.total;
-                this.lastupdated=data.aggregations.last_created.value_as_string;
+				let datesplitearr=this.calendDate.split("-");
+				this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
+				this.enddate = this.calendDate;
 
 				$('.datepicker').datepicker({
 					format: 'yyyy-mm-dd',

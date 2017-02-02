@@ -41,7 +41,7 @@ export class D3mapComponent implements OnInit, OnChanges {
         this.company = this._config.company;
         this.parentNativeElement = element.nativeElement;
         this.width = 650 - this.margin.left - this.margin.right;
-        this.height = 400 - this.margin.top - this.margin.bottom;
+        this.height = 320 - this.margin.top - this.margin.bottom;
     }
 
     ngOnInit(): void {
@@ -63,7 +63,6 @@ export class D3mapComponent implements OnInit, OnChanges {
             enddate: this.enddate
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
-            console.log(regionsData);
             this.drawMap(regionsData);
 
         })
