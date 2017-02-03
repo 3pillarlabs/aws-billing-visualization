@@ -107,3 +107,7 @@ div.tooltipcss {
 #startdemohelp{
     margin: 10px 15px 0px 20px;
 }
+
+.navbar-fixed-top {
+    z-index: 1101;
+}

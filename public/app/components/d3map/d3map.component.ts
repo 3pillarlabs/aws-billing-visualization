@@ -82,8 +82,10 @@ export class D3mapComponent implements OnInit, OnChanges {
             
             this.legendSvg = d3.select(this.parentNativeElement).append("svg")
                 .attr("class", "legend")
-                .attr("width", 500)
-                .attr("height", 40);
+                .attr("width",  this.width + this.margin.left + this.margin.right)
+                .attr("height", 40)
+                .append("g")
+                .attr("transform", "translate(160,0)");
         }
     }
 
