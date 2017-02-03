@@ -24,10 +24,16 @@ export class HeaderComponent {
             var tour = new Tour({
                 steps: [
                     {
+                        element: "#availabledata",
+                        title: "Available Data",
+                        placement: "bottom",
+                        content: "A quick overview of current system being visualized"
+                    },
+                    {
                         element: "#datefilter",
                         title: "Date Filters",
                         placement: "bottom",
-                        content: "Select a date range to filter the data and simply hit \"Go\"."
+                        content: "Select a date range to filter the data and simply hit \"Go\". Will only allow selection of date where data is avialable."
                     },
                     {
                         element: "#d3map",

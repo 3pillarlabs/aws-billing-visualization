@@ -40,6 +40,7 @@ export class AwsdataService{
 		var headers= new Headers();
         headers.append('Content-Type','application/json');
 		let maxval = 0;
+		let priceArr =  [];
         return this._http.post('reports/regions',JSON.stringify(data),{headers:headers}).map((res)=>{
         	var data= res.json();
         	for (let region of data.aggregations.AvailabilityRegion.buckets) {				
@@ -47,6 +48,7 @@ export class AwsdataService{
 					  if(maxval < region.TotalBlendedCost.value){
 						  maxval = Math.ceil(region.TotalBlendedCost.value);
 					  }
+					  priceArr.push(Math.ceil(region.TotalBlendedCost.value));
 					  regionData[region.key] = {
 						  name: region.key,
 						  totalcost: parseFloat(region.TotalBlendedCost.value).toFixed(2),
@@ -56,6 +58,8 @@ export class AwsdataService{
   				}
 			}			
 			regionData['maxval'] = maxval;
+			priceArr.sort(function(a, b){return a-b});
+			regionData['pricedata'] = priceArr;
 			return regionData;
         });
 	}
