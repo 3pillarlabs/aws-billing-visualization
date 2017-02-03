@@ -22,6 +22,7 @@ export class D3mapComponent implements OnInit, OnChanges {
     private rotate: number = 0;//60;
     private maxlat: number = 83;
     private svg: any;
+    private legendSvg: any;
     private projection: any;
     private path: any;
     private tooltipGroup: any;
@@ -49,7 +50,6 @@ export class D3mapComponent implements OnInit, OnChanges {
         this.getProjection();
         this.getPath();
         this.getTooltip();
-        this.getLegend();
     }
 
     ngOnChanges(): void {
@@ -79,6 +79,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .append("g")
                 .attr("width", this.width)
                 .attr("height", this.height);
+            
+            this.legendSvg = d3.select(this.parentNativeElement).append("svg")
+                .attr("class", "legend")
+                .attr("width", 500)
+                .attr("height", 40);
         }
     }
 
@@ -117,31 +122,6 @@ export class D3mapComponent implements OnInit, OnChanges {
             .attr("class", "tooltipcss").style("opacity", 0);
     }
 
-    getLegend(): void {
-        var legend = d3.select(this.parentNativeElement).append("svg")
-            .attr("class", "legend")
-            .attr("width", 500)
-            .attr("height", 40)
-            .selectAll("g")
-            .data(this.colorRange)
-            .enter()
-            .append("g")
-            .attr("transform", function (d, i) { return "translate(" + ((i * 150) + 100) + ", 10)"; });
-
-        legend.append("rect")
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", function (d) { return d; });
-
-        legend.append("text")
-            .data(this.legendText)
-            .attr("x", 24)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .text(function (d) { return d; });
-
-    }
-
     drawMap(data): void {
         d3.json(this.worldMapJson, (error, collection) => {
             if (error) throw error;
@@ -152,6 +132,25 @@ export class D3mapComponent implements OnInit, OnChanges {
             let color = d3.scaleLinear<string>()
                 .domain([0, data.maxval])
                 .range(this.colorRange);
+
+            //console.log(data.pricedata);
+            this.legendSvg.html('');
+            var legendG = this.legendSvg.selectAll("g")
+                            .data(data.pricedata)
+                            .enter()
+                            .append("g");
+
+            legendG.append("rect")
+                .attr("transform", function (d, i) { return "translate(" + ((i * 50)) + ", 10)"; })
+                .attr("width", 60)
+                .attr("height", 15)
+                .style("fill", function (d, i) { return color(d); });
+
+            legendG.append("text")
+                .attr("x", function (d, i) { return i * 50; })
+                .attr("y", 33)
+                .attr("dy", ".35em")
+                .text(function (d) { return "$"+d; });
 
             this.selectionMap.enter().append("path")
                 .attr("class", (d) => { return "subunit " + d.id; })
@@ -204,11 +203,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                         .style("opacity", .9);
                     this.tooltipGroup.html(tooltext)
                         .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 150) + "px");
+                        .style("top", (d3.event.pageY - 120) + "px");
                 })
                 .on("mousemove", (d) => {
                     this.tooltipGroup
-                        .style("top", (d3.event.pageY - 150) + "px")
+                        .style("top", (d3.event.pageY - 120) + "px")
                         .style("left", (d3.event.pageX - 100) + "px");
                 })
                 .on("mouseout", (d) => {
