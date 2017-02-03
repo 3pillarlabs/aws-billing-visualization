@@ -21,6 +21,9 @@ export class AppComponent implements OnInit{
 	public calstartDate:string;
 	public calendDate:string;
 
+	totalRecord:number;
+	lastupdated:string;
+
 	constructor(private _config: ConfigService,private _awsdata:AwsdataService) {
 		this.company = this._config.company;
 		let today = new Date();
@@ -39,6 +42,8 @@ export class AppComponent implements OnInit{
 	ngOnInit(){
 		this._awsdata.getMinMaxDateRange(this.company).subscribe((data)=>{
             if(data){
+				this.totalRecord=data.hits.total;
+				this.lastupdated=data.aggregations.last_created.value_as_string;
                 this.calstartDate=data.aggregations.min_date.value_as_string;
                 this.calendDate=data.aggregations.max_date.value_as_string;
 				let datesplitearr=this.calendDate.split("-");
