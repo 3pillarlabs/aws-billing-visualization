@@ -4,28 +4,16 @@
 	<!-- 3. Display the application -->
 	<div class="row ">
 		<div class="well well-sm well-padding form-inline" id="datefilter">
-
 			<div class="form-group right-extra-pad">
-				<label for="sdate" class="right-extra-pad">Start Date:</label>
+				<label for="date-range" class="right-extra-pad">Date:</label>
 				<div class="input-group date datepicker">
-
-					<input type="text" name="startdate" class="form-control" [value]="appcomponentdata.startdate" #startDate readonly>
-					<div class="input-group-addon">
+					<input type="text" name="daterange" class="form-control" [value]="dateRange" #dateRangeVal readonly/>
+					<div class="input-group-addon input-glyph">
 						<span class="glyphicon glyphicon-calendar"></span>
 					</div>
 				</div>
 			</div>
-			<div class="form-group right-extra-pad">
-				<label for="edate" class="right-extra-pad">End Date:</label>
-				<div class="input-group date datepicker">
-					<input type="text" name="enddate" class="form-control" [value]="appcomponentdata.enddate" #endDate readonly>
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-calendar"></span>
-					</div>
-				</div>
-			</div>
-			<button type="submit" class="btn btn-primary" (click)="searchAwsData(startDate.value,endDate.value)">Go</button>
-
+			<button type="submit" class="btn btn-primary" (click)="searchAwsData(dateRangeVal.value)">Go</button>
 		</div>
 	</div>
 
@@ -38,9 +26,9 @@
 						<strong>Product wise Billing Cost</strong>
 					</h3>
 				</div>
-
 				<div class="panel-body">
-					<aws-billing-chart [appcomponentdata]="appcomponentdata"  [selectedProduct]="selectedProduct" [detailReportOption]="detailReportOption" [selectedRegion]="selectedRegion" (selectProduct)="onSelectProduct($event)"></aws-billing-chart>
+					<aws-billing-chart [appcomponentdata]="appcomponentdata" (selectProduct)="onSelectProduct($event)"></aws-billing-chart>
+
 				</div>
 			</div>
 
@@ -55,17 +43,16 @@
 				</div>
 
 				<div class="panel-body">
-					<d3-map [appcomponentdata]="appcomponentdata" [selectedProduct]="selectedProduct" [detailReportOption]="detailReportOption"  [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'
-						(isloading)="isloading=$event"></d3-map>
-					<!--<aws-billing-heatmap [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event" [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'></aws-billing-heatmap>-->
+					<d3-map [appcomponentdata]="appcomponentdata"  (selectRegion)='onSelectRegion($event)' (isloading)="isloading=$event"></d3-map>
+						<!--<aws-billing-heatmap [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event" [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'></aws-billing-heatmap>-->
 				</div>
 			</div>
 		</div>
-		
+
 	</div>
 	<div class="row">
-		<div class="col-lg-12"  id="datatable">
-			<aws-billing-datatable [appcomponentdata]="appcomponentdata" [selectedProduct]="selectedProduct" [detailReportOption]="detailReportOption" [selectedRegion]="selectedRegion" (selectedDetailReportOption)="onselectedDetailReportOption($event)" ></aws-billing-datatable>
+		<div class="col-lg-12" id="datatable">
+			<aws-billing-datatable [appcomponentdata]="appcomponentdata" (selectedDetailReportOption)="onselectedDetailReportOption($event)"></aws-billing-datatable>
 		</div>
 	</div>
 
@@ -73,9 +60,9 @@
 </div>
 
 <div class="container" *ngIf="error">
-  <div class="center-msg">
-    {{error}}
-  </div>
+	<div class="center-msg">
+		{{error}}
+	</div>
 </div>
 
 <aws-billing-footer></aws-billing-footer>
