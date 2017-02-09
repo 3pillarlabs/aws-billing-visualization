@@ -4,28 +4,16 @@
 	<!-- 3. Display the application -->
 	<div class="row ">
 		<div class="well well-sm well-padding form-inline" id="datefilter">
-
 			<div class="form-group right-extra-pad">
-				<label for="sdate" class="right-extra-pad">Start Date:</label>
+				<label for="date-range" class="right-extra-pad">Date:</label>
 				<div class="input-group date datepicker">
-
-					<input type="text" name="startdate" class="form-control" [value]="startdate" #startDate readonly>
+					<input type="text" name="daterange" class="form-control" [value]="dateRange" #dateRangeVal readonly/>
 					<div class="input-group-addon">
 						<span class="glyphicon glyphicon-calendar"></span>
 					</div>
 				</div>
 			</div>
-			<div class="form-group right-extra-pad">
-				<label for="edate" class="right-extra-pad">End Date:</label>
-				<div class="input-group date datepicker">
-					<input type="text" name="enddate" class="form-control" [value]="enddate" #endDate readonly>
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-calendar"></span>
-					</div>
-				</div>
-			</div>
-			<button type="submit" class="btn btn-primary" (click)="searchAwsData(startDate.value,endDate.value)">Go</button>
-
+			<button type="submit" class="btn btn-primary" (click)="searchAwsData(dateRangeVal.value)">Go</button>
 		</div>
 	</div>
 
@@ -39,7 +27,7 @@
 					</h3>
 				</div>
 
-				<div class="panel-body">
+				<div class="panel-body aws-panel-padding">
 					<d3-map [startdate]="startdate" [enddate]="enddate" [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'
 						(isloading)="isloading=$event"></d3-map>
 					<!--<aws-billing-heatmap [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event" [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'></aws-billing-heatmap>-->

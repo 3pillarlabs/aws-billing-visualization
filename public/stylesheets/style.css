@@ -111,3 +111,7 @@ div.tooltipcss {
 .navbar-fixed-top {
     z-index: 1101;
 }
+
+.aws-panel-padding{
+  padding: 15px 0 15px!important;
+}

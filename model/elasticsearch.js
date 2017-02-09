@@ -2,144 +2,19 @@ var elasticsearch = require('elasticsearch');
 
 var elasticClient = new elasticsearch.Client({
     host: "http://atg.3pillarglobal.com/es/"
-    //host:"http://172.20.38.132:9200/"
 });
-
-/**
- * Create an index
- * @param: @string indexName
- * @returns: @object
- */
-/*function initIndex(indexName) {
-    return elasticClient.indices.create({
-        index: indexName
-    });
-}
-exports.initIndex = initIndex;*/
-
-/**
- * Delete an index
- * @param: @string indexName
- * @returns: @object
- */
-/*function deleteIndex(indexName) {
-    return elasticClient.indices.delete({
-        index: indexName
-    });
-}
-exports.deleteIndex = deleteIndex;*/
 
 /**
  * Checks an index exist or not
  * @param: @string indexName
  * @returns: @boolean
  */
-/*function isIndexExists(indexName) {
+function isIndexExists(indexName) {
     return elasticClient.indices.exists({
         index: indexName
     });
 }
-exports.isIndexExists = isIndexExists;*/
-
-/**
- * Set the mapping of index type 
- * @param: @string indexName
- * @param: @string typeName
- * @returns: @object
- */
-/*function setMapping(indexName, typeName) {
-    return elasticClient.indices.putMapping({
-        index: indexName,
-        type: typeName,
-        body: {
-            properties: {
-                InvoiceID: { type: "string" },
-                PayerAccountId: { type: "string" },
-                LinkedAccountId: { type: "string" },
-                RecordType: { type: "string" },
-                RecordId: { type: "string" },
-                ProductName: { type: "string", "index": "not_analyzed" },
-                RateId: { type: "integer" },
-                SubscriptionId: { type: "integer" },
-                PricingPlanId: { type: "integer" },
-                UsageType: { type: "string" },
-                Operation: { type: "string" },
-                AvailabilityZone: { type: "string", "index": "not_analyzed" },                
-                ReservedInstance: { type: "string" },
-                ItemDescription: { type: "string" },
-                UsageStartDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" },
-                UsageEndDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" },
-                UsageQuantity: { type: "double" },
-                BlendedRate: { type: "double" },
-                BlendedCost: { type: "double" },
-                UnBlendedRate: { type: "double" },
-                UnBlendedCost: { type: "double" },
-                ResourceId: { type: "string" },
-                __AvailabilityRegion: { type: "string", "index": "not_analyzed" },
-                __CreatedDate: { type: "date", "format": "yyy-MM-dd HH:mm:ss" }
-            }
-        }
-    });
-}
-exports.setMapping = setMapping;*/
-
-/**
- * Get the mapping of index type 
- * @param: @string indexName
- * @param: @string typeName
- * @returns: @object
- */
-/*function getMapping(indexName, typeName) {
-    return elasticClient.indices.getMapping({
-        index: indexName,
-        type: typeName
-    });
-}
-exports.getMapping = getMapping;*/
-
-/**
- * Add document in index 
- * @param: @string indexName
- * @param: @string typeName
- * @param: @object data
- * @param: @number pid
- * @returns: @object
- */
-/*function addDocument(indexName, typeName, data, pid, updatedDate) {
-    let availabilityRegion = data['AvailabilityZone'].replace(/[a-z]$/, '');
-    return elasticClient.index({
-        index: indexName,
-        id: pid,
-        type: typeName,
-        body: {
-            "InvoiceID": data['InvoiceID'],
-            "PayerAccountId": data['PayerAccountId'],
-            "LinkedAccountId": data['LinkedAccountId'],
-            "RecordType": data['RecordType'],
-            "RecordId": data['RecordId'],
-            "ProductName": data['ProductName'],
-            "RateId": data['RateId'],
-            "SubscriptionId": data['SubscriptionId'],
-            "PricingPlanId": data['PricingPlanId'],
-            "UsageType": data['UsageType'],
-            "Operation": data['Operation'],
-            "AvailabilityZone": data['AvailabilityZone'],            
-            "ReservedInstance": data['ReservedInstance'],
-            "ItemDescription": data['ItemDescription'],
-            "UsageStartDate": data['UsageStartDate'],
-            "UsageEndDate": data['UsageEndDate'],
-            "UsageQuantity": data['UsageQuantity'],
-            "BlendedRate": data['BlendedRate'],
-            "BlendedCost": data['BlendedCost'],
-            "UnBlendedRate": data['UnBlendedRate'],
-            "UnBlendedCost": data['UnBlendedCost'],
-            "ResourceId": data['ResourceId'],
-            "__AvailabilityRegion": availabilityRegion,
-            __CreatedDate: updatedDate
-        }
-    });
-}
-exports.addDocument = addDocument;*/
+exports.isIndexExists = isIndexExists;
 
 /**
  * Calculate resource cost aggregated on regions within a date range filter
