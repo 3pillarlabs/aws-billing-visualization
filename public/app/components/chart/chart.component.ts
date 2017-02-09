@@ -1,4 +1,4 @@
-import { Component, OnChanges, ElementRef, Input, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, ElementRef, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
 import * as D3 from 'd3';
@@ -36,11 +36,17 @@ export class ChartComponent implements OnChanges {
   private g;
   private tooltip;
 
-  @Input() startdate: string;
-  @Input() enddate: string;
+  startdate: string;
+  enddate: string;
   @Input() selectedRegion: string;
+  @Input() appcomponentdata: any;
+  @Input() selectedProduct: string;
+  @Output() selectProduct: EventEmitter<string> = new EventEmitter<string>();
+  @Input() detailReportOption: any;
+
 
   company: string;
+  appdataloaded = false;
 
   public dataset = [];
   public msg = 'There is no product';
@@ -62,48 +68,68 @@ export class ChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.setMsg(changes);
-    let awsdata = {
-      company: this.company,
-      strdate: this.startdate,
-      enddate: this.enddate,
-      region: this.selectedRegion
-    };
-    this.getProduct(awsdata);
+    if (this.appcomponentdata.allServiceData) {
+      /*if (this.appdataloaded) {
+        this.setMsg(changes);
+        let awsdata = {
+          company: this.company,
+          strdate: this.appcomponentdata.startdate,
+          enddate: this.appcomponentdata.enddate,
+          region: this.selectedRegion
+        };
+        this.getProduct(awsdata);
+      } else {
+        this.parsePieChartData(this.appcomponentdata.allServiceData);
+      }*/
+      this.parsePieChartData(this.appcomponentdata.allServiceData);
+      //this.appdataloaded = true;
+    }
+
   }
 
   /** Set No data message on the bases of property change value */
   setMsg(changes): void {
-    if (changes.startdate) {
-      if ((typeof (changes.startdate.previousValue) == 'string' && changes.startdate.currentValue != changes.startdate.previousValue)) {
-        this.msg = 'There is no product for selected date range';
-      }
-    } else if (changes.enddate) {
-      if ((typeof (changes.enddate.previousValue) == 'string' && changes.enddate.currentValue != changes.enddate.previousValue)) {
-        this.msg = 'There is no product for selected date range';
-      }
+    console.log(changes);
+    if ((typeof (changes.appcomponentdata.previousValue.startdate) == 'string' && changes.appcomponentdata.currentValue.startdate != changes.appcomponentdata.previousValue.startdate)) {
+      this.msg = 'There is no product for selected date range';
+    } else if ((typeof (changes.appcomponentdata.previousValue.enddate) == 'string' && changes.appcomponentdata.currentValue.enddate != changes.appcomponentdata.previousValue.enddate)) {
+      this.msg = 'There is no product for selected date range';
     } else if (changes.selectedRegion) {
       if ((typeof (changes.selectedRegion.previousValue) == 'string' && changes.selectedRegion.currentValue != changes.selectedRegion.previousValue)) {
         this.msg = 'There is no product for selected region';
       }
     }
+
   }
 
   public getProduct(awsdata: any) {
     this._awsdata.getUniqueProduct(awsdata).subscribe((data) => {
+      this.parsePieChartData(data);
+    }, (error) => {
+      console.log(error);
+    });
+  }
 
-      var products = [];
-      if (data.length > 0) {
-        for (let product of data) {
-          if (product.totalcost > 0) {
-            products.push(product);
+  parsePieChartData(data: any): void {
+    if (data && data.aggregations) {
+      if (data.aggregations.product_name) {
+        let productdata = [];
+        for (let product of data.aggregations.product_name.buckets) {
+          if (product.TotalBlendedCost.value > 0) {
+            var productdoc = {
+              'name': product.key,
+              'totalcost': Math.round(product.TotalBlendedCost.value),
+              'totalresource': product.doc_count
+            };
+            productdata.push(productdoc);
+
           }
         }
+        this.dataset = productdata;
+        this.setup();
+        this.buildSVG();
       }
-      this.dataset = products;
-      this.setup();
-      this.buildSVG();
-    });
+    }
   }
 
   /**
@@ -133,7 +159,7 @@ export class ChartComponent implements OnChanges {
 
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height+60)
+        .attr('height', this.height + 60)
         .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
 
 
@@ -141,24 +167,28 @@ export class ChartComponent implements OnChanges {
         .data(this.pie(this.dataset))
         .enter()
         .append("g")
-        .attr("class", "arc");
+        .attr("class", "arc")
+        .on("click", (d, i) => {
+          //alert(this.dataset[i].name);
+          this.selectProduct.emit(this.dataset[i].name);
+        })
 
       this.g.append("path")
         .attr("d", this.arc)
         .attr('fill', (d) => { return this.color(d.data.totalcost); });
-        /*.on("mouseover", (d, i) => {
-          this.svg.append("text")
-            .attr("dy", ".5em")
-            .style("text-anchor", "middle")
-            .style("font-size", 15)
-            .attr("class", "label")
-            .style("fill", function (d, i) { return "black"; })
-            .text(d.data.name);
+      /*.on("mouseover", (d, i) => {
+        this.svg.append("text")
+          .attr("dy", ".5em")
+          .style("text-anchor", "middle")
+          .style("font-size", 15)
+          .attr("class", "label")
+          .style("fill", function (d, i) { return "black"; })
+          .text(d.data.name);
 
-        })
-        .on("mouseout", (d) => {
-          this.svg.select(".label").remove();
-        })*/
+      })
+      .on("mouseout", (d) => {
+        this.svg.select(".label").remove();
+      })*/
 
 
       var legend = this.svg.selectAll('.legend')
@@ -195,7 +225,7 @@ export class ChartComponent implements OnChanges {
     } else {
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height+60)
+        .attr('height', this.height + 60)
         .append('g').attr("transform", "translate(" + 120 + "," + this.height / 2 + ")");
 
       this.svg.selectAll("g")
@@ -206,4 +236,6 @@ export class ChartComponent implements OnChanges {
         .text(this.msg);
     }
   }
+
+
 }

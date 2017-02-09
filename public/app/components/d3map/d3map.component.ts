@@ -7,7 +7,7 @@ import { ConfigService } from './../../services/config.service';
     moduleId: module.id,
     selector: 'd3-map',
     template: ``,
-    inputs: ['startdate', 'enddate', 'selectedRegion'],
+    inputs: ['appcomponentdata', 'selectedRegion','selectedProduct','detailReportOption'],
     outputs: ['isloading', 'selectRegion']
 })
 
@@ -30,8 +30,13 @@ export class D3mapComponent implements OnInit, OnChanges {
     private company: string;
     private selectionMap: any;
 
+    appcomponentdata: any;
+    appdataloaded = false;
+
     selectedRegion: string;
     selectRegion: EventEmitter<string> = new EventEmitter<string>();
+
+    detailReportOption:any;
 
     colorRange = ["green", "red"];
     legendText = ["Low Uses", "High Uses"];
@@ -53,20 +58,61 @@ export class D3mapComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(): void {
-        this.getRegionsData();
+        if (this.appcomponentdata.allServiceData) {
+            
+            //this.getRegionsData();
+            
+            this.parseD3Data(this.appcomponentdata.allServiceData);
+            
+            //this.appdataloaded = true;
+        }
+
+    }
+
+    parseD3Data(data: any): void {
+        if (data && data.aggregations) {
+            if(data.aggregations.AvailabilityRegion){
+                let regionData = {};
+                let maxval = 0;
+                let priceArr = [];
+                for (let region of data.aggregations.AvailabilityRegion.buckets) {
+                    if (region.TotalBlendedCost.value > 0) {
+                        if (maxval < region.TotalBlendedCost.value) {
+                            maxval = Math.ceil(region.TotalBlendedCost.value);
+                        }
+                        priceArr.push(Math.ceil(region.TotalBlendedCost.value));
+                        regionData[region.key] = {
+                            name: region.key,
+                            totalcost: parseFloat(region.TotalBlendedCost.value).toFixed(2),
+                            totalresource: region.doc_count,
+                            color: "red"
+                        }
+                    }
+                }
+                regionData['maxval'] = maxval;
+                priceArr.sort(function (a, b) { return a - b });
+                regionData['pricedata'] = priceArr;
+                this.drawMap(regionData);
+            }
+        }
     }
 
     getRegionsData() {
         let awsdata = {
             company: this.company,
-            strdate: this.startdate,
-            enddate: this.enddate
+            strdate: this.appcomponentdata.startdate,
+            enddate: this.appcomponentdata.enddate
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
-            this.drawMap(regionsData);
-
+            //console.log(regionsData);
+            this.parseD3Data(regionsData);            
+        }, (error) => {
+            console.log(error);
+            this.isloading.emit(false);
         })
     }
+
+
 
     initSvg(): void {
         if (this.parentNativeElement !== null) {
@@ -79,10 +125,10 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .append("g")
                 .attr("width", this.width)
                 .attr("height", this.height);
-            
+
             this.legendSvg = d3.select(this.parentNativeElement).append("svg")
                 .attr("class", "legend")
-                .attr("width",  this.width + this.margin.left + this.margin.right)
+                .attr("width", this.width + this.margin.left + this.margin.right)
                 .attr("height", 40)
                 .append("g")
                 .attr("transform", "translate(160,0)");
@@ -138,9 +184,9 @@ export class D3mapComponent implements OnInit, OnChanges {
             //console.log(data.pricedata);
             this.legendSvg.html('');
             var legendG = this.legendSvg.selectAll("g")
-                            .data(data.pricedata)
-                            .enter()
-                            .append("g");
+                .data(data.pricedata)
+                .enter()
+                .append("g");
 
             legendG.append("rect")
                 .attr("transform", function (d, i) { return "translate(" + ((i * 50)) + ", 10)"; })
@@ -152,7 +198,7 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .attr("x", function (d, i) { return i * 50; })
                 .attr("y", 33)
                 .attr("dy", ".35em")
-                .text(function (d) { return "$"+d; });
+                .text(function (d) { return "$" + d; });
 
             this.selectionMap.enter().append("path")
                 .attr("class", (d) => { return "subunit " + d.id; })
@@ -187,7 +233,7 @@ export class D3mapComponent implements OnInit, OnChanges {
                     }
                 })
                 .on("click", (d) => {
-                    this.isloading.emit(true);
+                    //this.isloading.emit(true);
                     this.selectRegion.emit(d.id);
                 })
                 .on("mouseover", (d) => {
