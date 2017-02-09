@@ -174,7 +174,7 @@ function getRegionsBillingCost(data) {
                     {
                         "range": {
                             "BlendedCost": {
-                                "gte": 0
+                                "gt": 0
                             }
                         }
                     }
@@ -274,7 +274,7 @@ function getResourcesData(data) {
                     {
                         "range": {
                             "BlendedCost": {
-                                "gte": 0
+                                "gt": 0
                             }
                         }
                     },
@@ -399,6 +399,172 @@ function getMinMaxDate(indexval) {
 }
 
 exports.getMinMaxDate = getMinMaxDate;
+
+
+function getGroupServicedata(data) {
+
+    console.log(data);
+    var indexName = data.company;
+    var startdate = data.strdate;
+    var enddate = data.enddate;
+    var filter = {};
+    var regionfilter = {};
+    var tablefilter = {};
+    var aggs = {};
+
+    /* Condition for aggregation start here */
+        if (data.product == "" && data.region == "" && data.detailreport == "" ) {
+
+            aggs = {
+                "AvailabilityRegion": {
+                    "terms": {
+                        "field": "__AvailabilityRegion",
+                        "order": { "TotalBlendedCost": "desc" }
+                    },
+                    "aggs": {
+                        "TotalBlendedCost": {
+                            "sum": {
+                                "field": "BlendedCost"
+                            }
+                        }
+                    }
+                },
+                "product_name": {
+                    "terms": {
+                        "field": "ProductName",
+                        "order": { "TotalBlendedCost": "desc" }
+
+                    },
+                    "aggs": {
+                        "TotalBlendedCost": {
+                            "sum": {
+                                "field": "BlendedCost"
+                            }
+                        }
+                    }
+                }
+            };
+        } else if (data.product != "" && data.region == ""  && data.detailreport == "") {
+            aggs = {
+                "AvailabilityRegion": {
+                    "terms": {
+                        "field": "__AvailabilityRegion",
+                        "order": { "TotalBlendedCost": "desc" }
+                    },
+                    "aggs": {
+                        "TotalBlendedCost": {
+                            "sum": {
+                                "field": "BlendedCost"
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+    if (data.product != '') {
+        filter = { "match": { "ProductName": data.product } };
+        if (data.region != '') {
+            filter = {
+                "match": {
+                    "ProductName": data.product
+                }
+            }, { "match": { "__AvailabilityRegion": data.region } };
+        }
+    }
+
+    if (data.product != '' && data.region != '') {
+        regionfilter = { "match": { "__AvailabilityRegion": data.region } };
+    }
+
+    var from = 0;
+    var size = 10;
+    var sort = {};
+    var sorting_order = "asc";
+    var sorting_field = "ProductName";
+    if (data.detailreport != '') {
+
+        from = data.detailreport.start;
+        size = data.detailreport.limit;
+
+        sorting_order = data.detailreport.shortorder;
+        sorting_field = data.detailreport.shortfield;
+        sort[sorting_field] = { "order": sorting_order };
+
+        if (data.detailreport.filtervalue != '') {
+            tablefilter = {
+                "multi_match": {
+                    "query": data.detailreport.filtervalue,
+                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
+                    "type": "phrase_prefix"
+                }
+            };
+        }
+
+    }
+
+    var query = {
+        "from": from,
+        "size": size,
+        "sort": [sort],
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "UsageStartDate": {
+                                "gte": startdate,
+                                "format": "yyyy-MM-dd"
+                            }
+                        }
+                    },
+                    {
+                        "range": {
+                            "UsageEndDate": {
+                                "lte": enddate,
+                                "format": "yyyy-MM-dd"
+                            }
+                        }
+                    },
+                    {
+                        "range": {
+                            "BlendedCost": {
+                                "gt": 0
+                            }
+                        }
+                    },
+                    filter,
+                    regionfilter,
+                    tablefilter
+
+                ]
+
+            }
+        },
+        "aggs": aggs,
+        "_source": [
+            "ProductName",
+            "UsageType",
+            "__AvailabilityRegion",
+            "ItemDescription",
+            "UsageStartDate",
+            "UsageEndDate",
+            "UsageQuantity",
+            "BlendedRate",
+            "BlendedCost",
+            "Operation"
+        ]
+    };
+
+    debugQuery(query)
+    return elasticClient.search({
+        index: indexName,
+        body: query
+    });
+}
+
+exports.getGroupServicedata = getGroupServicedata;
+
 
 function debugQuery(query) {
     console.log('--------------------Query Log-------------------------------');

@@ -9,8 +9,9 @@
         <div class="well well-sm form-inline">
             <div class="form-group detailed-report-filter">
                 <label class="right-extra-pad" for="email">Search :</label>
-                <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or Availability Region or Operation or Usage Type "
+                <input class="form-control" #detailfilterinput placeholder="Product name or Availability Region or Operation or Usage Type "
                 />
+                <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
             </div>
         </div>
 
