@@ -57,12 +57,7 @@ export class D3mapComponent implements OnInit, OnChanges {
 
     ngOnChanges(): void {
         if (this.appcomponentdata.allServiceData) {
-
-            //this.getRegionsData();
-
             this.parseD3Data(this.appcomponentdata.allServiceData);
-
-            //this.appdataloaded = true;
         }
 
     }
@@ -101,7 +96,6 @@ export class D3mapComponent implements OnInit, OnChanges {
             enddate: this.appcomponentdata.enddate
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
-            //console.log(regionsData);
             this.parseD3Data(regionsData);
         }, (error) => {
             console.log(error);
@@ -166,6 +160,7 @@ export class D3mapComponent implements OnInit, OnChanges {
     }
 
     drawMap(data): void {
+        let that = this;
         d3.json(this.worldMapJson, (error, collection) => {
             if (error) throw error;
 
@@ -215,6 +210,7 @@ export class D3mapComponent implements OnInit, OnChanges {
                         return 12;
                     }
                 })
+                .attr("circleClicked", "No")
                 .attr("class", (d) => {
                     if (data.hasOwnProperty(d.id)) {
                         return "resource-region";
@@ -226,9 +222,30 @@ export class D3mapComponent implements OnInit, OnChanges {
                         return color(data[d.id].totalcost);
                     }
                 })
-                .on("click", (d) => {
-                    //this.isloading.emit(true);
-                    this.selectRegion.emit(d.id);
+                .on("click", function (d, i) {
+                    if (d3.select(this).attr("circleClicked") == "No") {
+                        d3.selectAll("[circleClicked=Yes]")
+                            .attr("circleClicked", "No")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "none");
+
+                        d3.select(this)                            
+                            .attr("circleClicked", "Yes")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "blue")
+                            .attr("stroke-width", 2);
+
+                    }
+                    else if (d3.select(this).attr("circleClicked") == "Yes") {
+                        d3.select(this)
+                            .attr("circleClicked", "No")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "none");
+                    }
+                    that.selectRegion.emit(d.id);
                 })
                 .on("mouseover", (d) => {
                     let tooltext = d.properties.name + "<br/>"
@@ -245,11 +262,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                         .style("opacity", .9);
                     this.tooltipGroup.html(tooltext)
                         .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 120) + "px");
+                        .style("top", (d3.event.pageY+20) + "px");
                 })
                 .on("mousemove", (d) => {
                     this.tooltipGroup
-                        .style("top", (d3.event.pageY - 120) + "px")
+                        .style("top", (d3.event.pageY+20) + "px")
                         .style("left", (d3.event.pageX - 100) + "px");
                 })
                 .on("mouseout", (d) => {

@@ -174,7 +174,6 @@ export class ChartComponent implements OnChanges {
 
       this.g.append("path")
         .attr("d", this.arc)
-        .attr("class", "chart-path")
         .attr("clicked", "No")
         .attr('fill', (d) => { return this.color(d.data.totalcost); })
         .on("click", function (d, i) {

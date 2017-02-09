@@ -140,3 +140,7 @@ div.tooltipcss {
 .daterangepicker table { font-size: 12px!important; }
 .form-control { font-size: 12px!important; }
 .ranges li { font-size: 12px!important; }
+
+.date-range-input{
+  width: 230px!important;
+}
