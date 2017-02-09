@@ -28,6 +28,7 @@ export class ChartComponent implements OnChanges {
   private radius;      // Chart Radius
   private color;
   private arc;
+  private arcOver;
   private labelArc;
   private pie;
   private svg;
@@ -38,11 +39,11 @@ export class ChartComponent implements OnChanges {
 
   startdate: string;
   enddate: string;
-  @Input() selectedRegion: string;
+  //@Input() selectedRegion: string;
   @Input() appcomponentdata: any;
-  @Input() selectedProduct: string;
+  //@Input() selectedProduct: string;
   @Output() selectProduct: EventEmitter<string> = new EventEmitter<string>();
-  @Input() detailReportOption: any;
+  //@Input() detailReportOption: any;
 
 
   company: string;
@@ -141,6 +142,7 @@ export class ChartComponent implements OnChanges {
     this.radius = Math.min(this.width, this.height) / 2;
     this.color = D3.scaleOrdinal(D3.schemeCategory20);
     this.arc = D3.arc().outerRadius(this.radius - 10).innerRadius(0);
+    this.arcOver = D3.arc().outerRadius(this.radius).innerRadius(0);
     this.labelArc = D3.arc().outerRadius(this.radius - 40).innerRadius(this.radius - 40);
     this.pie = D3.pie().value(function (d) { return d.totalcost; }).sort(null);
 
@@ -150,16 +152,17 @@ export class ChartComponent implements OnChanges {
   * We can now build our SVG element using the configurations we created
   **/
   private buildSVG(): void {
+    console.log('html l');
     this.host.html('');
 
-
+    let that = this;
 
     /** Condition for checking product, if found then build pic chart else show message */
     if (this.dataset.length > 0) {
 
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height + 60)
+        .attr('height', this.height + 20)
         .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
 
 
@@ -167,28 +170,42 @@ export class ChartComponent implements OnChanges {
         .data(this.pie(this.dataset))
         .enter()
         .append("g")
-        .attr("class", "arc")
-        .on("click", (d, i) => {
-          //alert(this.dataset[i].name);
-          this.selectProduct.emit(this.dataset[i].name);
-        })
+        .attr("class", "arc");
 
       this.g.append("path")
         .attr("d", this.arc)
-        .attr('fill', (d) => { return this.color(d.data.totalcost); });
-      /*.on("mouseover", (d, i) => {
-        this.svg.append("text")
-          .attr("dy", ".5em")
-          .style("text-anchor", "middle")
-          .style("font-size", 15)
-          .attr("class", "label")
-          .style("fill", function (d, i) { return "black"; })
-          .text(d.data.name);
+        .attr("class", "chart-path")
+        .attr("clicked", "No")
+        .attr('fill', (d) => { return this.color(d.data.totalcost); })
+        .on("click", function (d, i) {
+         if (D3.select(this).attr("clicked") == "No") {
+            D3.selectAll("[clicked=Yes]")
+              .attr("clicked", "No")
+              .transition()
+              .duration(500)
+              .attr("d", that.arc)
+              .attr("stroke", "none");
 
-      })
-      .on("mouseout", (d) => {
-        this.svg.select(".label").remove();
-      })*/
+            D3.select(this)
+              .attr("stroke", "white")
+              .attr("clicked", "Yes")
+              .transition()
+              .duration(500)
+              .attr("d", that.arcOver)
+              .attr("stroke-width", 6);
+
+          }
+          else if (D3.select(this).attr("clicked") == "Yes") {
+            D3.select(this)
+              .attr("clicked", "No")
+              .transition()
+              .duration(500)
+              .attr("d", that.arc)
+              .attr("stroke", "none");
+          }
+          that.selectProduct.emit(that.dataset[i].name);
+        });
+
 
 
       var legend = this.svg.selectAll('.legend')
@@ -225,7 +242,7 @@ export class ChartComponent implements OnChanges {
     } else {
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height + 60)
+        .attr('height', this.height + 20)
         .append('g').attr("transform", "translate(" + 120 + "," + this.height / 2 + ")");
 
       this.svg.selectAll("g")

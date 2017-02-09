@@ -133,3 +133,10 @@ div.tooltipcss {
     cursor:pointer;
     width: 0;
 }
+.aws-panel-padding{
+  padding: 15px 0 15px!important;
+}
+
+.daterangepicker table { font-size: 12px!important; }
+.form-control { font-size: 12px!important; }
+.ranges li { font-size: 12px!important; }

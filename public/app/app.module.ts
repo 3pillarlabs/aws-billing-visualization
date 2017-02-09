@@ -4,9 +4,6 @@ import { HttpModule } from '@angular/http';
 import { FormsModule } from "@angular/forms";
 
 import { AppComponent }   from './app.component';
-//import { HeatmapComponent }   from './components/heatmap/heatmap.component';
-//import { DataTableModule } from "angular2-datatable";
-//import { DataFilterPipe } from "./components/datatable/data-filter.pipe";
 import { DatatableComponent } from "./components/datatable/datatable.component";
 import { AwsdataService } from "./services/awsdata.service";
 import { LoaderComponent } from './components/loader/loader.component';
