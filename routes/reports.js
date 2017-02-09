@@ -13,8 +13,10 @@ router.post('/regions',function(req,res,next){
     elastic.getRegionsBillingCost(data).then(function(result){
         res.json(result);
     },function(error){
-        res.send(400);
-        res.error(error);
+        res.status(error.status || 500);
+        res.json({
+            'error':error.message
+        });
     });
 });
 
@@ -29,8 +31,10 @@ router.post('/getalldata', function(req, res, next){
     elastic.getResourcesData(data).then(function(result){
         res.json(result);
     },function(error){
-        res.send(400);
-        res.error(error);
+        res.status(error.status || 500);
+        res.json({
+            'error':error.message
+        });
     });
 });
 
@@ -46,8 +50,10 @@ router.post('/getProductWiseData',function(req,res,next){
     elastic.getProductWiseData(data).then(function(result){
         res.json(result);
     },function(error){
-        res.send(400);
-        res.error(error);
+        res.status(error.status || 500);
+        res.json({
+            'error':error.message
+        });
     });
 });
 
@@ -63,8 +69,23 @@ router.get('/getMinMaxDate/:index',function(req,res){
     elastic.getMinMaxDate(req.params.index).then(function(result){
         res.json(result);
     },function(error){
-        res.send(400);
-        res.error(error);
+        res.status(error.status || 500);
+        res.json({
+            'error':error.message
+        });
+    });
+});
+
+
+router.post('/getGroupServicedata',function(req,res,next){
+    var data=req.body;
+    elastic.getGroupServicedata(data).then(function(result){
+        res.json(result);
+    },function(error){
+        res.status(error.status || 500);
+        res.json({
+            'error':error.message
+        });
     });
 });
 
