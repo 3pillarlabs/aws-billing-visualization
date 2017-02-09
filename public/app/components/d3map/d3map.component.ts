@@ -7,7 +7,7 @@ import { ConfigService } from './../../services/config.service';
     moduleId: module.id,
     selector: 'd3-map',
     template: ``,
-    inputs: ['appcomponentdata', 'selectedRegion','selectedProduct','detailReportOption'],
+    inputs: ['appcomponentdata'],
     outputs: ['isloading', 'selectRegion']
 })
 
@@ -16,7 +16,7 @@ export class D3mapComponent implements OnInit, OnChanges {
     private enddate: string;
     private isloading = new EventEmitter();
     private parentNativeElement: any;
-    private margin = { top: 20, right: 50, bottom: 30, left: 50 };
+    private margin = { top: 80, right: 0, bottom: 0, left: 0 };
     private width: number;
     private height: number;
     private rotate: number = 0;//60;
@@ -36,17 +36,15 @@ export class D3mapComponent implements OnInit, OnChanges {
     selectedRegion: string;
     selectRegion: EventEmitter<string> = new EventEmitter<string>();
 
-    detailReportOption:any;
+    detailReportOption: any;
 
-    colorRange = ["green", "red"];
-    legendText = ["Low Uses", "High Uses"];
-
+    colorRange = ["#ffe6e6", "#800000"];
     constructor(private element: ElementRef,
         private _awsService: AwsdataService,
         private _config: ConfigService) {
         this.company = this._config.company;
         this.parentNativeElement = element.nativeElement;
-        this.width = 650 - this.margin.left - this.margin.right;
+        this.width = 530 - this.margin.left - this.margin.right;
         this.height = 320 - this.margin.top - this.margin.bottom;
     }
 
@@ -59,11 +57,11 @@ export class D3mapComponent implements OnInit, OnChanges {
 
     ngOnChanges(): void {
         if (this.appcomponentdata.allServiceData) {
-            
+
             //this.getRegionsData();
-            
+
             this.parseD3Data(this.appcomponentdata.allServiceData);
-            
+
             //this.appdataloaded = true;
         }
 
@@ -71,10 +69,10 @@ export class D3mapComponent implements OnInit, OnChanges {
 
     parseD3Data(data: any): void {
         if (data && data.aggregations) {
-            if(data.aggregations.AvailabilityRegion){
+            if (data.aggregations.AvailabilityRegion) {
                 let regionData = {};
                 let maxval = 0;
-                let priceArr = [];
+                let priceArr = [0];
                 for (let region of data.aggregations.AvailabilityRegion.buckets) {
                     if (region.TotalBlendedCost.value > 0) {
                         if (maxval < region.TotalBlendedCost.value) {
@@ -84,8 +82,7 @@ export class D3mapComponent implements OnInit, OnChanges {
                         regionData[region.key] = {
                             name: region.key,
                             totalcost: parseFloat(region.TotalBlendedCost.value).toFixed(2),
-                            totalresource: region.doc_count,
-                            color: "red"
+                            totalresource: region.doc_count
                         }
                     }
                 }
@@ -105,7 +102,7 @@ export class D3mapComponent implements OnInit, OnChanges {
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
             //console.log(regionsData);
-            this.parseD3Data(regionsData);            
+            this.parseD3Data(regionsData);
         }, (error) => {
             console.log(error);
             this.isloading.emit(false);
@@ -128,10 +125,8 @@ export class D3mapComponent implements OnInit, OnChanges {
 
             this.legendSvg = d3.select(this.parentNativeElement).append("svg")
                 .attr("class", "legend")
-                .attr("width", this.width + this.margin.left + this.margin.right)
-                .attr("height", 40)
-                .append("g")
-                .attr("transform", "translate(160,0)");
+                .attr("width", 110)
+                .attr("height", this.height + this.margin.top + this.margin.bottom);
         }
     }
 
@@ -181,7 +176,6 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .domain([0, data.maxval])
                 .range(this.colorRange);
 
-            //console.log(data.pricedata);
             this.legendSvg.html('');
             var legendG = this.legendSvg.selectAll("g")
                 .data(data.pricedata)
@@ -189,14 +183,14 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .append("g");
 
             legendG.append("rect")
-                .attr("transform", function (d, i) { return "translate(" + ((i * 50)) + ", 10)"; })
-                .attr("width", 60)
-                .attr("height", 15)
+                .attr("transform", function (d, i) { return "translate(20, " + (280 - (i * 24)) + ")"; })
+                .attr("width", 20)
+                .attr("height", 25)
                 .style("fill", function (d, i) { return color(d); });
 
             legendG.append("text")
-                .attr("x", function (d, i) { return i * 50; })
-                .attr("y", 33)
+                .attr("x", 43)
+                .attr("y", function (d, i) { return (290 - (i * 24)); })
                 .attr("dy", ".35em")
                 .text(function (d) { return "$" + d; });
 

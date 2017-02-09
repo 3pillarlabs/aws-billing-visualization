@@ -9,13 +9,11 @@ import { ConfigService } from './../../services/config.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
-    inputs: ['selectedRegion', 'appcomponentdata','selectedProduct','detailReportOption'],
+    inputs: ['appcomponentdata'],
     outputs: ['isloading','selectedDetailReportOption']
 })
 export class DatatableComponent implements OnChanges {
     company: string;
-    selectedRegion: string;
-    selectedProduct:string;
     detailReportOption:any;
 
     isloading = new EventEmitter();
