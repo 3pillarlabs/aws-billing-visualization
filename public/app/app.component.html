@@ -5,9 +5,9 @@
 	<div class="row ">
 		<div class="well well-sm well-padding form-inline" id="datefilter">
 			<div class="form-group right-extra-pad">
-				<label for="date-range" class="right-extra-pad">Date:</label>
+				<label for="date-range" class="right-extra-pad">Date Range:</label>
 				<div class="input-group date datepicker">
-					<input type="text" name="daterange" class="form-control" [value]="dateRange" #dateRangeVal readonly/>
+					<input type="text" name="daterange" class="form-control date-range-input" [value]="dateRange" #dateRangeVal readonly/>
 					<div class="input-group-addon input-glyph">
 						<span class="glyphicon glyphicon-calendar"></span>
 					</div>
@@ -42,9 +42,8 @@
 					</h3>
 				</div>
 
-				<div class="panel-body">
+				<div class="panel-body aws-panel-padding">
 					<d3-map [appcomponentdata]="appcomponentdata"  (selectRegion)='onSelectRegion($event)' (isloading)="isloading=$event"></d3-map>
-						<!--<aws-billing-heatmap [startdate]="startdate" [enddate]="enddate" (isloading)="isloading=$event" [selectedRegion]="selectedRegion" (selectRegion)='onSelectRegion($event)'></aws-billing-heatmap>-->
 				</div>
 			</div>
 		</div>
