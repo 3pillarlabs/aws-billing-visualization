@@ -90,7 +90,6 @@ export class ChartComponent implements OnChanges {
 
   /** Set No data message on the bases of property change value */
   setMsg(changes): void {
-    console.log(changes);
     if ((typeof (changes.appcomponentdata.previousValue.startdate) == 'string' && changes.appcomponentdata.currentValue.startdate != changes.appcomponentdata.previousValue.startdate)) {
       this.msg = 'There is no product for selected date range';
     } else if ((typeof (changes.appcomponentdata.previousValue.enddate) == 'string' && changes.appcomponentdata.currentValue.enddate != changes.appcomponentdata.previousValue.enddate)) {
@@ -152,7 +151,6 @@ export class ChartComponent implements OnChanges {
   * We can now build our SVG element using the configurations we created
   **/
   private buildSVG(): void {
-    console.log('html l');
     this.host.html('');
 
     let that = this;

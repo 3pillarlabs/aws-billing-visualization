@@ -277,8 +277,6 @@ exports.getMinMaxDate = getMinMaxDate;
 
 
 function getGroupServicedata(data) {
-
-    console.log(data);
     var indexName = data.company;
     var startdate = data.strdate;
     var enddate = data.enddate;
@@ -431,7 +429,6 @@ function getGroupServicedata(data) {
         ]
     };
 
-    debugQuery(query)
     return elasticClient.search({
         index: indexName,
         body: query
