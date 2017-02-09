@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
 
 		this.startdate = year + '-' + month + '-01';
 		this.enddate = year + '-' + month + '-' + day;
-		this.dateRange = this.startdate + " - " + this.enddate;
+		this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 		this.isloading = false;
 
 
@@ -65,17 +65,15 @@ export class AppComponent implements OnInit {
 				let datesplitearr = this.calendDate.split("-");
 				this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
 				this.enddate = this.calendDate;
-				this.dateRange = this.startdate + " - " + this.enddate;
-
-
+				this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 
 				$('input[name="daterange"]').daterangepicker({
 					locale: {
-						format: 'YYYY-MM-DD'
+						format: 'MMMM D, YYYY'
 					},
-					startDate: this.startdate,
-					endDate: this.enddate,
-					minDate: this.calstartDate,
+					startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+					endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+					minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					//maxDate: this.calendDate,
 					autoApply: true,
 					ranges: {
@@ -130,8 +128,8 @@ export class AppComponent implements OnInit {
 		if (dateRangeStr) {
 			this.isloading = true;
 			let dateArr = dateRangeStr.split(" - ");
-			this.startdate = dateArr[0];
-			this.enddate = dateArr[1];
+			this.startdate = moment(dateArr[0], "MMMM D, YYYY").format('YYYY-MM-DD');
+			this.enddate = moment(dateArr[1], "MMMM D, YYYY").format('YYYY-MM-DD');
 			this.selectedProduct = '';
 			this.selectedRegion = '';
 			this.detailReportOption = "";
