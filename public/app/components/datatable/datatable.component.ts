@@ -9,7 +9,7 @@ import { ConfigService } from './../../services/config.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
-    inputs: ['appcomponentdata'],
+    inputs: ['appcomponentdata', 'productsRegionsData'],
     outputs: ['isloading','selectedDetailReportOption']
 })
 export class DatatableComponent implements OnChanges {
@@ -20,6 +20,7 @@ export class DatatableComponent implements OnChanges {
     selectedDetailReportOption= new EventEmitter();
     
     appcomponentdata:any; //Data from App Component
+    productsRegionsData:any;
 
     public data: any[] = [];
     public filterQuery = "";
