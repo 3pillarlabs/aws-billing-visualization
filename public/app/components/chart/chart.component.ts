@@ -1,4 +1,4 @@
-import { Component, OnChanges, ElementRef, Input, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, ElementRef, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
 import * as D3 from 'd3';
@@ -28,6 +28,7 @@ export class ChartComponent implements OnChanges {
   private radius;      // Chart Radius
   private color;
   private arc;
+  private arcOver;
   private labelArc;
   private pie;
   private svg;
@@ -36,11 +37,17 @@ export class ChartComponent implements OnChanges {
   private g;
   private tooltip;
 
-  @Input() startdate: string;
-  @Input() enddate: string;
-  @Input() selectedRegion: string;
+  startdate: string;
+  enddate: string;
+  //@Input() selectedRegion: string;
+  @Input() appcomponentdata: any;
+  //@Input() selectedProduct: string;
+  @Output() selectProduct: EventEmitter<string> = new EventEmitter<string>();
+  //@Input() detailReportOption: any;
+
 
   company: string;
+  appdataloaded = false;
 
   public dataset = [];
   public msg = 'There is no product';
@@ -62,48 +69,67 @@ export class ChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.setMsg(changes);
-    let awsdata = {
-      company: this.company,
-      strdate: this.startdate,
-      enddate: this.enddate,
-      region: this.selectedRegion
-    };
-    this.getProduct(awsdata);
+    if (this.appcomponentdata.allServiceData) {
+      /*if (this.appdataloaded) {
+        this.setMsg(changes);
+        let awsdata = {
+          company: this.company,
+          strdate: this.appcomponentdata.startdate,
+          enddate: this.appcomponentdata.enddate,
+          region: this.selectedRegion
+        };
+        this.getProduct(awsdata);
+      } else {
+        this.parsePieChartData(this.appcomponentdata.allServiceData);
+      }*/
+      this.parsePieChartData(this.appcomponentdata.allServiceData);
+      //this.appdataloaded = true;
+    }
+
   }
 
   /** Set No data message on the bases of property change value */
   setMsg(changes): void {
-    if (changes.startdate) {
-      if ((typeof (changes.startdate.previousValue) == 'string' && changes.startdate.currentValue != changes.startdate.previousValue)) {
-        this.msg = 'There is no product for selected date range';
-      }
-    } else if (changes.enddate) {
-      if ((typeof (changes.enddate.previousValue) == 'string' && changes.enddate.currentValue != changes.enddate.previousValue)) {
-        this.msg = 'There is no product for selected date range';
-      }
+    if ((typeof (changes.appcomponentdata.previousValue.startdate) == 'string' && changes.appcomponentdata.currentValue.startdate != changes.appcomponentdata.previousValue.startdate)) {
+      this.msg = 'There is no product for selected date range';
+    } else if ((typeof (changes.appcomponentdata.previousValue.enddate) == 'string' && changes.appcomponentdata.currentValue.enddate != changes.appcomponentdata.previousValue.enddate)) {
+      this.msg = 'There is no product for selected date range';
     } else if (changes.selectedRegion) {
       if ((typeof (changes.selectedRegion.previousValue) == 'string' && changes.selectedRegion.currentValue != changes.selectedRegion.previousValue)) {
         this.msg = 'There is no product for selected region';
       }
     }
+
   }
 
   public getProduct(awsdata: any) {
     this._awsdata.getUniqueProduct(awsdata).subscribe((data) => {
+      this.parsePieChartData(data);
+    }, (error) => {
+      console.log(error);
+    });
+  }
 
-      var products = [];
-      if (data.length > 0) {
-        for (let product of data) {
-          if (product.totalcost > 0) {
-            products.push(product);
+  parsePieChartData(data: any): void {
+    if (data && data.aggregations) {
+      if (data.aggregations.product_name) {
+        let productdata = [];
+        for (let product of data.aggregations.product_name.buckets) {
+          if (product.TotalBlendedCost.value > 0) {
+            var productdoc = {
+              'name': product.key,
+              'totalcost': Math.round(product.TotalBlendedCost.value),
+              'totalresource': product.doc_count
+            };
+            productdata.push(productdoc);
+
           }
         }
+        this.dataset = productdata;
+        this.setup();
+        this.buildSVG();
       }
-      this.dataset = products;
-      this.setup();
-      this.buildSVG();
-    });
+    }
   }
 
   /**
@@ -115,6 +141,7 @@ export class ChartComponent implements OnChanges {
     this.radius = Math.min(this.width, this.height) / 2;
     this.color = D3.scaleOrdinal(D3.schemeCategory20);
     this.arc = D3.arc().outerRadius(this.radius - 10).innerRadius(0);
+    this.arcOver = D3.arc().outerRadius(this.radius).innerRadius(0);
     this.labelArc = D3.arc().outerRadius(this.radius - 40).innerRadius(this.radius - 40);
     this.pie = D3.pie().value(function (d) { return d.totalcost; }).sort(null);
 
@@ -126,14 +153,14 @@ export class ChartComponent implements OnChanges {
   private buildSVG(): void {
     this.host.html('');
 
-
+    let that = this;
 
     /** Condition for checking product, if found then build pic chart else show message */
     if (this.dataset.length > 0) {
 
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height+60)
+        .attr('height', this.height + 20)
         .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
 
 
@@ -145,20 +172,37 @@ export class ChartComponent implements OnChanges {
 
       this.g.append("path")
         .attr("d", this.arc)
-        .attr('fill', (d) => { return this.color(d.data.totalcost); });
-        /*.on("mouseover", (d, i) => {
-          this.svg.append("text")
-            .attr("dy", ".5em")
-            .style("text-anchor", "middle")
-            .style("font-size", 15)
-            .attr("class", "label")
-            .style("fill", function (d, i) { return "black"; })
-            .text(d.data.name);
+        .attr("clicked", "No")
+        .attr('fill', (d) => { return this.color(d.data.totalcost); })
+        .on("click", function (d, i) {
+         if (D3.select(this).attr("clicked") == "No") {
+            D3.selectAll("[clicked=Yes]")
+              .attr("clicked", "No")
+              .transition()
+              .duration(500)
+              .attr("d", that.arc)
+              .attr("stroke", "none");
 
-        })
-        .on("mouseout", (d) => {
-          this.svg.select(".label").remove();
-        })*/
+            D3.select(this)
+              .attr("stroke", "white")
+              .attr("clicked", "Yes")
+              .transition()
+              .duration(500)
+              .attr("d", that.arcOver)
+              .attr("stroke-width", 6);
+
+          }
+          else if (D3.select(this).attr("clicked") == "Yes") {
+            D3.select(this)
+              .attr("clicked", "No")
+              .transition()
+              .duration(500)
+              .attr("d", that.arc)
+              .attr("stroke", "none");
+          }
+          that.selectProduct.emit(that.dataset[i].name);
+        });
+
 
 
       var legend = this.svg.selectAll('.legend')
@@ -195,7 +239,7 @@ export class ChartComponent implements OnChanges {
     } else {
       this.svg = this.host.append('svg')
         .attr('width', this.width)
-        .attr('height', this.height+60)
+        .attr('height', this.height + 20)
         .append('g').attr("transform", "translate(" + 120 + "," + this.height / 2 + ")");
 
       this.svg.selectAll("g")
@@ -206,4 +250,6 @@ export class ChartComponent implements OnChanges {
         .text(this.msg);
     }
   }
+
+
 }

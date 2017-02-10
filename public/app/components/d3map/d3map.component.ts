@@ -7,7 +7,7 @@ import { ConfigService } from './../../services/config.service';
     moduleId: module.id,
     selector: 'd3-map',
     template: ``,
-    inputs: ['startdate', 'enddate', 'selectedRegion'],
+    inputs: ['appcomponentdata'],
     outputs: ['isloading', 'selectRegion']
 })
 
@@ -16,7 +16,7 @@ export class D3mapComponent implements OnInit, OnChanges {
     private enddate: string;
     private isloading = new EventEmitter();
     private parentNativeElement: any;
-    private margin = { top: 20, right: 50, bottom: 30, left: 50 };
+    private margin = { top: 80, right: 0, bottom: 0, left: 0 };
     private width: number;
     private height: number;
     private rotate: number = 0;//60;
@@ -30,18 +30,21 @@ export class D3mapComponent implements OnInit, OnChanges {
     private company: string;
     private selectionMap: any;
 
+    appcomponentdata: any;
+    appdataloaded = false;
+
     selectedRegion: string;
     selectRegion: EventEmitter<string> = new EventEmitter<string>();
 
-    colorRange = ["green", "red"];
-    legendText = ["Low Uses", "High Uses"];
+    detailReportOption: any;
 
+    colorRange = ["#ffe6e6", "#800000"];
     constructor(private element: ElementRef,
         private _awsService: AwsdataService,
         private _config: ConfigService) {
         this.company = this._config.company;
         this.parentNativeElement = element.nativeElement;
-        this.width = 650 - this.margin.left - this.margin.right;
+        this.width = 530 - this.margin.left - this.margin.right;
         this.height = 320 - this.margin.top - this.margin.bottom;
     }
 
@@ -53,20 +56,54 @@ export class D3mapComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(): void {
-        this.getRegionsData();
+        if (this.appcomponentdata.allServiceData) {
+            this.parseD3Data(this.appcomponentdata.allServiceData);
+        }
+
+    }
+
+    parseD3Data(data: any): void {
+        if (data && data.aggregations) {
+            if (data.aggregations.AvailabilityRegion) {
+                let regionData = {};
+                let maxval = 0;
+                let priceArr = [0];
+                for (let region of data.aggregations.AvailabilityRegion.buckets) {
+                    if (region.TotalBlendedCost.value > 0) {
+                        if (maxval < region.TotalBlendedCost.value) {
+                            maxval = Math.ceil(region.TotalBlendedCost.value);
+                        }
+                        priceArr.push(Math.ceil(region.TotalBlendedCost.value));
+                        regionData[region.key] = {
+                            name: region.key,
+                            totalcost: parseFloat(region.TotalBlendedCost.value).toFixed(2),
+                            totalresource: region.doc_count
+                        }
+                    }
+                }
+                regionData['maxval'] = maxval;
+                priceArr.sort(function (a, b) { return a - b });
+                regionData['pricedata'] = priceArr;
+                this.drawMap(regionData);
+            }
+        }
     }
 
     getRegionsData() {
         let awsdata = {
             company: this.company,
-            strdate: this.startdate,
-            enddate: this.enddate
+            strdate: this.appcomponentdata.startdate,
+            enddate: this.appcomponentdata.enddate
         };
         this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
-            this.drawMap(regionsData);
-
+            this.parseD3Data(regionsData);
+        }, (error) => {
+            console.log(error);
+            this.isloading.emit(false);
         })
     }
+
+
 
     initSvg(): void {
         if (this.parentNativeElement !== null) {
@@ -79,13 +116,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .append("g")
                 .attr("width", this.width)
                 .attr("height", this.height);
-            
+
             this.legendSvg = d3.select(this.parentNativeElement).append("svg")
                 .attr("class", "legend")
-                .attr("width",  this.width + this.margin.left + this.margin.right)
-                .attr("height", 40)
-                .append("g")
-                .attr("transform", "translate(160,0)");
+                .attr("width", 110)
+                .attr("height", this.height + this.margin.top + this.margin.bottom);
         }
     }
 
@@ -125,6 +160,7 @@ export class D3mapComponent implements OnInit, OnChanges {
     }
 
     drawMap(data): void {
+        let that = this;
         d3.json(this.worldMapJson, (error, collection) => {
             if (error) throw error;
 
@@ -135,24 +171,23 @@ export class D3mapComponent implements OnInit, OnChanges {
                 .domain([0, data.maxval])
                 .range(this.colorRange);
 
-            //console.log(data.pricedata);
             this.legendSvg.html('');
             var legendG = this.legendSvg.selectAll("g")
-                            .data(data.pricedata)
-                            .enter()
-                            .append("g");
+                .data(data.pricedata)
+                .enter()
+                .append("g");
 
             legendG.append("rect")
-                .attr("transform", function (d, i) { return "translate(" + ((i * 50)) + ", 10)"; })
-                .attr("width", 60)
-                .attr("height", 15)
+                .attr("transform", function (d, i) { return "translate(20, " + (280 - (i * 24)) + ")"; })
+                .attr("width", 20)
+                .attr("height", 25)
                 .style("fill", function (d, i) { return color(d); });
 
             legendG.append("text")
-                .attr("x", function (d, i) { return i * 50; })
-                .attr("y", 33)
+                .attr("x", 43)
+                .attr("y", function (d, i) { return (290 - (i * 24)); })
                 .attr("dy", ".35em")
-                .text(function (d) { return "$"+d; });
+                .text(function (d) { return "$" + d; });
 
             this.selectionMap.enter().append("path")
                 .attr("class", (d) => { return "subunit " + d.id; })
@@ -175,6 +210,7 @@ export class D3mapComponent implements OnInit, OnChanges {
                         return 12;
                     }
                 })
+                .attr("circleClicked", "No")
                 .attr("class", (d) => {
                     if (data.hasOwnProperty(d.id)) {
                         return "resource-region";
@@ -186,9 +222,30 @@ export class D3mapComponent implements OnInit, OnChanges {
                         return color(data[d.id].totalcost);
                     }
                 })
-                .on("click", (d) => {
-                    this.isloading.emit(true);
-                    this.selectRegion.emit(d.id);
+                .on("click", function (d, i) {
+                    if (d3.select(this).attr("circleClicked") == "No") {
+                        d3.selectAll("[circleClicked=Yes]")
+                            .attr("circleClicked", "No")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "none");
+
+                        d3.select(this)                            
+                            .attr("circleClicked", "Yes")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "blue")
+                            .attr("stroke-width", 2);
+
+                    }
+                    else if (d3.select(this).attr("circleClicked") == "Yes") {
+                        d3.select(this)
+                            .attr("circleClicked", "No")
+                            .transition()
+                            .duration(500)
+                            .attr("stroke", "none");
+                    }
+                    that.selectRegion.emit(d.id);
                 })
                 .on("mouseover", (d) => {
                     let tooltext = d.properties.name + "<br/>"
@@ -205,11 +262,11 @@ export class D3mapComponent implements OnInit, OnChanges {
                         .style("opacity", .9);
                     this.tooltipGroup.html(tooltext)
                         .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 120) + "px");
+                        .style("top", (d3.event.pageY+20) + "px");
                 })
                 .on("mousemove", (d) => {
                     this.tooltipGroup
-                        .style("top", (d3.event.pageY - 120) + "px")
+                        .style("top", (d3.event.pageY+20) + "px")
                         .style("left", (d3.event.pageX - 100) + "px");
                 })
                 .on("mouseout", (d) => {
