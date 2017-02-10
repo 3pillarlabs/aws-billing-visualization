@@ -48,6 +48,11 @@
                 </tr>
             </thead>
             <tbody>
+                <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
+                    <td colspan="7"></td>
+                    <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
+                    <td></td>
+                </tr>
                 <tr *ngFor="let item of data">
 
                     <td>{{item.ProductName}}</td>
@@ -60,22 +65,32 @@
                     <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                     <td>{{item.UsageStartDate | date:'short'}} - {{item.UsageEndDate | date:'shortTime'}}</td>
                 </tr>
+
                 <tr *ngIf="data.length == 0">
                     <td colspan="10" [ngStyle]="{'text-align':'center'}">
                         <h3>No Data</h3>
                     </td>
                 </tr>
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="10">
-                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
-                            (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
-                            last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
 
+        </table>
+        <div class="row">
+            <div class="col-sm-5 dataTables_length_info">
+                <div class="dataTables_length" id="example_length">
+                    <label>Show 
+                        <select name="example_length" aria-controls="example" class="form-control input-sm" (change)="onLengthChange($event.target.value)">
+                            <option *ngFor="let length of dataTableLenth" [selected]="length == rowsOnPage" value="{{length}}">{{length}}</option>
+                        </select> entries
+                    </label></div>
+                <div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
+            </div>
+            <div class="col-sm-7">
+                <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
+                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
+                        last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
