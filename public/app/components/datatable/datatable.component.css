@@ -33,3 +33,26 @@
     font-weight: bold;
 }
 
+div.dataTables_length,dataTables_length_info{
+    float: left;
+}
+
+div.dataTables_length label {
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+div.dataTables_length select {
+    width: 75px;
+    display: inline-block;
+}
+
+div.dataTables_info{
+    float: left;
+    margin-left: 10px;
+    margin: 5px 0px 0px 15px;
+}
+
+

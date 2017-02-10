@@ -190,7 +190,7 @@ export class ChartComponent implements OnChanges {
               .duration(500)
               .attr("d", that.arcOver)
               .attr("stroke-width", 6);
-
+              that.selectProduct.emit(that.dataset[i].name);
           }
           else if (D3.select(this).attr("clicked") == "Yes") {
             D3.select(this)
@@ -199,8 +199,9 @@ export class ChartComponent implements OnChanges {
               .duration(500)
               .attr("d", that.arc)
               .attr("stroke", "none");
+              that.selectProduct.emit("");
           }
-          that.selectProduct.emit(that.dataset[i].name);
+          
         });
 
 
