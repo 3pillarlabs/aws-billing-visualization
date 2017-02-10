@@ -31,6 +31,7 @@ export class AppComponent implements OnInit {
 	lastupdated: string;
 	allServiceData: any;
 	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '' };
+	productsRegionsData = {"regions":"", "products":""};
 
 
 
@@ -67,6 +68,9 @@ export class AppComponent implements OnInit {
 				this.enddate = this.calendDate;
 				this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 
+				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
+				this.productsRegionsData.products = data.aggregations.product_names.buckets;
+
 				$('input[name="daterange"]').daterangepicker({
 					locale: {
 						format: 'MMMM D, YYYY'
@@ -74,7 +78,7 @@ export class AppComponent implements OnInit {
 					startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					//maxDate: this.calendDate,
+					//maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					autoApply: true,
 					ranges: {
 						'Today': [moment(), moment()],
