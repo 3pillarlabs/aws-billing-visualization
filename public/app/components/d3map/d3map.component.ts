@@ -237,6 +237,8 @@ export class D3mapComponent implements OnInit, OnChanges {
                             .attr("stroke", "blue")
                             .attr("stroke-width", 2);
 
+                            that.selectRegion.emit(d.id);
+
                     }
                     else if (d3.select(this).attr("circleClicked") == "Yes") {
                         d3.select(this)
@@ -244,8 +246,10 @@ export class D3mapComponent implements OnInit, OnChanges {
                             .transition()
                             .duration(500)
                             .attr("stroke", "none");
+
+                        that.selectRegion.emit("");
                     }
-                    that.selectRegion.emit(d.id);
+                    
                 })
                 .on("mouseover", (d) => {
                     let tooltext = d.properties.name + "<br/>"

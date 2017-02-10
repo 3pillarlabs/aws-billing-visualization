@@ -144,3 +144,12 @@ div.tooltipcss {
 .date-range-input{
   width: 230px!important;
 }
+
+.dataTables_paginate{
+    margin: 0;
+    white-space: nowrap;
+    text-align: right;
+}
+.pagination{
+  margin:0px !important;
+}
