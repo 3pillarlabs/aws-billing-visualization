@@ -9,8 +9,9 @@
         <div class="well well-sm form-inline">
             <div class="form-group detailed-report-filter">
                 <label class="right-extra-pad" for="email">Search :</label>
-                <input class="form-control" (keyup)="filterbyOperation($event.target.value)" placeholder="Product name or Availability Region or Operation or Usage Type "
+                <input class="form-control" #detailfilterinput placeholder="Product name or Availability Region or Operation or Usage Type "
                 />
+                <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
             </div>
         </div>
 
@@ -39,7 +40,6 @@
                     <td>{{item.UsageQuantity | number:'1.0-2'}}</td>
                     <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
                     <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
-                    <!--<td>{{item.usage_start_date | date:'short'}}</td>-->
                     <td>{{item.UsageStartDate | date:'short'}} - {{item.UsageEndDate | date:'shortTime'}}</td>
                 </tr>
                 <tr *ngIf="data.length == 0">
@@ -54,7 +54,6 @@
                         <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
                             (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
                             last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
-                        <!--<mfBootstrapPaginator [rowsOnPageSet]="[5,10,15]"></mfBootstrapPaginator>-->
                     </td>
                 </tr>
             </tfoot>

@@ -63,7 +63,7 @@ code {
 }
 
 div.tooltipcss {   
- 	position: absolute;           
+ 	position: fixed;           
 	text-align: center;           
 	width: 200px;                 
 	padding: 10px;             
@@ -110,4 +110,37 @@ div.tooltipcss {
 
 .navbar-fixed-top {
     z-index: 1101;
+}
+
+.container{
+  position: fixed;
+  top: 50%;
+  width:100%;
+}
+
+.center-msg{
+    margin: auto;
+    overflow: hidden;
+    width: 50%;
+}
+
+#detailfilter {
+    position: relative;
+    z-index: 1;
+    left: -25px;
+    top: 1px;
+    color: #7B7B7B;
+    cursor:pointer;
+    width: 0;
+}
+.aws-panel-padding{
+  padding: 15px 0 15px!important;
+}
+
+.daterangepicker table { font-size: 12px!important; }
+.form-control { font-size: 12px!important; }
+.ranges li { font-size: 12px!important; }
+
+.date-range-input{
+  width: 230px!important;
 }
