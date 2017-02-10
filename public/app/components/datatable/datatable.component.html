@@ -1,19 +1,37 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">
+        <div class="panel-title form-inline">
             <strong>Detailed Report</strong>
-        </h3>
+            <div class="form-group">
+                <select class="form-control">
+                    <option>Select Product</option>
+                    <option *ngFor="let product of productsRegionsData.products" [value]="product.key">{{product.key}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control">
+                    <option>Select Region</option>
+                    <option *ngFor="let region of productsRegionsData.regions" [value]="region.key">{{region.key}}</option>
+                </select>
+            </div>
+            <div class="form-group detailed-report-filter">
+                <input class="form-control" #detailfilterinput placeholder="Product name or Availability Region or Operation or Usage Type "
+                />
+                <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
+            </div>
+        </div>
+
     </div>
 
     <div class="panel-body">
-        <div class="well well-sm form-inline">
+        <!--<div class="well well-sm form-inline">
             <div class="form-group detailed-report-filter">
                 <label class="right-extra-pad" for="email">Search :</label>
                 <input class="form-control" #detailfilterinput placeholder="Product name or Availability Region or Operation or Usage Type "
                 />
                 <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
             </div>
-        </div>
+        </div>-->
 
         <table class="table table-striped table-bordered table-sortable">
             <thead class="thead-default">

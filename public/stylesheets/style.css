@@ -92,13 +92,13 @@ div.tooltipcss {
 	cursor: pointer;
 }
 
-.detailed-report-filter{
+/*.detailed-report-filter{
 	width: 100%;
 }
 
 .detailed-report-filter input{
 	width: 30% !important;
-}
+}*/
 
 .form-control[readonly]{
       background-color: #fff !important;

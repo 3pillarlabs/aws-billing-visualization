@@ -266,7 +266,20 @@ function getMinMaxDate(indexval) {
             "aggs": {
                 "max_date": { "max": { "field": "UsageEndDate", "format": "YYYY-MM-dd" } },
                 "min_date": { "min": { "field": "UsageStartDate", "format": "YYYY-MM-dd" } },
-                "last_created": { "max": { "field": "__CreatedDate" } }
+                "last_created": { "max": { "field": "__CreatedDate" } },
+                "availability_regions": {
+                    "terms": {
+                        "field": "__AvailabilityRegion",
+                        "order": { "_term": "asc" }
+                    }
+                },
+                "product_names": {
+                    "terms": {
+                        "field": "ProductName",
+                        "order": { "_term": "asc" }
+
+                    }
+                }
             }
 
         }
@@ -286,54 +299,54 @@ function getGroupServicedata(data) {
     var aggs = {};
 
     /* Condition for aggregation start here */
-        if (data.product == "" && data.region == "" && data.detailreport == "" ) {
+    if (data.product == "" && data.region == "" && data.detailreport == "") {
 
-            aggs = {
-                "AvailabilityRegion": {
-                    "terms": {
-                        "field": "__AvailabilityRegion",
-                        "order": { "TotalBlendedCost": "desc" }
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
-                        }
-                    }
+        aggs = {
+            "AvailabilityRegion": {
+                "terms": {
+                    "field": "__AvailabilityRegion",
+                    "order": { "TotalBlendedCost": "desc" }
                 },
-                "product_name": {
-                    "terms": {
-                        "field": "ProductName",
-                        "order": { "TotalBlendedCost": "desc" }
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
+                        }
+                    }
+                }
+            },
+            "product_name": {
+                "terms": {
+                    "field": "ProductName",
+                    "order": { "TotalBlendedCost": "desc" }
 
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
+                },
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
                         }
                     }
                 }
-            };
-        } else if (data.product != "" && data.region == ""  && data.detailreport == "") {
-            aggs = {
-                "AvailabilityRegion": {
-                    "terms": {
-                        "field": "__AvailabilityRegion",
-                        "order": { "TotalBlendedCost": "desc" }
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
+            }
+        };
+    } else if (data.product != "" && data.region == "" && data.detailreport == "") {
+        aggs = {
+            "AvailabilityRegion": {
+                "terms": {
+                    "field": "__AvailabilityRegion",
+                    "order": { "TotalBlendedCost": "desc" }
+                },
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
                         }
                     }
                 }
-            };
-        }
+            }
+        };
+    }
 
     if (data.product != '') {
         filter = { "match": { "ProductName": data.product } };
