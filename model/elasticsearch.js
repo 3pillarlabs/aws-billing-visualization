@@ -296,7 +296,13 @@ function getGroupServicedata(data) {
     var filter = {};
     var regionfilter = {};
     var tablefilter = {};
-    var aggs = {};
+    var aggs = {
+        "total_cost": {
+            "sum": {
+                "field": "BlendedCost"
+            }
+        }
+    };
 
     /* Condition for aggregation start here */
     if (data.product == "" && data.region == "" && data.detailreport == "") {
@@ -328,6 +334,11 @@ function getGroupServicedata(data) {
                         }
                     }
                 }
+            },
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
+                }
             }
         };
     } else if (data.product != "" && data.region == "" && data.detailreport == "") {
@@ -343,6 +354,11 @@ function getGroupServicedata(data) {
                             "field": "BlendedCost"
                         }
                     }
+                }
+            },
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
                 }
             }
         };
@@ -368,13 +384,21 @@ function getGroupServicedata(data) {
     var sort = {};
     var sorting_order = "asc";
     var sorting_field = "ProductName";
-    if (data.detailreport != '') {
 
-        from = data.detailreport.start;
-        size = data.detailreport.limit;
+    
+
+    if (data.detailreport != '') {
+        if (data.detailreport.limit) {
+            size = data.detailreport.limit;
+        }
+
+        if (data.detailreport.start) {
+            from = ((data.detailreport.start - 1) * size);
+        }
 
         sorting_order = data.detailreport.shortorder;
         sorting_field = data.detailreport.shortfield;
+        
         sort[sorting_field] = { "order": sorting_order };
 
         if (data.detailreport.filtervalue != '') {
@@ -438,10 +462,12 @@ function getGroupServicedata(data) {
             "UsageQuantity",
             "BlendedRate",
             "BlendedCost",
-            "Operation"
+            "Operation",
+            "aws:*",
+            "user:*"
         ]
     };
-
+    //debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query

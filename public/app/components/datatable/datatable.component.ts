@@ -14,7 +14,7 @@ import { ConfigService } from './../../services/config.service';
 })
 export class DatatableComponent implements OnChanges {
     company: string;
-    detailReportOption:any;
+    detailReportOption: any;
 
     isloading = new EventEmitter();
     selectedDetailReportOption= new EventEmitter();
@@ -29,10 +29,14 @@ export class DatatableComponent implements OnChanges {
     public sortOrder = "asc";
 
     public currentPage: number = 1;
-    public totalItems: number = 200; // total numbar of page not items 
+    public totalItems: number = 0; // total numbar of page not items 
     public maxSize: number = 10; // max page size 
     filter: string = '';
-    appdataloaded=false;
+    appdataloaded = false;
+    totalBlendedCost: number = 0;
+    showingfrom=this.currentPage;
+    showingto=this.rowsOnPage;
+    dataTableLenth:any=[10,25,50,100];
 
 
     columns: any[] = [
@@ -89,95 +93,47 @@ export class DatatableComponent implements OnChanges {
         descending: false
     };
 
-
-
     constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
         this.company = this._config.company;
     }
 
     ngOnChanges(): void {
-        if(this.appcomponentdata.allServiceData){
-            /*if(this.appdataloaded){
-                this.isloading.emit(true);
-                this.currentPage = 1;
-                let awsdata = {
-                    company: this.company,
-                    strdate: this.appcomponentdata.startdate,
-                    enddate: this.appcomponentdata.enddate,
-                    currentpage: this.currentPage,
-                    size: this.rowsOnPage,
-                    filter: this.filter,
-                    region: this.selectedRegion
-                };
-                this.getAllAwsResourcedata(awsdata);
-            }else{
-                this.parseDetailData(this.appcomponentdata.allServiceData);
-            }
-            this.appdataloaded=true;*/
+        if (this.appcomponentdata.allServiceData) {
             this.parseDetailData(this.appcomponentdata.allServiceData);
         }
-        
     }
 
-    getAllAwsResourcedata(awsdata: any) {
-       
-        var shortingorder = 'asc';
-        awsdata.sortingfield = this.sorting.column;
-        if (this.sorting.descending) {
-            shortingorder = 'desc';
-        }
-        awsdata.shortingorder = shortingorder;
 
-        this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
-            this.parseDetailData(data);
-            this.isloading.emit(false);
-        }, (error) => {
-            console.log(error);
-            this.isloading.emit(false);
-        });
-
-
-    }
-
-    parseDetailData(data:any):void{
+    parseDetailData(data: any): void {
         var jsondata: any = [];
-        if (data.hits.total) {
-                this.totalItems = data.hits.total;
+        if (data.aggregations) {
+            if (data.aggregations.total_cost) {
+                this.totalBlendedCost = data.aggregations.total_cost.value;
             }
-            for (let hit of data.hits.hits) {
-                jsondata.push(hit._source);
-            }
+        }
 
-            this.data = jsondata;
+
+        if (data.hits.total) {
+            this.totalItems = data.hits.total;
+        }
+        for (let hit of data.hits.hits) {
+            jsondata.push(hit._source);
+        }
+
+        this.data = jsondata;
     }
 
     filterbyOperation(val: string) {
-            this.filter = val
-            let temp={
-                "start":this.currentPage,
-                "limit":this.rowsOnPage,
-                "filterfield":'',
-                "filtervalue":this.filter,
-                "shortorder":'asc',
-                "shortfield":'ProductName'
-            }
-            this.selectedDetailReportOption.emit(temp);
-            /*this.filter = val;
-            this.currentPage = 1;
-            let awsdata = {
-                company: this.company,
-                strdate: this.appcomponentdata.startdate,
-                enddate: this.appcomponentdata.enddate,
-                currentpage: this.currentPage,
-                size: this.rowsOnPage,
-                filter: this.filter,
-                region: this.selectedRegion
-            };
-            this.isloading.emit(true);
-            this.getAllAwsResourcedata(awsdata);*/
-        
-        
-
+        this.filter = val
+        let data = {
+            "start": this.currentPage,
+            "limit": this.rowsOnPage,
+            "filterfield": '',
+            "filtervalue": this.filter,
+            "shortorder": this.sorting.descending,
+            "shortfield": this.sorting.column
+        }
+        this.callEmitData(data);
     }
 
 
@@ -186,31 +142,34 @@ export class DatatableComponent implements OnChanges {
         this.currentPage = pageNo;
     };
 
-    public pageChanged(event: any): void {
-        //this method will trigger every page click 
-        /*let awsdata = {
-            company: this.company,
-            strdate: this.appcomponentdata.startdate,
-            enddate: this.appcomponentdata.enddate,
-            currentpage: this.currentPage,
-            size: this.rowsOnPage,
-            filter: this.filter,
-            region: this.selectedRegion
-        };
-        this.isloading.emit(true);
-        this.currentPage = event.itemsPerPage;
-        this.getAllAwsResourcedata(awsdata);*/
+    public onLengthChange(length:number):void{
+      this.rowsOnPage=length;
+      let data = {
+            "start": this.currentPage,
+            "limit": this.rowsOnPage,
+            "filterfield": '',
+            "filtervalue": this.filter,
+            "shortorder": this.sorting.descending,
+            "shortfield": this.sorting.column
+      }
+      this.callEmitData(data);
+    }
 
-        let temp={
-            "start":this.currentPage,
-            "limit":this.rowsOnPage,
-            "filterfield":'',
-            "filtervalue":this.filter,
-            "shortorder":'asc',
-            "shortfield":'ProductName'
+    public pageChanged(event: any): void {
+        let data = {
+            "start": this.currentPage,
+            "limit": this.rowsOnPage,
+            "filterfield": '',
+            "filtervalue": this.filter,
+            "shortorder": this.sorting.descending,
+            "shortfield": this.sorting.column
         }
-        
-        this.selectedDetailReportOption.emit(temp);
+
+        this.showingfrom=((this.currentPage-1)*this.rowsOnPage)+1;
+        var calshowingTo=this.currentPage*this.rowsOnPage;
+        this.showingto=calshowingTo > this.totalItems ?  this.totalItems : calshowingTo;
+
+        this.callEmitData(data);
     };
 
 
@@ -228,34 +187,30 @@ export class DatatableComponent implements OnChanges {
         }
 
         this.currentPage = 1;
-        /*let awsdata = {
-            company: this.company,
-            strdate: this.appcomponentdata.startdate,
-            enddate: this.appcomponentdata.enddate,
-            currentpage: this.currentPage,
-            size: this.rowsOnPage,
-            filter: this.filter,
-            region: this.selectedRegion
-        };
         
-        this.isloading.emit(true);
-        this.getAllAwsResourcedata(awsdata);*/
-
-        var shortingorder = 'asc';
-        let temp={
-            "start":this.currentPage,
-            "limit":this.rowsOnPage,
-            "filterfield":'',
-            "filtervalue":this.filter,
-            "shortorder":'asc',
-            "shortfield":'ProductName'
+        let data = {
+            "start": this.currentPage,
+            "limit": this.rowsOnPage,
+            "filterfield": '',
+            "filtervalue": this.filter,
+            "shortorder": this.sorting.descending,
+            "shortfield": this.sorting.column
         }
-        temp.shortfield = this.sorting.column;
+        this.callEmitData(data);
+        
+    }
+
+    callEmitData(data:any){
+        var awsdata=data;
+        var shortingorder = 'asc';
+        awsdata.shortfield = this.sorting.column;
         if (this.sorting.descending) {
             shortingorder = 'desc';
         }
-        temp.shortorder = shortingorder;
-        this.selectedDetailReportOption.emit(temp);
+        awsdata.shortorder = shortingorder;
+
+        console.log(awsdata);
+        this.selectedDetailReportOption.emit(awsdata);
     }
 
 }
