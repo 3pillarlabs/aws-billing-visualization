@@ -89,6 +89,7 @@ exports.getRegionsBillingCost = getRegionsBillingCost;
  * @return: @Object
  */
 function getResourcesData(data) {
+    console.log(data);
     var indexName = data.company;
     var startdate = data.strdate;
     var enddate = data.enddate;
@@ -96,6 +97,7 @@ function getResourcesData(data) {
     var size = 10;
     var filter = {};
     var regionfilter = {};
+    var productfilter = {};
     var sorting_order = data.shortingorder;
     var sorting_field = data.sortingfield;
 
@@ -107,11 +109,11 @@ function getResourcesData(data) {
         from = ((data.currentpage - 1) * size);
     }
 
-    if (data.filter) {
+    if (data.filter!= "") {
         filter = {
             "multi_match": {
                 "query": data.filter,
-                "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
+                "fields": ["ResourceId","aws:*","user:*"],
                 "type": "phrase_prefix"
             }
         };
@@ -119,6 +121,10 @@ function getResourcesData(data) {
 
     if (data.region != "") {
         regionfilter = { "match": { "__AvailabilityRegion": data.region } };
+    }
+
+    if (data.product != "") {
+        productfilter = { "match": { "ProductName": data.product } };
     }
     var sort = {};
     sort[sorting_field] = { "order": sorting_order };
@@ -154,10 +160,19 @@ function getResourcesData(data) {
                         }
                     },
                     filter,
+                    productfilter,
                     regionfilter
 
                 ]
 
+            }
+
+        },
+        "aggs": {
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
+                }
             }
         },
         "_source": [
@@ -170,10 +185,14 @@ function getResourcesData(data) {
             "UsageQuantity",
             "BlendedRate",
             "BlendedCost",
-            "Operation"
+            "Operation",
+            "aws:*",
+            "user:*",
+            "ResourceId"
         ]
     };
 
+    debugQuery(query);
 
     return elasticClient.search({
         index: indexName,
@@ -266,7 +285,20 @@ function getMinMaxDate(indexval) {
             "aggs": {
                 "max_date": { "max": { "field": "UsageEndDate", "format": "YYYY-MM-dd" } },
                 "min_date": { "min": { "field": "UsageStartDate", "format": "YYYY-MM-dd" } },
-                "last_created": { "max": { "field": "__CreatedDate" } }
+                "last_created": { "max": { "field": "__CreatedDate" } },
+                "availability_regions": {
+                    "terms": {
+                        "field": "__AvailabilityRegion",
+                        "order": { "_term": "asc" }
+                    }
+                },
+                "product_names": {
+                    "terms": {
+                        "field": "ProductName",
+                        "order": { "_term": "asc" }
+
+                    }
+                }
             }
 
         }
@@ -283,57 +315,73 @@ function getGroupServicedata(data) {
     var filter = {};
     var regionfilter = {};
     var tablefilter = {};
-    var aggs = {};
+    var aggs = {
+        "total_cost": {
+            "sum": {
+                "field": "BlendedCost"
+            }
+        }
+    };
 
     /* Condition for aggregation start here */
-        if (data.product == "" && data.region == "" && data.detailreport == "" ) {
+    if (data.product == "" && data.region == "" && data.detailreport == "") {
 
-            aggs = {
-                "AvailabilityRegion": {
-                    "terms": {
-                        "field": "__AvailabilityRegion",
-                        "order": { "TotalBlendedCost": "desc" }
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
-                        }
-                    }
+        aggs = {
+            "AvailabilityRegion": {
+                "terms": {
+                    "field": "__AvailabilityRegion",
+                    "order": { "TotalBlendedCost": "desc" }
                 },
-                "product_name": {
-                    "terms": {
-                        "field": "ProductName",
-                        "order": { "TotalBlendedCost": "desc" }
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
+                        }
+                    }
+                }
+            },
+            "product_name": {
+                "terms": {
+                    "field": "ProductName",
+                    "order": { "TotalBlendedCost": "desc" }
 
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
+                },
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
                         }
                     }
                 }
-            };
-        } else if (data.product != "" && data.region == ""  && data.detailreport == "") {
-            aggs = {
-                "AvailabilityRegion": {
-                    "terms": {
-                        "field": "__AvailabilityRegion",
-                        "order": { "TotalBlendedCost": "desc" }
-                    },
-                    "aggs": {
-                        "TotalBlendedCost": {
-                            "sum": {
-                                "field": "BlendedCost"
-                            }
+            },
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
+                }
+            }
+        };
+    } else if (data.product != "" && data.region == "" && data.detailreport == "") {
+        aggs = {
+            "AvailabilityRegion": {
+                "terms": {
+                    "field": "__AvailabilityRegion",
+                    "order": { "TotalBlendedCost": "desc" }
+                },
+                "aggs": {
+                    "TotalBlendedCost": {
+                        "sum": {
+                            "field": "BlendedCost"
                         }
                     }
                 }
-            };
-        }
+            },
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
+                }
+            }
+        };
+    }
 
     if (data.product != '') {
         filter = { "match": { "ProductName": data.product } };
@@ -355,26 +403,34 @@ function getGroupServicedata(data) {
     var sort = {};
     var sorting_order = "asc";
     var sorting_field = "ProductName";
-    if (data.detailreport != '') {
 
-        from = data.detailreport.start;
-        size = data.detailreport.limit;
+
+
+    /*if (data.detailreport != '') {
+        if (data.detailreport.limit) {
+            size = data.detailreport.limit;
+        }
+
+        if (data.detailreport.start) {
+            from = ((data.detailreport.start - 1) * size);
+        }
 
         sorting_order = data.detailreport.shortorder;
         sorting_field = data.detailreport.shortfield;
+
         sort[sorting_field] = { "order": sorting_order };
 
         if (data.detailreport.filtervalue != '') {
             tablefilter = {
                 "multi_match": {
                     "query": data.detailreport.filtervalue,
-                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
+                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType","ResourceId"],
                     "type": "phrase_prefix"
                 }
             };
         }
 
-    }
+    }*/
 
     var query = {
         "from": from,
@@ -407,9 +463,7 @@ function getGroupServicedata(data) {
                         }
                     },
                     filter,
-                    regionfilter,
-                    tablefilter
-
+                    regionfilter
                 ]
 
             }
@@ -425,10 +479,13 @@ function getGroupServicedata(data) {
             "UsageQuantity",
             "BlendedRate",
             "BlendedCost",
-            "Operation"
+            "Operation",
+            "aws:*",
+            "user:*",
+            "ResourceId"
         ]
     };
-
+    debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query

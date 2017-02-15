@@ -1,20 +1,31 @@
+<div id="example_processing" class="dataTables_processing" *ngIf="datatableloading">Processing...</div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">
+        <div class="panel-title form-inline">
             <strong>Detailed Report</strong>
-        </h3>
-    </div>
-
-    <div class="panel-body">
-        <div class="well well-sm form-inline">
-            <div class="form-group detailed-report-filter">
-                <label class="right-extra-pad" for="email">Search :</label>
-                <input class="form-control" #detailfilterinput placeholder="Product name or Availability Region or Operation or Usage Type "
-                />
-                <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
+            <div class="dataTable_filter">
+                <div class="form-group">
+                    <select class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
+                        <option value="">Select Product</option>
+                        <option *ngFor="let product of productsRegionsData.products" [value]="product.key">{{product.key}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select class="form-control" (change)="onChangeRegion($event.target.value)" [(ngModel)]="region">
+                        <option value="">Select Region</option>
+                        <option *ngFor="let region of productsRegionsData.regions" [value]="region.key">{{region.key}}</option>
+                    </select>
+                </div>
+                <div class="form-group detailed-report-filter">
+                    <input class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" />
+                    <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
+                </div>
             </div>
         </div>
 
+    </div>
+
+    <div class="panel-body">
         <table class="table table-striped table-bordered table-sortable">
             <thead class="thead-default">
                 <tr>
@@ -30,11 +41,17 @@
                 </tr>
             </thead>
             <tbody>
+                <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
+                    <td colspan="9"></td>
+                    <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
+                    <td></td>
+                </tr>
                 <tr *ngFor="let item of data">
-
                     <td>{{item.ProductName}}</td>
                     <td>{{item.__AvailabilityRegion}}</td>
-                    <td>{{item.Operation}}</td>
+                    <td>{{tags(item) }}{{item.Operation}}</td>
+                    <td [innerHTML]="alltags"></td>
+                    <td>{{item.ResourceId}}</td>
                     <td>{{item.ItemDescription}}</td>
                     <td>{{item.UsageType}}</td>
                     <td>{{item.UsageQuantity | number:'1.0-2'}}</td>
@@ -42,22 +59,26 @@
                     <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                     <td>{{item.UsageStartDate | date:'short'}} - {{item.UsageEndDate | date:'shortTime'}}</td>
                 </tr>
+
                 <tr *ngIf="data.length == 0">
                     <td colspan="10" [ngStyle]="{'text-align':'center'}">
                         <h3>No Data</h3>
                     </td>
                 </tr>
             </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="10">
-                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
-                            (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
-                            last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
 
+        </table>
+        <div class="row">
+            <div class="col-sm-5 dataTables_length_info">
+                <div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
+            </div>
+            <div class="col-sm-7">
+                <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
+                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
+                        last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

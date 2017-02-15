@@ -43,7 +43,7 @@
 				</div>
 
 				<div class="panel-body aws-panel-padding">
-					<d3-map [appcomponentdata]="appcomponentdata"  (selectRegion)='onSelectRegion($event)' (isloading)="isloading=$event"></d3-map>
+					<d3-map [appcomponentdata]="appcomponentdata" (selectRegion)='onSelectRegion($event)'></d3-map>
 				</div>
 			</div>
 		</div>
@@ -51,7 +51,7 @@
 	</div>
 	<div class="row">
 		<div class="col-lg-12" id="datatable">
-			<aws-billing-datatable [appcomponentdata]="appcomponentdata" (selectedDetailReportOption)="onselectedDetailReportOption($event)"></aws-billing-datatable>
+			<aws-billing-datatable [productsRegionsData]="productsRegionsData" [appcomponentdata]="appcomponentdata"></aws-billing-datatable>
 		</div>
 	</div>
 
