@@ -89,6 +89,7 @@ exports.getRegionsBillingCost = getRegionsBillingCost;
  * @return: @Object
  */
 function getResourcesData(data) {
+    console.log(data);
     var indexName = data.company;
     var startdate = data.strdate;
     var enddate = data.enddate;
@@ -96,6 +97,7 @@ function getResourcesData(data) {
     var size = 10;
     var filter = {};
     var regionfilter = {};
+    var productfilter = {};
     var sorting_order = data.shortingorder;
     var sorting_field = data.sortingfield;
 
@@ -107,11 +109,11 @@ function getResourcesData(data) {
         from = ((data.currentpage - 1) * size);
     }
 
-    if (data.filter) {
+    if (data.filter!= "") {
         filter = {
             "multi_match": {
                 "query": data.filter,
-                "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
+                "fields": ["ResourceId","aws:*","user:*"],
                 "type": "phrase_prefix"
             }
         };
@@ -119,6 +121,10 @@ function getResourcesData(data) {
 
     if (data.region != "") {
         regionfilter = { "match": { "__AvailabilityRegion": data.region } };
+    }
+
+    if (data.product != "") {
+        productfilter = { "match": { "ProductName": data.product } };
     }
     var sort = {};
     sort[sorting_field] = { "order": sorting_order };
@@ -154,10 +160,19 @@ function getResourcesData(data) {
                         }
                     },
                     filter,
+                    productfilter,
                     regionfilter
 
                 ]
 
+            }
+
+        },
+        "aggs": {
+            "total_cost": {
+                "sum": {
+                    "field": "BlendedCost"
+                }
             }
         },
         "_source": [
@@ -170,10 +185,14 @@ function getResourcesData(data) {
             "UsageQuantity",
             "BlendedRate",
             "BlendedCost",
-            "Operation"
+            "Operation",
+            "aws:*",
+            "user:*",
+            "ResourceId"
         ]
     };
 
+    debugQuery(query);
 
     return elasticClient.search({
         index: indexName,
@@ -385,9 +404,9 @@ function getGroupServicedata(data) {
     var sorting_order = "asc";
     var sorting_field = "ProductName";
 
-    
 
-    if (data.detailreport != '') {
+
+    /*if (data.detailreport != '') {
         if (data.detailreport.limit) {
             size = data.detailreport.limit;
         }
@@ -398,20 +417,20 @@ function getGroupServicedata(data) {
 
         sorting_order = data.detailreport.shortorder;
         sorting_field = data.detailreport.shortfield;
-        
+
         sort[sorting_field] = { "order": sorting_order };
 
         if (data.detailreport.filtervalue != '') {
             tablefilter = {
                 "multi_match": {
                     "query": data.detailreport.filtervalue,
-                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType"],
+                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType","ResourceId"],
                     "type": "phrase_prefix"
                 }
             };
         }
 
-    }
+    }*/
 
     var query = {
         "from": from,
@@ -444,9 +463,7 @@ function getGroupServicedata(data) {
                         }
                     },
                     filter,
-                    regionfilter,
-                    tablefilter
-
+                    regionfilter
                 ]
 
             }
@@ -464,10 +481,11 @@ function getGroupServicedata(data) {
             "BlendedCost",
             "Operation",
             "aws:*",
-            "user:*"
+            "user:*",
+            "ResourceId"
         ]
     };
-    //debugQuery(query);
+    debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query

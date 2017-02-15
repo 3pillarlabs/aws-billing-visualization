@@ -46,13 +46,12 @@ export class D3mapComponent implements OnInit, OnChanges {
         this.parentNativeElement = element.nativeElement;
         this.width = 530 - this.margin.left - this.margin.right;
         this.height = 320 - this.margin.top - this.margin.bottom;
+        this.initSvg();
     }
 
     ngOnInit(): void {
-        this.initSvg();
-        this.getProjection();
-        this.getPath();
-        this.getTooltip();
+        
+        
     }
 
     ngOnChanges(): void {
@@ -84,6 +83,12 @@ export class D3mapComponent implements OnInit, OnChanges {
                 regionData['maxval'] = maxval;
                 priceArr.sort(function (a, b) { return a - b });
                 regionData['pricedata'] = priceArr;
+
+                this.svg.html("");
+                this.legendSvg.html("");
+                this.getProjection();
+                this.getPath();
+                this.getTooltip();
                 this.drawMap(regionData);
             }
         }
