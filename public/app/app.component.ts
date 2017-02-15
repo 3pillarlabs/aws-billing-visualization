@@ -8,7 +8,7 @@ declare var moment: any
 	moduleId: module.id,
 	selector: 'my-app',
 	templateUrl: 'app.component.html',
-	inputs: ['selectProduct', 'selectedDetailReportOption']
+	inputs: ['selectProduct']
 })
 
 export class AppComponent implements OnInit {
@@ -30,11 +30,26 @@ export class AppComponent implements OnInit {
 	totalRecord: number;
 	lastupdated: string;
 	allServiceData: any;
-	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '' };
+	inputdata:any;
+	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '','inputdata':'' };
+	productsRegionsData = {"regions":"", "products":""};
 
 
 
 	constructor(private _config: ConfigService, private _awsdata: AwsdataService) {
+		this.inputdata={
+			'region':this.selectedRegion,
+			'product':this.selectedProduct,
+			'detaildata': {
+				"start": 1,
+				"limit": 10,
+				"filterfield": '',
+				"filtervalue": '',
+				"shortorder": 'asc',
+				"shortfield": 'ProductName'
+			}
+		};
+		this.appcomponentdata.inputdata=this.inputdata;
 		this.company = this._config.company;
 		let today = new Date();
 		let year = today.getFullYear();
@@ -67,6 +82,9 @@ export class AppComponent implements OnInit {
 				this.enddate = this.calendDate;
 				this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 
+				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
+				this.productsRegionsData.products = data.aggregations.product_names.buckets;
+
 				$('input[name="daterange"]').daterangepicker({
 					locale: {
 						format: 'MMMM D, YYYY'
@@ -74,7 +92,7 @@ export class AppComponent implements OnInit {
 					startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					//maxDate: this.calendDate,
+					//maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					autoApply: true,
 					ranges: {
 						'Today': [moment(), moment()],
@@ -114,7 +132,8 @@ export class AppComponent implements OnInit {
 			let newappcomponentdata = {
 				"startdate": this.startdate,
 				"enddate": this.enddate,
-				"allServiceData": this.allServiceData
+				"allServiceData": this.allServiceData,
+				"inputdata":this.inputdata
 			}
 			this.appcomponentdata = newappcomponentdata;
 			this.isloading = false;
@@ -134,6 +153,17 @@ export class AppComponent implements OnInit {
 			this.selectedRegion = '';
 			this.detailReportOption = "";
 
+			this.inputdata.product="";
+			this.inputdata.region="";
+			this.inputdata.detaildata={
+				"start": 1,
+				"limit": 10,
+				"filterfield": '',
+				"filtervalue": '',
+				"shortorder": 'asc',
+				"shortfield": 'ProductName'
+			};
+
 			let newappcomponentdata = {
 				"startdate": this.startdate,
 				"enddate": this.enddate,
@@ -151,6 +181,15 @@ export class AppComponent implements OnInit {
 		this.isloading = true;
 		this.selectedRegion = region;
 		this.detailReportOption = "";
+		this.inputdata.region=region;
+		this.inputdata.detaildata={
+			"start": 1,
+			"limit": 10,
+			"filterfield": '',
+			"filtervalue": '',
+			"shortorder": 'asc',
+			"shortfield": 'ProductName'
+		};
 		this.getAllServiceData();
 	}
 
@@ -159,12 +198,16 @@ export class AppComponent implements OnInit {
 		this.selectedProduct = selectedproduct;
 		this.selectedRegion = '';
 		this.detailReportOption = "";
-		this.getAllServiceData();
-	}
-
-	onselectedDetailReportOption(detailoption: any) {
-		this.isloading = true;
-		this.detailReportOption = detailoption;
+		this.inputdata.product=selectedproduct;
+		this.inputdata.region="";
+		this.inputdata.detaildata={
+			"start": 1,
+			"limit": 10,
+			"filterfield": '',
+			"filtervalue": '',
+			"shortorder": 'asc',
+			"shortfield": 'ProductName'
+		};
 		this.getAllServiceData();
 	}
 }

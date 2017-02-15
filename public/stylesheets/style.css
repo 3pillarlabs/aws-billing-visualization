@@ -92,13 +92,13 @@ div.tooltipcss {
 	cursor: pointer;
 }
 
-.detailed-report-filter{
+/*.detailed-report-filter{
 	width: 100%;
 }
 
 .detailed-report-filter input{
 	width: 30% !important;
-}
+}*/
 
 .form-control[readonly]{
       background-color: #fff !important;
@@ -143,4 +143,13 @@ div.tooltipcss {
 
 .date-range-input{
   width: 230px!important;
+}
+
+.dataTables_paginate{
+    margin: 0;
+    white-space: nowrap;
+    text-align: right;
+}
+.pagination{
+  margin:0px !important;
 }

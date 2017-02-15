@@ -62,7 +62,11 @@ export class ChartComponent implements OnChanges {
 
     this.htmlElement = this.element.nativeElement;
     this.host = D3.select(this.element.nativeElement);
-
+    this.setup();
+    this.svg = this.host.append('svg')
+      .attr('width', this.width)
+      .attr('height', this.height + 20)
+      .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
     this.company = this._config.company;
 
 
@@ -70,22 +74,8 @@ export class ChartComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.appcomponentdata.allServiceData) {
-      /*if (this.appdataloaded) {
-        this.setMsg(changes);
-        let awsdata = {
-          company: this.company,
-          strdate: this.appcomponentdata.startdate,
-          enddate: this.appcomponentdata.enddate,
-          region: this.selectedRegion
-        };
-        this.getProduct(awsdata);
-      } else {
-        this.parsePieChartData(this.appcomponentdata.allServiceData);
-      }*/
       this.parsePieChartData(this.appcomponentdata.allServiceData);
-      //this.appdataloaded = true;
     }
-
   }
 
   /** Set No data message on the bases of property change value */
@@ -115,10 +105,11 @@ export class ChartComponent implements OnChanges {
       if (data.aggregations.product_name) {
         let productdata = [];
         for (let product of data.aggregations.product_name.buckets) {
-          if (product.TotalBlendedCost.value > 0) {
+          let TotalBlendedCost = Math.round(product.TotalBlendedCost.value)
+          if (TotalBlendedCost > 0) {
             var productdoc = {
               'name': product.key,
-              'totalcost': Math.round(product.TotalBlendedCost.value),
+              'totalcost': TotalBlendedCost,
               'totalresource': product.doc_count
             };
             productdata.push(productdoc);
@@ -126,7 +117,6 @@ export class ChartComponent implements OnChanges {
           }
         }
         this.dataset = productdata;
-        this.setup();
         this.buildSVG();
       }
     }
@@ -151,19 +141,12 @@ export class ChartComponent implements OnChanges {
   * We can now build our SVG element using the configurations we created
   **/
   private buildSVG(): void {
-    this.host.html('');
+    this.svg.html('');
 
     let that = this;
 
     /** Condition for checking product, if found then build pic chart else show message */
     if (this.dataset.length > 0) {
-
-      this.svg = this.host.append('svg')
-        .attr('width', this.width)
-        .attr('height', this.height + 20)
-        .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
-
-
       this.g = this.svg.selectAll("g")
         .data(this.pie(this.dataset))
         .enter()
@@ -175,7 +158,7 @@ export class ChartComponent implements OnChanges {
         .attr("clicked", "No")
         .attr('fill', (d) => { return this.color(d.data.totalcost); })
         .on("click", function (d, i) {
-         if (D3.select(this).attr("clicked") == "No") {
+          if (D3.select(this).attr("clicked") == "No") {
             D3.selectAll("[clicked=Yes]")
               .attr("clicked", "No")
               .transition()
@@ -190,7 +173,7 @@ export class ChartComponent implements OnChanges {
               .duration(500)
               .attr("d", that.arcOver)
               .attr("stroke-width", 6);
-
+            that.selectProduct.emit(that.dataset[i].name);
           }
           else if (D3.select(this).attr("clicked") == "Yes") {
             D3.select(this)
@@ -199,8 +182,9 @@ export class ChartComponent implements OnChanges {
               .duration(500)
               .attr("d", that.arc)
               .attr("stroke", "none");
+            that.selectProduct.emit("");
           }
-          that.selectProduct.emit(that.dataset[i].name);
+
         });
 
 
@@ -235,13 +219,9 @@ export class ChartComponent implements OnChanges {
       this.g.append("text")
         .attr("transform", (d) => { return "translate(" + this.labelArc.centroid(d) + ")"; })
         .attr("dy", ".35em")
-        .text((d) => { return d.data.totalcost; });
+        .style('font-size', '10px')
+        .text((d) => { return '$'+d.data.totalcost; });
     } else {
-      this.svg = this.host.append('svg')
-        .attr('width', this.width)
-        .attr('height', this.height + 20)
-        .append('g').attr("transform", "translate(" + 120 + "," + this.height / 2 + ")");
-
       this.svg.selectAll("g")
         .data([1])
         .enter()

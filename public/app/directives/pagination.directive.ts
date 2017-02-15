@@ -5,8 +5,7 @@ import {NgModel, ControlValueAccessor} from "@angular/forms";
 @Component({
   selector:'ng-pagination[ngModel]',
 //  directives: [NgIf, NgFor, NgClass],
-  template:`<div class="text-center">
-              <ul class="pagination" >
+  template:`<ul class="pagination" >
                   <li *ngIf="previousItemValid && firstText" (click)="firstPage()"><a href="#" [innerHTML]="firstText">First</a></li>
                   <li> <a *ngIf="previousItemValid" (click)="previousPage(nextItem)" aria-label="Previous"> <span aria-hidden="true">&laquo;</span> </a> </li>
                   <li *ngFor="let pageNo of pageList" [ngClass]="{'active':seletedPage === pageNo}">
@@ -14,9 +13,7 @@ import {NgModel, ControlValueAccessor} from "@angular/forms";
                   </li>                
                   <li> <a  *ngIf="nextItemValid" (click)="nextPage(nextItem)" aria-label="Next"> <span aria-hidden="true">&raquo;</span> </a> </li>
                   <li><a *ngIf="nextItemValid && lastText" (click)="lastPage()" [innerHTML]="lastText" >Last</a></li>
-                </ul></div>
-
-`
+                </ul>`
 })
 export class PaginationDirective implements ControlValueAccessor, OnChanges{
   @Input("previous-text") previousText:string;

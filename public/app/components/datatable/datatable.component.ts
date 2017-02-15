@@ -9,17 +9,16 @@ import { ConfigService } from './../../services/config.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
-    inputs: ['appcomponentdata'],
-    outputs: ['isloading','selectedDetailReportOption']
+    inputs: ['appcomponentdata', 'productsRegionsData']
 })
 export class DatatableComponent implements OnChanges {
     company: string;
-    detailReportOption:any;
+    detailReportOption: any;
+    startdate: string;
+    enddate: string;
 
-    isloading = new EventEmitter();
-    selectedDetailReportOption= new EventEmitter();
-    
-    appcomponentdata:any; //Data from App Component
+    appcomponentdata: any; //Data from App Component
+    productsRegionsData: any;
 
     public data: any[] = [];
     public filterQuery = "";
@@ -28,10 +27,18 @@ export class DatatableComponent implements OnChanges {
     public sortOrder = "asc";
 
     public currentPage: number = 1;
-    public totalItems: number = 200; // total numbar of page not items 
+    public totalItems: number = 0; // total numbar of page not items 
     public maxSize: number = 10; // max page size 
     filter: string = '';
-    appdataloaded=false;
+    appdataloaded = false;
+    totalBlendedCost: number = 0;
+    showingfrom = this.currentPage;
+    showingto = this.rowsOnPage;
+    dataTableLenth: any = [10, 25, 50, 100];
+    product: string = '';
+    region: string = '';
+    alltags: string = '';
+    datatableloading: boolean = false;
 
 
     columns: any[] = [
@@ -49,6 +56,16 @@ export class DatatableComponent implements OnChanges {
         {
             display: 'Operation',
             variable: 'Operation',
+            sortable: false
+        },
+        {
+            display: 'Tags',
+            variable: 'user:*',
+            sortable: false
+        },
+        {
+            display: 'Resourse ID',
+            variable: 'ResourceId',
             sortable: false
         },
         {
@@ -88,129 +105,78 @@ export class DatatableComponent implements OnChanges {
         descending: false
     };
 
-
-
     constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
         this.company = this._config.company;
     }
 
     ngOnChanges(): void {
-        if(this.appcomponentdata.allServiceData){
-            /*if(this.appdataloaded){
-                this.isloading.emit(true);
-                this.currentPage = 1;
-                let awsdata = {
-                    company: this.company,
-                    strdate: this.appcomponentdata.startdate,
-                    enddate: this.appcomponentdata.enddate,
-                    currentpage: this.currentPage,
-                    size: this.rowsOnPage,
-                    filter: this.filter,
-                    region: this.selectedRegion
-                };
-                this.getAllAwsResourcedata(awsdata);
-            }else{
-                this.parseDetailData(this.appcomponentdata.allServiceData);
-            }
-            this.appdataloaded=true;*/
+        if (this.appcomponentdata.allServiceData) {
+            this.setupInfo();
             this.parseDetailData(this.appcomponentdata.allServiceData);
         }
-        
     }
 
-    getAllAwsResourcedata(awsdata: any) {
-       
-        var shortingorder = 'asc';
-        awsdata.sortingfield = this.sorting.column;
-        if (this.sorting.descending) {
-            shortingorder = 'desc';
-        }
-        awsdata.shortingorder = shortingorder;
-
-        this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
-            this.parseDetailData(data);
-            this.isloading.emit(false);
-        }, (error) => {
-            console.log(error);
-            this.isloading.emit(false);
-        });
-
-
+    setupInfo(): void {
+        this.currentPage = this.appcomponentdata.inputdata.detaildata.start;
+        this.rowsOnPage = this.appcomponentdata.inputdata.detaildata.limit;
+        this.product = this.appcomponentdata.inputdata.product;
+        this.region = this.appcomponentdata.inputdata.region;
+        this.startdate = this.appcomponentdata.startdate;
+        this.enddate = this.appcomponentdata.enddate;
+        this.filter = "";
+        this.pageInfo();
+        console.log(this.appcomponentdata);
     }
 
-    parseDetailData(data:any):void{
+
+    parseDetailData(data: any): void {
         var jsondata: any = [];
+        if (data.aggregations) {
+            if (data.aggregations.total_cost) {
+                this.totalBlendedCost = data.aggregations.total_cost.value;
+            }
+        }
         if (data.hits.total) {
-                this.totalItems = data.hits.total;
-            }
-            for (let hit of data.hits.hits) {
-                jsondata.push(hit._source);
-            }
+            this.totalItems = data.hits.total;
+        }
+        for (let hit of data.hits.hits) {
+            jsondata.push(hit._source);
+        }
 
-            this.data = jsondata;
+        this.data = jsondata;
+        this.pageInfo();
     }
 
     filterbyOperation(val: string) {
-            this.filter = val
-            let temp={
-                "start":this.currentPage,
-                "limit":this.rowsOnPage,
-                "filterfield":'',
-                "filtervalue":this.filter,
-                "shortorder":'asc',
-                "shortfield":'ProductName'
-            }
-            this.selectedDetailReportOption.emit(temp);
-            /*this.filter = val;
-            this.currentPage = 1;
-            let awsdata = {
-                company: this.company,
-                strdate: this.appcomponentdata.startdate,
-                enddate: this.appcomponentdata.enddate,
-                currentpage: this.currentPage,
-                size: this.rowsOnPage,
-                filter: this.filter,
-                region: this.selectedRegion
-            };
-            this.isloading.emit(true);
-            this.getAllAwsResourcedata(awsdata);*/
-        
-        
-
+        this.filter = val
+        this.getResourceData();
     }
 
-
+    tags(item: any) {
+        var obj = item;
+        var alltags = '';
+        var awscreatedtag = '';
+        for (var key in obj) {
+            if (key.startsWith('user:') || key.startsWith('aws:')) {
+                alltags += key + "=" + obj[key] + "<br/>";
+            }
+        }
+        this.alltags = alltags;
+    }
 
     public setPage(pageNo: number): void {
         this.currentPage = pageNo;
     };
 
     public pageChanged(event: any): void {
-        //this method will trigger every page click 
-        /*let awsdata = {
-            company: this.company,
-            strdate: this.appcomponentdata.startdate,
-            enddate: this.appcomponentdata.enddate,
-            currentpage: this.currentPage,
-            size: this.rowsOnPage,
-            filter: this.filter,
-            region: this.selectedRegion
-        };
-        this.isloading.emit(true);
-        this.currentPage = event.itemsPerPage;
-        this.getAllAwsResourcedata(awsdata);*/
-
-        let temp={
-            "start":this.currentPage,
-            "limit":this.rowsOnPage,
-            "filterfield":'',
-            "filtervalue":this.filter,
-            "shortorder":'asc',
-            "shortfield":'ProductName'
-        }
-        
-        this.selectedDetailReportOption.emit(temp);
+        this.getResourceData();
     };
+
+    pageInfo() {
+        this.showingfrom = ((this.currentPage - 1) * this.rowsOnPage) + 1;
+        var calshowingTo = this.currentPage * this.rowsOnPage;
+        this.showingto = calshowingTo > this.totalItems ? this.totalItems : calshowingTo;
+    }
 
 
     selectedClass(columnName): string {
@@ -227,34 +193,49 @@ export class DatatableComponent implements OnChanges {
         }
 
         this.currentPage = 1;
-        /*let awsdata = {
-            company: this.company,
-            strdate: this.appcomponentdata.startdate,
-            enddate: this.appcomponentdata.enddate,
-            currentpage: this.currentPage,
-            size: this.rowsOnPage,
-            filter: this.filter,
-            region: this.selectedRegion
-        };
-        
-        this.isloading.emit(true);
-        this.getAllAwsResourcedata(awsdata);*/
+        this.getResourceData();
 
+    }
+
+    getResourceData(): void {
+        this.datatableloading = true;
         var shortingorder = 'asc';
-        let temp={
-            "start":this.currentPage,
-            "limit":this.rowsOnPage,
-            "filterfield":'',
-            "filtervalue":this.filter,
-            "shortorder":'asc',
-            "shortfield":'ProductName'
-        }
-        temp.shortfield = this.sorting.column;
         if (this.sorting.descending) {
             shortingorder = 'desc';
         }
-        temp.shortorder = shortingorder;
-        this.selectedDetailReportOption.emit(temp);
+
+        let awsdata = {
+            "company": this.company,
+            "strdate": this.startdate,
+            "enddate": this.enddate,
+            "size": this.rowsOnPage,
+            "currentpage": this.currentPage,
+            "filter": this.filter,
+            "product": this.product,
+            "sortingfield": this.sorting.column,
+            "shortingorder": shortingorder,
+            "region": this.region
+        };
+        this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
+            this.parseDetailData(data);
+            this.datatableloading = false;
+            this.pageInfo();
+        }, (error) => {
+            console.log(error);
+            this.datatableloading = false;
+        })
+    }
+
+    onChangeProduct(product: string) {
+        this.currentPage = 1;
+        this.product = product;
+        this.getResourceData();
+    }
+
+    onChangeRegion(region: string) {
+        this.currentPage = 1;
+        this.region = region;
+        this.getResourceData();
     }
 
 }
