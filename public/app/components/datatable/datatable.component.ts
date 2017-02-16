@@ -158,7 +158,9 @@ export class DatatableComponent implements OnChanges {
         var awscreatedtag = '';
         for (var key in obj) {
             if (key.startsWith('user:') || key.startsWith('aws:')) {
-                alltags += key + "=" + obj[key] + "<br/>";
+                if(obj[key]!=""){
+                    alltags += key + "=" + obj[key] + "<br/>";
+                }
             }
         }
         this.alltags = alltags;

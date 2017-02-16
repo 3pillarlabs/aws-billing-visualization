@@ -62,7 +62,8 @@ export class ChartComponent implements OnChanges {
 
     this.htmlElement = this.element.nativeElement;
     this.host = D3.select(this.element.nativeElement);
-    this.setup();
+    this.width = 600;
+    this.height = 300;
     this.svg = this.host.append('svg')
       .attr('width', this.width)
       .attr('height', this.height + 20)
@@ -117,6 +118,7 @@ export class ChartComponent implements OnChanges {
           }
         }
         this.dataset = productdata;
+        this.setup();
         this.buildSVG();
       }
     }
@@ -126,8 +128,6 @@ export class ChartComponent implements OnChanges {
    * Basically we get the dom element size and build the container 
    **/
   private setup(): void {
-    this.width = 600;
-    this.height = 300;
     this.radius = Math.min(this.width, this.height) / 2;
     this.color = D3.scaleOrdinal(D3.schemeCategory20);
     this.arc = D3.arc().outerRadius(this.radius - 10).innerRadius(0);
