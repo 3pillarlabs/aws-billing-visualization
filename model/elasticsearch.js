@@ -192,7 +192,7 @@ function getResourcesData(data) {
         ]
     };
 
-    debugQuery(query);
+    //debugQuery(query);
 
     return elasticClient.search({
         index: indexName,
@@ -385,16 +385,9 @@ function getGroupServicedata(data) {
 
     if (data.product != '') {
         filter = { "match": { "ProductName": data.product } };
-        if (data.region != '') {
-            filter = {
-                "match": {
-                    "ProductName": data.product
-                }
-            }, { "match": { "__AvailabilityRegion": data.region } };
-        }
     }
 
-    if (data.product != '' && data.region != '') {
+    if (data.region != '') {
         regionfilter = { "match": { "__AvailabilityRegion": data.region } };
     }
 
@@ -485,7 +478,7 @@ function getGroupServicedata(data) {
             "ResourceId"
         ]
     };
-    debugQuery(query);
+    //debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query
