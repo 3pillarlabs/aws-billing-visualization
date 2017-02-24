@@ -1,4 +1,4 @@
-import { Component, OnChanges, ElementRef, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, OnChanges, ElementRef, Input, SimpleChanges, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
 import * as D3 from 'd3';
@@ -8,7 +8,7 @@ import * as D3 from 'd3';
 @Component({
   moduleId: module.id,
   selector: 'aws-billing-chart',
-  template: '',
+  template: '<div id="awsbillingchart"></div><div id="awsbillingchartLegend"></div>',
   styles: [`
               .arc text {
                   font: 10px sans-serif;
@@ -18,11 +18,24 @@ import * as D3 from 'd3';
                 .arc path {
                   stroke: #fff;
                 }
+
+                #awsbillingchart{
+                  width:70%;
+                  height:48%;
+                  float:left;
+                }
+
+                #awsbillingchartLegend{
+                  width:30%;
+                  height:48%;
+                  float:left;
+                }
           `]
 })
 
-export class ChartComponent implements OnChanges {
+export class ChartComponent implements OnChanges, AfterViewInit {
   private host;
+  private legendhost;
   private width;       // Chart width
   private height;      // Chart height
   private radius;      // Chart Radius
@@ -32,10 +45,14 @@ export class ChartComponent implements OnChanges {
   private labelArc;
   private pie;
   private svg;
-  private htmlElement: HTMLElement;
+  private Legendsvg;
+  private charthtmlElement: HTMLElement;
+  private chartlegendhtmlElement: HTMLElement;
   private path;
   private g;
   private tooltip;
+  private legendwidth;
+  private legendheight;
 
   startdate: string;
   enddate: string;
@@ -59,18 +76,31 @@ export class ChartComponent implements OnChanges {
   * and then we create a D3 Wrapper for our host element
   **/
   constructor(private element: ElementRef, private _awsdata: AwsdataService, private _config: ConfigService) {
-
-    this.htmlElement = this.element.nativeElement;
-    this.host = D3.select(this.element.nativeElement);
-    this.width = 600;
-    this.height = 300;
-    this.svg = this.host.append('svg')
-      .attr('width', this.width)
-      .attr('height', this.height + 20)
-      .append('g').attr("transform", "translate(" + ((this.width / 2) - 100) + "," + this.height / 2 + ")");
     this.company = this._config.company;
+  }
 
+  ngAfterViewInit(): void {
+    this.charthtmlElement = this.element.nativeElement.querySelector('div#awsbillingchart');
+    this.host = D3.select(this.element.nativeElement.querySelector('div#awsbillingchart'));
+    this.width = this.charthtmlElement.clientWidth;
+    this.height = this.charthtmlElement.clientHeight;
+    this.svg = this.host.append('svg')
+      .attr("width", '100%')
+      .attr("height", '100%')
+      .attr('viewBox', '0 0 ' + Math.min(this.width, this.height) + ' ' + Math.min(this.width, this.height))
+      .attr('preserveAspectRatio', 'xMidYMid')
+      .append('g').attr("transform", "translate(" + Math.min(this.width, this.height) / 2 + "," + Math.min(this.width, this.height) / 2 + ")");
 
+    this.chartlegendhtmlElement = this.element.nativeElement.querySelector('div#awsbillingchartLegend');
+    this.legendhost = D3.select(this.element.nativeElement.querySelector('div#awsbillingchartLegend'));
+    this.legendwidth = this.chartlegendhtmlElement.clientWidth;
+    this.legendheight = this.chartlegendhtmlElement.clientHeight;
+    this.Legendsvg = this.legendhost
+                          .append('svg')
+                          .attr("width", '100%')
+                          .attr("height", '100%')
+                          .attr('viewBox', '0 0 ' + Math.min(this.legendwidth, this.legendheight) + ' ' + Math.min(this.legendwidth, this.legendheight))
+                          .attr('preserveAspectRatio', 'xMinYMid')
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -142,7 +172,7 @@ export class ChartComponent implements OnChanges {
   **/
   private buildSVG(): void {
     this.svg.html('');
-
+    this.Legendsvg.html('');
     let that = this;
 
     /** Condition for checking product, if found then build pic chart else show message */
@@ -156,7 +186,7 @@ export class ChartComponent implements OnChanges {
       this.g.append("path")
         .attr("d", this.arc)
         .attr("clicked", "No")
-        .attr('fill', (d) => { return this.color(d.data.totalcost); })
+        .attr('fill', (d,i) => { return this.color(i); })
         .on("click", function (d, i) {
           if (D3.select(this).attr("clicked") == "No") {
             D3.selectAll("[clicked=Yes]")
@@ -171,8 +201,8 @@ export class ChartComponent implements OnChanges {
               .attr("clicked", "Yes")
               .transition()
               .duration(500)
-              .attr("d", that.arcOver)
-              .attr("stroke-width", 6);
+              .attr("d", that.arcOver);
+            //.attr("stroke-width", 6);
             that.selectProduct.emit(that.dataset[i].name);
           }
           else if (D3.select(this).attr("clicked") == "Yes") {
@@ -189,18 +219,15 @@ export class ChartComponent implements OnChanges {
 
 
 
-      var legend = this.svg.selectAll('.legend')
+      var legend = this.Legendsvg.selectAll('.legend')
         .data(this.color.domain())
         .enter()
         .append('g')
         .attr('class', 'legend')
         .attr('transform', (d, i) => {
-
           var height = this.legendRectSize + this.legendSpacing;
-          var offset = height * this.color.domain().length / 2;
-          var horz = 9 * this.legendRectSize;
-          var vert = i * height - (offset + 20);
-          return 'translate(' + horz + ',' + vert + ')';
+          var vert = i * height;
+          return 'translate(0,' + vert + ')';
         });
 
       legend.append('rect')
@@ -220,7 +247,7 @@ export class ChartComponent implements OnChanges {
         .attr("transform", (d) => { return "translate(" + this.labelArc.centroid(d) + ")"; })
         .attr("dy", ".35em")
         .style('font-size', '10px')
-        .text((d) => { return '$'+d.data.totalcost; });
+        .text((d) => { return '$' + d.data.totalcost; });
     } else {
       this.svg.selectAll("g")
         .data([1])

@@ -85,6 +85,7 @@ export class AppComponent implements OnInit {
 				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
 				this.productsRegionsData.products = data.aggregations.product_names.buckets;
 
+				var that=this;
 				$('input[name="daterange"]').daterangepicker({
 					locale: {
 						format: 'MMMM D, YYYY'
@@ -92,7 +93,7 @@ export class AppComponent implements OnInit {
 					startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					//maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+					maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
 					autoApply: true,
 					ranges: {
 						'Today': [moment(), moment()],
@@ -102,6 +103,9 @@ export class AppComponent implements OnInit {
 						'This Month': [moment().startOf('month'), moment().endOf('month')],
 						'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
 					}
+				}).on('change',function(e){
+					var dateRangeStr= $('input[name="daterange"]').val();
+					that.searchAwsData(dateRangeStr);
 				});
 				$('.input-glyph').click(function () {
 					$('input[name="daterange"]').data("daterangepicker").show();
