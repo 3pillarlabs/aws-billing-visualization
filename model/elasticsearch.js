@@ -109,11 +109,11 @@ function getResourcesData(data) {
         from = ((data.currentpage - 1) * size);
     }
 
-    if (data.filter!= "") {
+    if (data.filter != "") {
         filter = {
             "multi_match": {
                 "query": data.filter,
-                "fields": ["ResourceId","aws:*","user:*"],
+                "fields": ["ResourceId", "aws:*", "user:*"],
                 "type": "phrase_prefix"
             }
         };
@@ -278,6 +278,7 @@ exports.getProductWiseData = getProductWiseData;
 
 
 function getMinMaxDate(indexval) {
+    var agglimit = 10;
     return elasticClient.search({
         index: indexval,
         size: 0,
@@ -289,16 +290,36 @@ function getMinMaxDate(indexval) {
                 "availability_regions": {
                     "terms": {
                         "field": "__AvailabilityRegion",
-                        "order": { "_term": "asc" }
+                        "order": {
+                            "TotalBlendedCost": "desc"
+                        },
+                        "size": agglimit
+                    },
+                    "aggs": {
+                        "TotalBlendedCost": {
+                            "sum": {
+                                "field": "BlendedCost"
+                            }
+                        }
                     }
                 },
                 "product_names": {
                     "terms": {
                         "field": "ProductName",
-                        "order": { "_term": "asc" }
-
+                        "order": {
+                            "TotalBlendedCost": "desc"
+                        },
+                        "size": agglimit
+                    },
+                    "aggs": {
+                        "TotalBlendedCost": {
+                            "sum": {
+                                "field": "BlendedCost"
+                            }
+                        }
                     }
                 }
+
             }
 
         }
@@ -309,6 +330,7 @@ exports.getMinMaxDate = getMinMaxDate;
 
 
 function getGroupServicedata(data) {
+    var agglimit = 10;
     var indexName = data.company;
     var startdate = data.strdate;
     var enddate = data.enddate;
@@ -330,7 +352,8 @@ function getGroupServicedata(data) {
             "AvailabilityRegion": {
                 "terms": {
                     "field": "__AvailabilityRegion",
-                    "order": { "TotalBlendedCost": "desc" }
+                    "order": { "TotalBlendedCost": "desc" },
+                    "size": agglimit
                 },
                 "aggs": {
                     "TotalBlendedCost": {
@@ -343,8 +366,8 @@ function getGroupServicedata(data) {
             "product_name": {
                 "terms": {
                     "field": "ProductName",
-                    "order": { "TotalBlendedCost": "desc" }
-
+                    "order": { "TotalBlendedCost": "desc" },
+                    "size": agglimit
                 },
                 "aggs": {
                     "TotalBlendedCost": {
@@ -365,7 +388,8 @@ function getGroupServicedata(data) {
             "AvailabilityRegion": {
                 "terms": {
                     "field": "__AvailabilityRegion",
-                    "order": { "TotalBlendedCost": "desc" }
+                    "order": { "TotalBlendedCost": "desc" },
+                    "size": agglimit
                 },
                 "aggs": {
                     "TotalBlendedCost": {
@@ -397,7 +421,7 @@ function getGroupServicedata(data) {
     var sorting_order = "asc";
     var sorting_field = "ProductName";
 
-
+    sort[sorting_field] = { "order": sorting_order };
 
     /*if (data.detailreport != '') {
         if (data.detailreport.limit) {
@@ -478,7 +502,7 @@ function getGroupServicedata(data) {
             "ResourceId"
         ]
     };
-    //debugQuery(query);
+    debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query

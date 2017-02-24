@@ -127,10 +127,10 @@ div.tooltipcss {
 #detailfilter {
     position: relative;
     z-index: 1;
-    left: -25px;
-    top: 1px;
+    left: 10px;
+    top: 2px;
     color: #7B7B7B;
-    cursor:pointer;
+    cursor: pointer;
     width: 0;
 }
 .aws-panel-padding{
@@ -153,3 +153,4 @@ div.tooltipcss {
 .pagination{
   margin:0px !important;
 }
+

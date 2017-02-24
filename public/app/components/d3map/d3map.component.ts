@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ElementRef, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, ElementRef, EventEmitter,AfterViewInit} from '@angular/core';
 import * as d3 from 'd3';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
@@ -6,12 +6,23 @@ import { ConfigService } from './../../services/config.service';
 @Component({
     moduleId: module.id,
     selector: 'd3-map',
-    template: ``,
+    template: `<div id="awsbillingD3Map"></div><div id="awsbillingD3MapLegend"></div>`,
+    styles: [`#awsbillingD3Map{
+                  width:80%;
+                  height:48%;
+                  float:left;
+                }
+
+                #awsbillingD3MapLegend{
+                    width:20%;
+                    height:48%;
+                    float:left;
+                }`],
     inputs: ['appcomponentdata'],
     outputs: ['isloading', 'selectRegion']
 })
 
-export class D3mapComponent implements OnInit, OnChanges {
+export class D3mapComponent implements OnChanges {
     private startdate: string;
     private enddate: string;
     private isloading = new EventEmitter();
@@ -19,6 +30,8 @@ export class D3mapComponent implements OnInit, OnChanges {
     private margin = { top: 80, right: 0, bottom: 0, left: 0 };
     private width: number;
     private height: number;
+    private legendwidth: number;
+    private legendheight: number;
     private rotate: number = 0;//60;
     private maxlat: number = 83;
     private svg: any;
@@ -29,10 +42,11 @@ export class D3mapComponent implements OnInit, OnChanges {
     private worldMapJson: string = "app/components/d3map/worldmap.json";
     private company: string;
     private selectionMap: any;
+    private legendRectSize:number=22;
 
     appcomponentdata: any;
     appdataloaded = false;
-
+    parentNativeElementLegend:any;
     selectedRegion: string;
     selectRegion: EventEmitter<string> = new EventEmitter<string>();
 
@@ -43,15 +57,20 @@ export class D3mapComponent implements OnInit, OnChanges {
         private _awsService: AwsdataService,
         private _config: ConfigService) {
         this.company = this._config.company;
-        this.parentNativeElement = element.nativeElement;
-        this.width = 530 - this.margin.left - this.margin.right;
-        this.height = 320 - this.margin.top - this.margin.bottom;
-        this.initSvg();
+        
     }
 
-    ngOnInit(): void {
+    ngAfterViewInit():void{
+        this.parentNativeElement = this.element.nativeElement.querySelector('div#awsbillingD3Map');
+        this.parentNativeElementLegend = this.element.nativeElement.querySelector('div#awsbillingD3MapLegend');
         
-        
+        this.width = this.parentNativeElement.clientWidth-140;
+        this.height = this.parentNativeElement.clientHeight;
+
+        this.legendwidth = this.parentNativeElementLegend.clientWidth;
+        this.legendheight = this.parentNativeElementLegend.clientHeight;
+
+        this.initSvg();
     }
 
     ngOnChanges(): void {
@@ -114,18 +133,22 @@ export class D3mapComponent implements OnInit, OnChanges {
         if (this.parentNativeElement !== null) {
             this.svg = d3.select(this.parentNativeElement)
                 .append('svg')
-                .attr("width", this.width + this.margin.left + this.margin.right)
-                .attr("height", this.height + this.margin.top + this.margin.bottom)
+                .attr("width", '100%')
+                .attr("height", '100%')
+                .attr('viewBox', '0 0 ' + Math.min(this.width, this.height) + ' ' + Math.min(this.width, this.height))
+                .attr('preserveAspectRatio', 'xMidYMid meet')
                 .append("g")
-                .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+                //.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
                 .append("g")
                 .attr("width", this.width)
                 .attr("height", this.height);
 
-            this.legendSvg = d3.select(this.parentNativeElement).append("svg")
+            this.legendSvg = d3.select(this.parentNativeElementLegend).append("svg")
                 .attr("class", "legend")
-                .attr("width", 110)
-                .attr("height", this.height + this.margin.top + this.margin.bottom);
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr('viewBox','0 0 ' + Math.min(this.legendwidth, this.legendheight) + ' ' + Math.min(this.legendwidth, this.legendheight))
+                .attr('preserveAspectRatio', 'xMinYMin meet');
         }
     }
 
@@ -180,18 +203,24 @@ export class D3mapComponent implements OnInit, OnChanges {
             var legendG = this.legendSvg.selectAll("g")
                 .data(data.pricedata)
                 .enter()
-                .append("g");
+                .append("g")
+                .attr('class', 'legend')
+                .attr('transform', (d, i) => {
+                    var height = this.legendRectSize;
+                    var vert = i * height;
+                    return 'translate(20,' + vert + ')';
+                });
+
 
             legendG.append("rect")
-                .attr("transform", function (d, i) { return "translate(20, " + (280 - (i * 24)) + ")"; })
-                .attr("width", 20)
-                .attr("height", 25)
+                .attr("width", this.legendRectSize)
+                .attr("height", this.legendRectSize)
                 .style("fill", function (d, i) { return color(d); });
 
             legendG.append("text")
-                .attr("x", 43)
-                .attr("y", function (d, i) { return (290 - (i * 24)); })
-                .attr("dy", ".35em")
+                .attr("x", this.legendRectSize+10)
+                .attr("y",(d, i)=>{ return i+10; })
+                .style('font-size', '11px')
                 .text(function (d) { return "$" + d; });
 
             this.selectionMap.enter().append("path")
