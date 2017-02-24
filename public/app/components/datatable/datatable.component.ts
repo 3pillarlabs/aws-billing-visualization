@@ -125,7 +125,6 @@ export class DatatableComponent implements OnChanges {
         this.enddate = this.appcomponentdata.enddate;
         this.filter = "";
         this.pageInfo();
-        console.log(this.appcomponentdata);
     }
 
 
@@ -237,6 +236,19 @@ export class DatatableComponent implements OnChanges {
     onChangeRegion(region: string) {
         this.currentPage = 1;
         this.region = region;
+        this.getResourceData();
+    }
+
+    onClearFilter():void{
+        this.currentPage = 1;
+        this.filter='';
+        this.getResourceData();
+    }
+
+    clearFilter():void{
+        this.product='';
+        this.region='';
+        this.filter='';
         this.getResourceData();
     }
 
