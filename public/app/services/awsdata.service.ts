@@ -8,7 +8,7 @@ import 'rxjs/add/operator/map';
 export class AwsdataService {
 
 	constructor(private _http: Http) {
-		console.log('aws-service data initialized');
+		//console.log('aws-service data initialized');
 	}
 
 	getRegionsData(data: any) {
