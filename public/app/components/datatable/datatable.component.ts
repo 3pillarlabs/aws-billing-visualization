@@ -125,9 +125,7 @@ export class DatatableComponent implements OnChanges {
         this.enddate = this.appcomponentdata.enddate;
         this.filter = "";
         this.pageInfo();
-        console.log(this.appcomponentdata);
     }
-
 
     parseDetailData(data: any): void {
         var jsondata: any = [];
@@ -148,7 +146,7 @@ export class DatatableComponent implements OnChanges {
     }
 
     filterbyOperation(val: string) {
-        this.filter = val
+        this.filter = val;
         this.getResourceData();
     }
 

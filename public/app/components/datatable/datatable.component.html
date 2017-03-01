@@ -50,8 +50,8 @@
                     <td>{{item.ProductName}}</td>
                     <td>{{item.__AvailabilityRegion}}</td>
                     <td>{{tags(item) }}{{item.Operation}}</td>
-                    <td [innerHTML]="alltags"></td>
-                    <td>{{item.ResourceId}}</td>
+                    <td [ngStyle]="{'word-break': 'break-all'}" [innerHTML]="alltags"></td>
+                    <td [ngStyle]="{'word-break': 'break-all'}" >{{item.ResourceId}}</td>
                     <td>{{item.ItemDescription}}</td>
                     <td>{{item.UsageType}}</td>
                     <td>{{item.UsageQuantity | number:'1.0-2'}}</td>
@@ -61,7 +61,7 @@
                 </tr>
 
                 <tr *ngIf="data.length == 0">
-                    <td colspan="10" [ngStyle]="{'text-align':'center'}">
+                    <td colspan="11" [ngStyle]="{'text-align':'center'}">
                         <h3>No Data</h3>
                     </td>
                 </tr>
