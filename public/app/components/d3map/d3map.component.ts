@@ -201,7 +201,7 @@ export class D3mapComponent implements OnChanges {
 
             this.legendSvg.html('');
             var legendG = this.legendSvg.selectAll("g")
-                .data(data.pricedata)
+                .data(color.ticks(5))
                 .enter()
                 .append("g")
                 .attr('class', 'legend')

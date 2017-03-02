@@ -89,7 +89,6 @@ exports.getRegionsBillingCost = getRegionsBillingCost;
  * @return: @Object
  */
 function getResourcesData(data) {
-    console.log(data);
     var indexName = data.company;
     var startdate = data.strdate;
     var enddate = data.enddate;
@@ -172,6 +171,11 @@ function getResourcesData(data) {
             "total_cost": {
                 "sum": {
                     "field": "BlendedCost"
+                }
+            },
+            "total_quantity": {
+                "sum": {
+                    "field": "UsageQuantity"
                 }
             }
         },
@@ -342,6 +346,11 @@ function getGroupServicedata(data) {
             "sum": {
                 "field": "BlendedCost"
             }
+        },
+        "total_quantity": {
+            "sum": {
+                "field": "UsageQuantity"
+            }
         }
     };
 
@@ -381,6 +390,11 @@ function getGroupServicedata(data) {
                 "sum": {
                     "field": "BlendedCost"
                 }
+            },
+            "total_quantity": {
+                "sum": {
+                    "field": "UsageQuantity"
+                }
             }
         };
     } else if (data.product != "" && data.region == "" && data.detailreport == "") {
@@ -402,6 +416,11 @@ function getGroupServicedata(data) {
             "total_cost": {
                 "sum": {
                     "field": "BlendedCost"
+                }
+            },
+            "total_quantity": {
+                "sum": {
+                    "field": "UsageQuantity"
                 }
             }
         };
@@ -441,7 +460,7 @@ function getGroupServicedata(data) {
             tablefilter = {
                 "multi_match": {
                     "query": data.detailreport.filtervalue,
-                    "fields": ["Operation", "ProductName", "__AvailabilityRegion", "UsageType","ResourceId"],
+                    "fields": ["ResourceId", "aws:*", "user:*"],
                     "type": "phrase_prefix"
                 }
             };
@@ -502,7 +521,7 @@ function getGroupServicedata(data) {
             "ResourceId"
         ]
     };
-    debugQuery(query);
+    //debugQuery(query);
     return elasticClient.search({
         index: indexName,
         body: query

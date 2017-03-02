@@ -30,16 +30,16 @@ export class AppComponent implements OnInit {
 	totalRecord: number;
 	lastupdated: string;
 	allServiceData: any;
-	inputdata:any;
-	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '','inputdata':'' };
-	productsRegionsData = {"regions":"", "products":""};
+	inputdata: any;
+	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '', 'inputdata': '' };
+	productsRegionsData = { "regions": "", "products": "" };
 
 
 
 	constructor(private _config: ConfigService, private _awsdata: AwsdataService) {
-		this.inputdata={
-			'region':this.selectedRegion,
-			'product':this.selectedProduct,
+		this.inputdata = {
+			'region': this.selectedRegion,
+			'product': this.selectedProduct,
 			'detaildata': {
 				"start": 1,
 				"limit": 10,
@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
 				"shortfield": 'ProductName'
 			}
 		};
-		this.appcomponentdata.inputdata=this.inputdata;
+		this.appcomponentdata.inputdata = this.inputdata;
 		this.company = this._config.company;
 		let today = new Date();
 		let year = today.getFullYear();
@@ -85,7 +85,7 @@ export class AppComponent implements OnInit {
 				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
 				this.productsRegionsData.products = data.aggregations.product_names.buckets;
 
-				var that=this;
+				var that = this;
 				$('input[name="daterange"]').daterangepicker({
 					locale: {
 						format: 'MMMM D, YYYY'
@@ -103,8 +103,8 @@ export class AppComponent implements OnInit {
 						'This Month': [moment().startOf('month'), moment().endOf('month')],
 						'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
 					}
-				}).on('change',function(e){
-					var dateRangeStr= $('input[name="daterange"]').val();
+				}).on('change', function (e) {
+					var dateRangeStr = $('input[name="daterange"]').val();
 					that.searchAwsData(dateRangeStr);
 				});
 				$('.input-glyph').click(function () {
@@ -137,7 +137,7 @@ export class AppComponent implements OnInit {
 				"startdate": this.startdate,
 				"enddate": this.enddate,
 				"allServiceData": this.allServiceData,
-				"inputdata":this.inputdata
+				"inputdata": this.inputdata
 			}
 			this.appcomponentdata = newappcomponentdata;
 			this.isloading = false;
@@ -157,9 +157,9 @@ export class AppComponent implements OnInit {
 			this.selectedRegion = '';
 			this.detailReportOption = "";
 
-			this.inputdata.product="";
-			this.inputdata.region="";
-			this.inputdata.detaildata={
+			this.inputdata.product = "";
+			this.inputdata.region = "";
+			this.inputdata.detaildata = {
 				"start": 1,
 				"limit": 10,
 				"filterfield": '',
@@ -185,8 +185,8 @@ export class AppComponent implements OnInit {
 		this.isloading = true;
 		this.selectedRegion = region;
 		this.detailReportOption = "";
-		this.inputdata.region=region;
-		this.inputdata.detaildata={
+		this.inputdata.region = region;
+		this.inputdata.detaildata = {
 			"start": 1,
 			"limit": 10,
 			"filterfield": '',
@@ -202,9 +202,9 @@ export class AppComponent implements OnInit {
 		this.selectedProduct = selectedproduct;
 		this.selectedRegion = '';
 		this.detailReportOption = "";
-		this.inputdata.product=selectedproduct;
-		this.inputdata.region="";
-		this.inputdata.detaildata={
+		this.inputdata.product = selectedproduct;
+		this.inputdata.region = "";
+		this.inputdata.detaildata = {
 			"start": 1,
 			"limit": 10,
 			"filterfield": '',
@@ -213,5 +213,45 @@ export class AppComponent implements OnInit {
 			"shortfield": 'ProductName'
 		};
 		this.getAllServiceData();
+	}
+
+	onDetailReportChange(detailData: any) {
+		//console.log(detailData);
+		this.isloading = true;
+		this.startdate = detailData.strdate;
+		this.enddate = detailData.enddate;
+		/*this.selectedProduct=detailData.product;
+		this.selectedRegion=detailData.region;
+		this.detailReportOption={
+			"limit":detailData.size,
+			"start":detailData.currentpage,
+			"shortorder":detailData.shortingorder,
+			"shortfield":detailData.sortingfield,
+			"filtervalue":detailData.filter
+		}*/
+		this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
+
+		this.selectedProduct = '';
+		this.selectedRegion = '';
+		this.detailReportOption = "";
+
+		this.inputdata.product = "";
+		this.inputdata.region = "";
+		this.inputdata.detaildata = {
+			"start": 1,
+			"limit": 10,
+			"filterfield": '',
+			"filtervalue": '',
+			"shortorder": 'asc',
+			"shortfield": 'ProductName'
+		};
+
+		let newappcomponentdata = {
+			"startdate": this.startdate,
+			"enddate": this.enddate,
+			"allServiceData": this.allServiceData
+		}
+		this.getAllServiceData();
+
 	}
 }
