@@ -97,7 +97,12 @@ div.dataTables_processing{
 
 .detailed-report-filter input{
     text-indent: 20px;
-    width: 96%;
+    width: 95%;
+}
+
+.detailed-report-filter{
+    float:right;
+    width: 47%;
 }
 
 #searchclear {
@@ -119,6 +124,7 @@ div.dataTables_processing{
 
 .filter-margin{
     margin-top: -5px;
+    width:50%;
 }
 
 

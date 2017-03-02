@@ -9,6 +9,7 @@ import { ConfigService } from './../../services/config.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
+    outputs: ['detailReportChange'],
     inputs: ['appcomponentdata', 'productsRegionsData']
 })
 export class DatatableComponent implements OnChanges {
@@ -19,7 +20,7 @@ export class DatatableComponent implements OnChanges {
 
     appcomponentdata: any; //Data from App Component
     productsRegionsData: any;
-
+    detailReportChange: EventEmitter<any> = new EventEmitter<string>();;
     public data: any[] = [];
     public filterQuery = "";
     public rowsOnPage = 10;
@@ -32,6 +33,7 @@ export class DatatableComponent implements OnChanges {
     filter: string = '';
     appdataloaded = false;
     totalBlendedCost: number = 0;
+    totalQuantity: number;
     showingfrom = this.currentPage;
     showingto = this.rowsOnPage;
     dataTableLenth: any = [10, 25, 50, 100];
@@ -91,7 +93,7 @@ export class DatatableComponent implements OnChanges {
         {
             display: 'Blended Cost',
             variable: 'BlendedCost',
-            sortable: false
+            sortable: true
         },
         {
             display: 'Usage Duration',
@@ -134,6 +136,10 @@ export class DatatableComponent implements OnChanges {
             if (data.aggregations.total_cost) {
                 this.totalBlendedCost = data.aggregations.total_cost.value;
             }
+            if (data.aggregations.total_quantity) {
+                this.totalQuantity = data.aggregations.total_quantity.value;
+            }
+
         }
         if (data.hits.total) {
             this.totalItems = data.hits.total;
@@ -149,20 +155,27 @@ export class DatatableComponent implements OnChanges {
     filterbyOperation(val: string) {
         this.filter = val
         this.getResourceData();
+        //this.callDetailReportFilter();
     }
 
-    tags(item: any) {
+    tags(item: any): any {
         var obj = item;
+        var tagsarr = [];
         var alltags = '';
         var awscreatedtag = '';
+
         for (var key in obj) {
             if (key.startsWith('user:') || key.startsWith('aws:')) {
-                if(obj[key]!=""){
-                    alltags += key + "=" + obj[key] + "<br/>";
+                if (obj[key] != "") {
+                    let tag = {
+                        'key': key,
+                        'val': obj[key]
+                    };
+                    tagsarr.push(tag);
                 }
             }
         }
-        this.alltags = alltags;
+        return tagsarr;
     }
 
     public setPage(pageNo: number): void {
@@ -171,6 +184,7 @@ export class DatatableComponent implements OnChanges {
 
     public pageChanged(event: any): void {
         this.getResourceData();
+        //this.callDetailReportFilter();
     };
 
     pageInfo() {
@@ -195,6 +209,7 @@ export class DatatableComponent implements OnChanges {
 
         this.currentPage = 1;
         this.getResourceData();
+        //this.callDetailReportFilter();
 
     }
 
@@ -231,25 +246,57 @@ export class DatatableComponent implements OnChanges {
         this.currentPage = 1;
         this.product = product;
         this.getResourceData();
+        //this.callDetailReportFilter();
     }
 
     onChangeRegion(region: string) {
         this.currentPage = 1;
         this.region = region;
         this.getResourceData();
+        //this.callDetailReportFilter();
     }
 
-    onClearFilter():void{
+    onClearFilter(): void {
         this.currentPage = 1;
-        this.filter='';
+        this.filter = '';
+        this.getResourceData();
+        //this.callDetailReportFilter();
+    }
+
+    clearFilter(): void {
+        this.product = '';
+        this.region = '';
+        this.filter = '';
+        //this.callDetailReportFilter();
         this.getResourceData();
     }
 
-    clearFilter():void{
-        this.product='';
-        this.region='';
-        this.filter='';
-        this.getResourceData();
+    callDetailReportFilter() {
+        var shortingorder = 'asc';
+        if (this.sorting.descending) {
+            shortingorder = 'desc';
+        }
+
+        let obj = {
+            "company": this.company,
+            "strdate": this.startdate,
+            "enddate": this.enddate,
+            "size": this.rowsOnPage,
+            "currentpage": this.currentPage,
+            "filter": this.filter,
+            "product": this.product,
+            "sortingfield": this.sorting.column,
+            "shortingorder": shortingorder,
+            "region": this.region
+        }
+
+        this.detailReportChange.emit(obj);
+    }
+
+    onDateSelect(stDate: string, endDate: string) {
+        this.startdate=stDate.substr(0,10);
+        this.enddate=endDate.substr(0,10);
+        this.callDetailReportFilter();
     }
 
 }
