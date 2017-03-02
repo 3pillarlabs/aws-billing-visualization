@@ -142,7 +142,7 @@ div.tooltipcss {
 .ranges li { font-size: 12px!important; }
 
 .date-range-input{
-  width: 230px!important;
+  /*width: 230px!important;*/
 }
 
 .dataTables_paginate{
@@ -154,3 +154,11 @@ div.tooltipcss {
   margin:0px !important;
 }
 
+@media only screen and (max-width: 860px) {
+    /*.navbar {
+        background-color: lightblue;
+    }
+    .navbar-text{
+      font-size: 12px;
+    }*/
+}

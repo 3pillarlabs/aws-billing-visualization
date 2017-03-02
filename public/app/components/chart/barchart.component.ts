@@ -32,7 +32,7 @@ export class BarchartComponent implements AfterViewInit {
 
     private width;
     private height;
-    private margin = {top: 0, right: 0, bottom:80 , left: 60};
+    private margin = {top: 10, right: 40, bottom:80 , left: 60};
     private xScale;
     private yScale;
     private dollarFormatter;
@@ -43,6 +43,9 @@ export class BarchartComponent implements AfterViewInit {
     private barheight:number=20;
     private color;
     private tooltip;
+    private y1Scale;
+    private yAxisRight;
+    private percentFormatter;
 
     constructor(private element: ElementRef,private _awsdata: AwsdataService, private _config: ConfigService) {
         this.company = this._config.company;
@@ -106,11 +109,14 @@ export class BarchartComponent implements AfterViewInit {
 
         this.xScale = D3.scaleBand().range([0, this.width]).padding(0.1);
         this.yScale = D3.scaleLinear().range([this.height, 0]);
+        this.y1Scale = D3.scaleLinear().range([this.height, 0]);
 
         this.dollarFormatter = D3.format(",.0f");
+        this.percentFormatter= D3.format(".0%");
         
         this.xAxis = D3.axisBottom(this.xScale);
         this.yAxis = D3.axisLeft(this.yScale).tickFormat((d)=>{  return "$" + this.dollarFormatter(d); });
+        this.yAxisRight = D3.axisRight(this.y1Scale).tickFormat((d)=>{  return this.percentFormatter(d); });
 
         
         this.color = D3.scaleOrdinal(D3.schemeCategory20);
@@ -120,6 +126,9 @@ export class BarchartComponent implements AfterViewInit {
     buildSVG():void{
         let that=this;
         if (this.dataset.length > 0) {
+            var tots = D3.sum(this.dataset, function(d) { 
+                return d.totalcost; 
+            });
             
             this.svg = D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart'))
                 .attr("width", this.width + this.margin.left + this.margin.right)
@@ -130,6 +139,7 @@ export class BarchartComponent implements AfterViewInit {
 
             this.xScale.domain(this.dataset.map(function (d) { return d.name; }));
             this.yScale.domain([0, D3.max(this.dataset, function (d) { return d.totalcost; })]);
+            this.y1Scale.domain([0, D3.max(this.dataset, function (d) { return (d.totalcost / tots); })]);
 
             // append the rectangles for the bar chart
             this.svg.selectAll(".bar")
@@ -170,12 +180,12 @@ export class BarchartComponent implements AfterViewInit {
                     }
                     
                 })
-                .on("mousemove", (d)=>{
+                .on("mousemove", (d,i)=>{
                     this.tooltip
                         .style("left", D3.event.pageX - 50 + "px")
                         .style("top", D3.event.pageY - 100 + "px")
                         .style("display", "inline-block")
-                        .html((d.name) + "<br>" + "$" + (d.totalcost));
+                        .html((d.name) + "<br>" + "$" + (d.totalcost)+ "<br/>"+ Math.round((d.totalcost/tots)*100)+'%');
                  })
                 .on("mouseout", (d)=>{ this.tooltip.style("display", "none");});
 
@@ -192,6 +202,10 @@ export class BarchartComponent implements AfterViewInit {
             // add the y Axis
             this.svg.append("g")
                 .call(this.yAxis);
+
+            this.svg.append("g")
+                .attr("transform", "translate("+this.width+"," +"0)")
+                .call(this.yAxisRight);
 
             /*this.svg.append("g")
                 .attr("class", "y axis")
