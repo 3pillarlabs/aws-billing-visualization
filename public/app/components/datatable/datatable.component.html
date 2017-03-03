@@ -3,7 +3,10 @@
     <div class="panel-heading">
         <div class="panel-title form-inline">
             <strong>Detailed Report</strong>
-            <div class="dataTable_filter">
+            <div class="pull-right filter-margin">
+                <span class="icon-stack">
+                    <a href="javascript:void(0)" (click)="clearFilter()" title="Clear filter"><img src="images/Data-Clear-Filters-icon.png"></a>
+                </span>
                 <div class="form-group">
                     <select class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
                         <option value="">Select Product</option>
@@ -17,68 +20,81 @@
                     </select>
                 </div>
                 <div class="form-group detailed-report-filter">
-                    <input class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" />
                     <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
+                    <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)"
+                    />
+                    <span id="searchclear" *ngIf="filter!=''" (click)="onClearFilter()" class="glyphicon glyphicon-remove-circle"></span>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <div class="panel-body">
-        <table class="table table-striped table-bordered table-sortable">
-            <thead class="thead-default">
-                <tr>
-                    <template ngFor let-column [ngForOf]="columns">
-                        <th *ngIf="column.sortable" [class]="selectedClass(column.variable)" (click)="changeSorting(column.variable)">
-                            {{column.display}}
-                        </th>
-                        <td *ngIf="!column.sortable">
-                            {{column.display}}
+    <div class="panel-body ">
+        <div class="row table-responsive">
+            <table class="table table-striped table-bordered table-sortable">
+                <thead class="thead-default">
+                    <tr>
+                        <template ngFor let-column [ngForOf]="columns">
+                            <th *ngIf="column.sortable" [class]="selectedClass(column.variable)" (click)="changeSorting(column.variable)">
+                                {{column.display}}
+                            </th>
+                            <td *ngIf="!column.sortable">
+                                {{column.display}}
+                            </td>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
+                        <td colspan="7"></td>
+                        <td>{{totalQuantity}} Hrs</td>
+                        <td></td>
+                        <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
+                        <td></td>
+                    </tr>
+                    <tr *ngFor="let item of data">
+                        <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)" title="click to select product">{{item.ProductName}}</a></td>
+                        <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
+                        <td>{{item.Operation}}</td>
+                        <td [ngStyle]="{'word-break': 'break-all'}">
+                            <p *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
                         </td>
-                    </template>
+                        <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
+                        <td>{{item.ItemDescription}}</td>
+                        <td>{{item.UsageType}}</td>
+                        <td>{{item.UsageQuantity | number:'1.0-2'}} Hrs</td>
+                        <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
+                        <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
+                        <td>
+                            <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
+                                <p>{{item.UsageStartDate }}</p>
+                                <p>{{item.UsageEndDate}}</p>
+                            </a>
+                        </td>
+                    </tr>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
-                    <td colspan="9"></td>
-                    <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
-                    <td></td>
-                </tr>
-                <tr *ngFor="let item of data">
-                    <td>{{item.ProductName}}</td>
-                    <td>{{item.__AvailabilityRegion}}</td>
-                    <td>{{tags(item) }}{{item.Operation}}</td>
-                    <td [ngStyle]="{'word-break': 'break-all'}" [innerHTML]="alltags"></td>
-                    <td [ngStyle]="{'word-break': 'break-all'}" >{{item.ResourceId}}</td>
-                    <td>{{item.ItemDescription}}</td>
-                    <td>{{item.UsageType}}</td>
-                    <td>{{item.UsageQuantity | number:'1.0-2'}}</td>
-                    <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
-                    <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
-                    <td>{{item.UsageStartDate | date:'short'}} - {{item.UsageEndDate | date:'shortTime'}}</td>
-                </tr>
-
-                <tr *ngIf="data.length == 0">
-                    <td colspan="11" [ngStyle]="{'text-align':'center'}">
-                        <h3>No Data</h3>
-                    </td>
-                </tr>
-            </tbody>
-
-        </table>
-        <div class="row">
-            <div class="col-sm-5 dataTables_length_info">
-                <div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
-            </div>
-            <div class="col-sm-7">
-                <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
-                    <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
-                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
-                        last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
-                </div>
-            </div>
+                    <tr *ngIf="data.length == 0">
+                        <td colspan="11" [ngStyle]="{'text-align':'center'}">
+                            <h3>No Data</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="11">
+                            <div class="col-sm-5 dataTables_length_info">
+                                <div class="dataTables_info" *ngIf="data.length > 0" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
+                            </div>
+                            <div class="col-sm-7">
+                                <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                                    <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
+                                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
+                                        last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

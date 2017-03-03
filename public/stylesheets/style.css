@@ -123,10 +123,10 @@ div.tooltipcss {
 #detailfilter {
     position: relative;
     z-index: 1;
-    left: -25px;
-    top: 1px;
+    left: 10px;
+    top: 2px;
     color: #7B7B7B;
-    cursor:pointer;
+    cursor: pointer;
     width: 0;
 }
 .aws-panel-padding{
@@ -147,7 +147,7 @@ div.tooltipcss {
 .ranges li { font-size: 12px!important; }
 
 .date-range-input{
-  width: 230px!important;
+  /*width: 230px!important;*/
 }
 
 .dataTables_paginate{
@@ -157,4 +157,13 @@ div.tooltipcss {
 }
 .pagination{
   margin:0px !important;
+}
+
+@media only screen and (max-width: 860px) {
+    /*.navbar {
+        background-color: lightblue;
+    }
+    .navbar-text{
+      font-size: 12px;
+    }*/
 }
