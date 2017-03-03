@@ -33,6 +33,14 @@
     font-weight: bold;
 }
 
+.table-sortable > thead > tr > th:nth-child(1){
+    width:9%;
+}
+
+.table-sortable > thead > tr > th:nth-child(2){
+    width: 10%;
+}
+
 div.dataTables_length,dataTables_length_info{
     float: left;
 }
@@ -83,11 +91,46 @@ div.dataTables_processing{
     font-size: 22px;
 }
 
+.thead-default td:last-child{
+    width:12%;
+}
+
+.detailed-report-filter input{
+    text-indent: 20px;
+    width: 95%;
+}
+
+.detailed-report-filter{
+    float:right;
+    width: 47%;
+}
+
 div.dataTable_filter{
     float: right;
     margin-top: -1px;
 }
 
+#searchclear {
+    position: relative;
+    right: 24px;
+    top: 4px;
+    bottom: 0;
+    height: 14px;
+    margin: auto;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ccc;
+    width: 0px;
+}
+
+.panel-body > .table-responsive{
+    padding: 0px 12px;
+}
+
+.filter-margin{
+    margin-top: -5px;
+    width:50%;
+}
 
 
 
