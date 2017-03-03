@@ -105,6 +105,11 @@ div.dataTables_processing{
     width: 47%;
 }
 
+div.dataTable_filter{
+    float: right;
+    margin-top: -1px;
+}
+
 #searchclear {
     position: relative;
     right: 24px;

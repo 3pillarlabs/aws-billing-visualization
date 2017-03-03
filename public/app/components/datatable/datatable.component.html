@@ -43,7 +43,6 @@
                                 {{column.display}}
                             </td>
                         </template>
-
                     </tr>
                 </thead>
                 <tbody>
@@ -58,16 +57,20 @@
                         <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)" title="click to select product">{{item.ProductName}}</a></td>
                         <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
                         <td>{{item.Operation}}</td>
-                        <td><p *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p></td>
-                        <td><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
+                        <td [ngStyle]="{'word-break': 'break-all'}">
+                            <p *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
+                        </td>
+                        <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
                         <td>{{item.ItemDescription}}</td>
                         <td>{{item.UsageType}}</td>
                         <td>{{item.UsageQuantity | number:'1.0-2'}} Hrs</td>
                         <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
                         <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                         <td>
-                            <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)"><p>{{item.UsageStartDate }}</p>
-                            <p>{{item.UsageEndDate}}</p></a>
+                            <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
+                                <p>{{item.UsageStartDate }}</p>
+                                <p>{{item.UsageEndDate}}</p>
+                            </a>
                         </td>
                     </tr>
 
@@ -91,7 +94,6 @@
                         </td>
                     </tr>
                 </tbody>
-
             </table>
         </div>
     </div>

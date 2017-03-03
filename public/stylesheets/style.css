@@ -38,24 +38,19 @@ code {
   font-size: 80%;
 }
 
-.navbar-brand {
-    padding: 0px;
-		margin: 0px;
-}
-
-.navbar-brand > img {
-  height: 100%;
+.navbar-brand img {
+  height: 180%;
+  margin-top:-2.5%;
   width: auto;
-  padding: 6px 0px 6px 15px;
 }
 
-.navbar-text{
-	margin-bottom: 0px !important;
-}
-
-.navbar-text strong{
-  color: #000;
-  font-size: 18px;
+.navbar-default .navbar-header .navbar-text {
+    margin-bottom: auto !important;
+    margin-top: auto  !important;
+    margin-left: 10px  !important;
+    float: right  !important;
+    font-size: 0.9em  !important;
+    color: #000 !important;
 }
 
 .aws-app-container{
@@ -90,6 +85,7 @@ div.tooltipcss {
 
 .input-group-addon{
 	cursor: pointer;
+    padding: 4px 10px;
 }
 
 /*.detailed-report-filter{
@@ -138,7 +134,16 @@ div.tooltipcss {
 }
 
 .daterangepicker table { font-size: 12px!important; }
-.form-control { font-size: 12px!important; }
+
+.form-control {
+    font-size: 12px!important;
+    height: 25px;
+}
+
+#datatable .form-control {
+    height: 25px;
+}
+
 .ranges li { font-size: 12px!important; }
 
 .date-range-input{
