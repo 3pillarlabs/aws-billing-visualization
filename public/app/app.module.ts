@@ -11,6 +11,7 @@ import { PaginationDirective } from './directives/pagination.directive';
 
 import { D3mapComponent } from './components/d3map/d3map.component';
 import { ChartComponent } from "./components/chart/chart.component";
+import { BarchartComponent } from "./components/chart/barchart.component";
 import { ConfigService } from "./services/config.service";
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -25,7 +26,8 @@ import { FooterComponent } from './components/footer/footer.component';
     D3mapComponent,
     ChartComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    BarchartComponent
      ],
   providers: [ AwsdataService, ConfigService ],
   bootstrap:    [ AppComponent ]
