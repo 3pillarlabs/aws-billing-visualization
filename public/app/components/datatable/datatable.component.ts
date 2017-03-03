@@ -129,7 +129,6 @@ export class DatatableComponent implements OnChanges {
         this.pageInfo();
     }
 
-
     parseDetailData(data: any): void {
         var jsondata: any = [];
         if (data.aggregations) {
@@ -153,7 +152,7 @@ export class DatatableComponent implements OnChanges {
     }
 
     filterbyOperation(val: string) {
-        this.filter = val
+        this.filter = val;
         this.getResourceData();
         //this.callDetailReportFilter();
     }

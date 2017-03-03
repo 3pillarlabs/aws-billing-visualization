@@ -7,7 +7,7 @@ import 'rxjs/add/operator/map';
 
 export class AwsdataService {
 
-	constructor(private _http: Http) {}
+	constructor(private _http: Http) { }
 
 	getRegionsData(data: any) {
 		var headers = new Headers();
