@@ -73,7 +73,7 @@ export class BarchartComponent implements AfterViewInit {
                 for (let product of data.aggregations.product_name.buckets) {
                     let TotalBlendedCost = Math.round(product.TotalBlendedCost.value)
                     if (TotalBlendedCost > 0) {
-                        var productname=product.key.slice(7);
+                        var productname=product.key.replace(/AWS |Amazon /gi,"");
                         var productdoc = {
                             'name': productname,
                             'totalcost': TotalBlendedCost,
