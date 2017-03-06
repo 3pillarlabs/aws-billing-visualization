@@ -68,7 +68,8 @@ div.tooltipcss {
 	border-radius: 8px;           
 	pointer-events: none;   
 	color: #000;
-	font-weight: bold;      
+	font-weight: bold;
+  z-index: 1200;      
 }
 .resource-region:hover{
   fill: orange;
@@ -146,8 +147,8 @@ div.tooltipcss {
 
 .ranges li { font-size: 12px!important; }
 
-.date-range-input{
-  /*width: 230px!important;*/
+.datepicker{
+  width: 20em;
 }
 
 .dataTables_paginate{
