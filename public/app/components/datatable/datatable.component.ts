@@ -3,7 +3,6 @@ import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
 import { ConfigService } from './../../services/config.service';
 
-
 @Component({
     moduleId: module.id,
     selector: 'aws-billing-datatable',
