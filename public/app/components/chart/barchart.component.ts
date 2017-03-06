@@ -15,12 +15,17 @@ import * as D3 from 'd3';
                 #barcharttoolTip {
                     position: absolute;
                     display: none;
-                    min-width: 80px;
-                    height: auto;
-                    background: none repeat scroll 0 0 #ffffff;
-                    border: 1px solid #6F257F;
-                    padding: 10px;
-                    text-align: center;
+                    text-align: center;           
+                    width: 200px;                 
+                    padding: 10px;             
+                    font: 12px sans-serif;        
+                    background: lightsteelblue;   
+                    border: 0px;      
+                    border-radius: 8px;           
+                    pointer-events: none;   
+                    color: #000;
+                    font-weight: bold;
+                    z-index: 1200;      
                 }
             `]
 })

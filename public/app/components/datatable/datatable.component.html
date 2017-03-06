@@ -4,9 +4,12 @@
         <div class="panel-title form-inline">
             <strong>Detailed Report</strong>
             <div class="pull-right filter-margin">
-                <span class="icon-stack">
+                <a href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter">
+                    <i class="fa fa-eraser"></i>
+                </a>
+                <!--<span class="icon-stack">
                     <a href="javascript:void(0)" (click)="clearFilter()" title="Clear filter"><img src="images/Data-Clear-Filters-icon.png"></a>
-                </span>
+                </span>-->
                 <div class="form-group">
                     <select class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
                         <option value="">Select Product</option>
@@ -48,7 +51,7 @@
                 <tbody>
                     <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
                         <td colspan="7"></td>
-                        <td>{{totalQuantity}} Hrs</td>
+                        <td>{{totalQuantity | number:'1.0-2'}} Hrs</td>
                         <td></td>
                         <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
                         <td></td>
@@ -58,18 +61,19 @@
                         <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
                         <td>{{item.Operation}}</td>
                         <td [ngStyle]="{'word-break': 'break-all'}">
-                            <p *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
+                            <span *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></span>
                         </td>
                         <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
                         <td>{{item.ItemDescription}}</td>
                         <td>{{item.UsageType}}</td>
-                        <td>{{item.UsageQuantity | number:'1.0-2'}} Hrs</td>
+                        <td *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity  | number:'1.0-2'}} Hrs</td>
+                        <td *ngIf="item.UsageQuantity == ''">{{item.UsageQuantity }} Hrs</td>
                         <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
                         <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                         <td>
                             <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
-                                <p>{{item.UsageStartDate }}</p>
-                                <p>{{item.UsageEndDate}}</p>
+                                <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMMM DD, YYYY,h:mm a' }}</span><br/>
+                                <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMMM DD, YYYY,h:mm a' }}</span>
                             </a>
                         </td>
                     </tr>
