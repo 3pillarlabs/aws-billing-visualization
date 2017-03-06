@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
 
 	totalRecord: number;
 	lastupdated: string;
+	convertedDate:any;
 	allServiceData: any;
 	inputdata: any;
 	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '', 'inputdata': '' };
@@ -70,11 +71,15 @@ export class AppComponent implements OnInit {
 
 
 	ngOnInit() {
+
+		
 		this.isloading = true;
 		this._awsdata.getMinMaxDateRange(this.company).subscribe((data) => {
 			if (data) {
-				this.totalRecord = data.hits.total;
+				this.totalRecord = data.hits.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 				this.lastupdated = data.aggregations.last_created.value_as_string;
+				let localtimezoneDate=new Date(this.lastupdated+' UTC');
+				this.convertedDate = moment(localtimezoneDate, "YYYY-MM-DD").format('MMMM DD, YYYY,h:mm a');
 				this.calstartDate = data.aggregations.min_date.value_as_string;
 				this.calendDate = data.aggregations.max_date.value_as_string;
 				let datesplitearr = this.calendDate.split("-");

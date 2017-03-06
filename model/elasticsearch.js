@@ -2,6 +2,7 @@ var elasticsearch = require('elasticsearch');
 
 var elasticClient = new elasticsearch.Client({
     host: "http://atg.3pillarglobal.com/es/"
+    //host: "http://172.20.38.132:9200/"
 });
 
 /**
@@ -90,8 +91,8 @@ exports.getRegionsBillingCost = getRegionsBillingCost;
  */
 function getResourcesData(data) {
     var indexName = data.company;
-    var startdate = data.strdate;
-    var enddate = data.enddate;
+    var startdate = data.strdate + ' 00:00:00';
+    var enddate = data.enddate + ' 23:59:59';
     var from = 0;
     var size = 10;
     var filter = {};
@@ -139,7 +140,7 @@ function getResourcesData(data) {
                         "range": {
                             "UsageStartDate": {
                                 "gte": startdate,
-                                "format": "yyyy-MM-dd"
+                                "format": "yyyy-MM-dd HH:mm:ss"
                             }
                         }
                     },
@@ -147,7 +148,7 @@ function getResourcesData(data) {
                         "range": {
                             "UsageEndDate": {
                                 "lte": enddate,
-                                "format": "yyyy-MM-dd"
+                                "format": "yyyy-MM-dd HH:mm:ss"
                             }
                         }
                     },
@@ -287,6 +288,19 @@ function getMinMaxDate(indexval) {
         index: indexval,
         size: 0,
         body: {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "range": {
+                                "BlendedCost": {
+                                    "gt": 0
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
             "aggs": {
                 "max_date": { "max": { "field": "UsageEndDate", "format": "YYYY-MM-dd" } },
                 "min_date": { "min": { "field": "UsageStartDate", "format": "YYYY-MM-dd" } },
@@ -332,12 +346,12 @@ function getMinMaxDate(indexval) {
 
 exports.getMinMaxDate = getMinMaxDate;
 
-
+//TODO:Use moment js
 function getGroupServicedata(data) {
     var agglimit = 10;
     var indexName = data.company;
-    var startdate = data.strdate;
-    var enddate = data.enddate;
+    var startdate = data.strdate + ' 00:00:00';
+    var enddate = data.enddate + ' 23:59:59';
     var filter = {};
     var regionfilter = {};
     var tablefilter = {};
@@ -479,7 +493,7 @@ function getGroupServicedata(data) {
                         "range": {
                             "UsageStartDate": {
                                 "gte": startdate,
-                                "format": "yyyy-MM-dd"
+                                "format": "yyyy-MM-dd HH:mm:ss"
                             }
                         }
                     },
@@ -487,7 +501,7 @@ function getGroupServicedata(data) {
                         "range": {
                             "UsageEndDate": {
                                 "lte": enddate,
-                                "format": "yyyy-MM-dd"
+                                "format": "yyyy-MM-dd HH:mm:ss"
                             }
                         }
                     },
