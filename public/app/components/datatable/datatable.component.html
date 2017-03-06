@@ -72,8 +72,8 @@
                         <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                         <td>
                             <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
-                                <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMMM DD, YYYY,h:mm a' }}</span><br/>
-                                <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMMM DD, YYYY,h:mm a' }}</span>
+                                <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMM DD, YYYY hh:mm A' }}</span><br/>
+                                <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMM DD, YYYY hh:mm A' }}</span>
                             </a>
                         </td>
                     </tr>
