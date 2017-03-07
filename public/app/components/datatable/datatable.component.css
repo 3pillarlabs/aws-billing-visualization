@@ -41,6 +41,10 @@
     width: 10%;
 }
 
+.table-sortable > thead > tr > td:nth-child(5){
+    width: 20%;
+}
+
 div.dataTables_length,dataTables_length_info{
     float: left;
 }
