@@ -55,11 +55,11 @@ export class DatatableComponent implements OnChanges {
             variable: '__AvailabilityRegion',
             sortable: true
         },
-        {
+        /*{
             display: 'Operation',
             variable: 'Operation',
             sortable: false
-        },
+        },*/
         {
             display: 'Tags',
             variable: 'user:*',
@@ -75,11 +75,11 @@ export class DatatableComponent implements OnChanges {
             variable: 'ItemDescription',
             sortable: false
         },
-        {
+        /*{
             display: 'Usage Type',
             variable: 'UsageType',
             sortable: false
-        },
+        },*/
         {
             display: 'Usage Quantity',
             variable: 'UsageQuantity',
