@@ -132,23 +132,29 @@ export class AppComponent implements OnInit {
 		
 
 		this._awsdata.getGroupServicedata(awsdata).subscribe((data) => {
-			if(!data.aggregations.AvailabilityRegion.buckets.length){
-				this.noRegionData = true;
-			}else{
-				this.noRegionData = false;
+			if(data.aggregations.AvailabilityRegion) {
+				if(!data.aggregations.AvailabilityRegion.buckets.length){
+					this.noRegionData = true;
+				}else{
+					this.noRegionData = false;
+				}
 			}
-			if(!data.aggregations.product_name.buckets.length){
-				this.noProductData = true;
-			}else{
-				this.noProductData = false;
+
+			if(data.aggregations.product_name) {
+				if(!data.aggregations.product_name.buckets.length){
+					this.noProductData = true;
+				}else{
+					this.noProductData = false;
+				}
 			}
+
 			this.allServiceData = data;
 			let newappcomponentdata = {
 				"startdate": this.startdate,
 				"enddate": this.enddate,
 				"allServiceData": this.allServiceData,
 				"inputdata": this.inputdata
-			}
+			};
 			this.appcomponentdata = newappcomponentdata;
 			this.isloading = false;
 		}, (error) => {
