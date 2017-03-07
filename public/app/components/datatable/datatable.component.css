@@ -104,11 +104,6 @@ div.dataTables_processing{
     width: 95%;
 }
 
-.detailed-report-filter{
-    float:right;
-    width: 47%;
-}
-
 div.dataTable_filter{
     float: right;
     margin-top: -1px;
@@ -132,8 +127,11 @@ div.dataTable_filter{
 }
 
 .filter-margin{
-    margin-top: -5px;
-    width:50%;
+    margin-top: -2px;
+}
+
+.form-control{
+    padding:4px;
 }
 
 
