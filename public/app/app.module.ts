@@ -15,6 +15,7 @@ import { BarchartComponent } from "./components/chart/barchart.component";
 import { ConfigService } from "./services/config.service";
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { MomentPipe } from './moment.pipe';
 
 @NgModule({
   imports:      [ BrowserModule,HttpModule,FormsModule ],
@@ -27,7 +28,8 @@ import { FooterComponent } from './components/footer/footer.component';
     ChartComponent,
     HeaderComponent,
     FooterComponent,
-    BarchartComponent
+    BarchartComponent,
+    MomentPipe
      ],
   providers: [ AwsdataService, ConfigService ],
   bootstrap:    [ AppComponent ]
