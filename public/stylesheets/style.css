@@ -119,6 +119,7 @@ div.tooltipcss {
     margin: auto;
     overflow: hidden;
     width: 50%;
+    text-align: center;
 }
 
 #detailfilter {
@@ -171,4 +172,34 @@ div.tooltipcss {
     .navbar-text{
       font-size: 12px;
     }*/
+}
+
+div.overlay-text{
+    /*z-index: 1200;
+    position: absolute;
+    top: 2%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    margin-left: -50%;
+    margin-top: -25px;
+    padding-top: 20%;
+    text-align: center;
+    background-color: rgba(193, 193, 193, 0.16);
+    font-weight: bold;
+    font-size: 22px;*/
+
+    z-index: 1200;
+    position: absolute;
+    top: 16%;
+    left: 52%;
+    width: 96%;
+    height: 86%;
+    margin-left: -50%;
+    margin-top: -25px;
+    padding-top: 20%;
+    text-align: center;
+    background-color: rgba(193, 193, 193, 0.16);
+    font-weight: bold;
+    font-size: 22px;
 }
