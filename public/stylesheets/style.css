@@ -89,14 +89,6 @@ div.tooltipcss {
     padding: 4px 10px;
 }
 
-/*.detailed-report-filter{
-	width: 100%;
-}
-
-.detailed-report-filter input{
-	width: 30% !important;
-}*/
-
 .form-control[readonly]{
       background-color: #fff !important;
 }
@@ -165,30 +157,7 @@ div.tooltipcss {
   cursor: pointer !important;
 }
 
-@media only screen and (max-width: 860px) {
-    /*.navbar {
-        background-color: lightblue;
-    }
-    .navbar-text{
-      font-size: 12px;
-    }*/
-}
-
 div.overlay-text{
-    /*z-index: 1200;
-    position: absolute;
-    top: 2%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    margin-left: -50%;
-    margin-top: -25px;
-    padding-top: 20%;
-    text-align: center;
-    background-color: rgba(193, 193, 193, 0.16);
-    font-weight: bold;
-    font-size: 22px;*/
-
     z-index: 1200;
     position: absolute;
     top: 16%;
