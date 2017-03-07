@@ -79,7 +79,7 @@
                             <h3>No Data</h3>
                         </td>
                     </tr>
-                    <tr>
+                    <tr *ngIf="data.length > 0">
                         <td colspan="11" [ngStyle]="{'background-color': 'white'}">
                             <div class="dataTables_info" *ngIf="data.length > 0" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
                             <div class="dataTables_paginate paging_simple_numbers" id="example_paginate" *ngIf="totalItems > 10">
