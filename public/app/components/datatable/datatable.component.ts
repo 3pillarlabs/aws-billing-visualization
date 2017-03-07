@@ -8,8 +8,8 @@ import { ConfigService } from './../../services/config.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
-    outputs: ['detailReportChange'],
-    inputs: ['appcomponentdata', 'productsRegionsData']
+    outputs: ['detailReportChange','isloading'],
+    inputs: ['appcomponentdata']
 })
 export class DatatableComponent implements OnChanges {
     company: string;
@@ -18,8 +18,8 @@ export class DatatableComponent implements OnChanges {
     enddate: string;
 
     appcomponentdata: any; //Data from App Component
-    productsRegionsData: any;
-    detailReportChange: EventEmitter<any> = new EventEmitter<string>();;
+    detailReportChange: EventEmitter<any> = new EventEmitter<string>();
+    isloading:EventEmitter<boolean>=new EventEmitter<boolean>();
     public data: any[] = [];
     public filterQuery = "";
     public rowsOnPage = 10;
@@ -39,7 +39,8 @@ export class DatatableComponent implements OnChanges {
     product: string = '';
     region: string = '';
     alltags: string = '';
-    datatableloading: boolean = false;
+    regionList:any;
+    ProductList:any;
 
 
     columns: any[] = [
@@ -111,6 +112,13 @@ export class DatatableComponent implements OnChanges {
     }
 
     ngOnChanges(): void {
+        let data=this.appcomponentdata.allServiceData;
+        if(data.aggregations && data.aggregations.product_name && data.aggregations.product_name.buckets.length > 0){
+            this.ProductList=data.aggregations.product_name.buckets;
+        }
+        if(data.aggregations && data.aggregations.AvailabilityRegion && data.aggregations.AvailabilityRegion.buckets.length > 0){
+            this.regionList=data.aggregations.AvailabilityRegion.buckets;
+        }
         if (this.appcomponentdata.allServiceData) {
             this.setupInfo();
             this.parseDetailData(this.appcomponentdata.allServiceData);
@@ -129,6 +137,7 @@ export class DatatableComponent implements OnChanges {
     }
 
     parseDetailData(data: any): void {
+     
         var jsondata: any = [];
         if (data.aggregations) {
             if (data.aggregations.total_cost) {
@@ -212,7 +221,7 @@ export class DatatableComponent implements OnChanges {
     }
 
     getResourceData(): void {
-        this.datatableloading = true;
+        this.isloading.emit(true);
         var shortingorder = 'asc';
         if (this.sorting.descending) {
             shortingorder = 'desc';
@@ -232,11 +241,11 @@ export class DatatableComponent implements OnChanges {
         };
         this._awsdata.getAllAwsResource(awsdata).subscribe((data) => {
             this.parseDetailData(data);
-            this.datatableloading = false;
+            this.isloading.emit(false);
             this.pageInfo();
         }, (error) => {
             console.log(error);
-            this.datatableloading = false;
+            this.isloading.emit(false);
         })
     }
 
