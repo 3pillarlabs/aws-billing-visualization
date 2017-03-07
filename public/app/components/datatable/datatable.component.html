@@ -50,7 +50,7 @@
                 </thead>
                 <tbody>
                     <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
-                        <td colspan="7"></td>
+                        <td colspan="5"></td>
                         <td>{{totalQuantity | number:'1.0-2'}} Hrs</td>
                         <td></td>
                         <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
@@ -59,13 +59,16 @@
                     <tr *ngFor="let item of data">
                         <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)" title="click to select product">{{item.ProductName}}</a></td>
                         <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
-                        <td>{{item.Operation}}</td>
+                        <!--<td>{{item.Operation}}</td>-->
                         <td [ngStyle]="{'word-break': 'break-all'}">
                             <span *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></span>
                         </td>
                         <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
-                        <td>{{item.ItemDescription}}</td>
-                        <td>{{item.UsageType}}</td>
+                        <td>
+                            {{item.ItemDescription}}<br/>
+                            {{item.Operation}} | {{item.UsageType}}
+                        </td>
+                        <!--<td>{{item.UsageType}}</td>-->
                         <td *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity  | number:'1.0-2'}} Hrs</td>
                         <td *ngIf="item.UsageQuantity == ''">{{item.UsageQuantity }} Hrs</td>
                         <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
@@ -79,12 +82,12 @@
                     </tr>
 
                     <tr *ngIf="data.length == 0">
-                        <td colspan="11" [ngStyle]="{'text-align':'center'}">
+                        <td colspan="9" [ngStyle]="{'text-align':'center'}">
                             <h3>No Data</h3>
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="11">
+                    <tr *ngIf="data.length > 0">
+                        <td colspan="9">
                             <div class="col-sm-5 dataTables_length_info">
                                 <div class="dataTables_info" *ngIf="data.length > 0" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
                             </div>

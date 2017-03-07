@@ -34,6 +34,8 @@ export class AppComponent implements OnInit {
 	inputdata: any;
 	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '', 'inputdata': '' };
 	productsRegionsData = { "regions": "", "products": "" };
+	noProductData:boolean = false;
+	noRegionData:boolean = false;
 
 
 
@@ -82,44 +84,50 @@ export class AppComponent implements OnInit {
 				this.convertedDate = moment(localtimezoneDate, "YYYY-MM-DD").format('MMM DD, YYYY hh:mm A');
 				this.calstartDate = data.aggregations.min_date.value_as_string;
 				this.calendDate = data.aggregations.max_date.value_as_string;
-				let datesplitearr = this.calendDate.split("-");
-				this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
-				this.enddate = this.calendDate;
-				this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
+				if (this.calstartDate && this.calendDate) {
+					let datesplitearr = this.calendDate.split("-");
+					this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
+					this.enddate = this.calendDate;
+					this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 
-				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
-				this.productsRegionsData.products = data.aggregations.product_names.buckets;
+					this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
+					this.productsRegionsData.products = data.aggregations.product_names.buckets;
 
-				var that = this;
-				$('input[name="daterange"]').daterangepicker({
-					locale: {
-						format: 'MMMM D, YYYY'
-					},
-					startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
-					autoApply: true,
-					ranges: {
-						'Today': [moment(), moment()],
-						'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-						'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-						'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-						'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-					}
-				}).on('change', function (e) {
-					var dateRangeStr = $('input[name="daterange"]').val();
-					that.searchAwsData(dateRangeStr);
-				});
-				$('.input-glyph').click(function () {
-					$('input[name="daterange"]').data("daterangepicker").show();
-				});
+					var that = this;
+					$('input[name="daterange"]').daterangepicker({
+						locale: {
+							format: 'MMMM D, YYYY'
+						},
+						startDate: moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+						endDate: moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+						minDate: moment(this.calstartDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+						maxDate: moment(this.calendDate, "YYYY-MM-DD").format('MMMM D, YYYY'),
+						autoApply: true,
+						ranges: {
+							'Today': [moment(), moment()],
+							'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+							'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+							'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+							'This Month': [moment().startOf('month'), moment().endOf('month')],
+							'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+						}
+					}).on('change', function (e) {
+						var dateRangeStr = $('input[name="daterange"]').val();
+						that.searchAwsData(dateRangeStr);
+					});
+					$('.input-glyph').click(function () {
+						$('input[name="daterange"]').data("daterangepicker").show();
+					});
 
-				this.getAllServiceData();
+					this.getAllServiceData();
+				}
+				else{
+					this.error = "No data available."
+				}
+
 			}
 		}, (error) => {
-			this.error = error;
+			this.error = "No data available.";//error;
 		})
 
 
@@ -134,9 +142,19 @@ export class AppComponent implements OnInit {
 			region: this.selectedRegion,
 			detailreport: this.detailReportOption
 		};
-
+		
 
 		this._awsdata.getGroupServicedata(awsdata).subscribe((data) => {
+			if(!data.aggregations.AvailabilityRegion.buckets.length){
+				this.noRegionData = true;
+			}else{
+				this.noRegionData = false;
+			}
+			if(!data.aggregations.product_name.buckets.length){
+				this.noProductData = true;
+			}else{
+				this.noProductData = false;
+			}
 			this.allServiceData = data;
 			let newappcomponentdata = {
 				"startdate": this.startdate,
