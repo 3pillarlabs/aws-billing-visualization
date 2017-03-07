@@ -29,11 +29,10 @@ export class AppComponent implements OnInit {
 
 	totalRecord: number;
 	lastupdated: string;
-	convertedDate:any;
+	convertedDate: any;
 	allServiceData: any;
 	inputdata: any;
 	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '', 'inputdata': '' };
-	productsRegionsData = { "regions": "", "products": "" };
 
 
 
@@ -62,23 +61,15 @@ export class AppComponent implements OnInit {
 		this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 		this.isloading = false;
 
-
 	}
 
-
-
-
-
-
 	ngOnInit() {
-
-		
 		this.isloading = true;
 		this._awsdata.getMinMaxDateRange(this.company).subscribe((data) => {
 			if (data) {
 				this.totalRecord = data.hits.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 				this.lastupdated = data.aggregations.last_created.value_as_string;
-				let localtimezoneDate=new Date(this.lastupdated+' UTC');
+				let localtimezoneDate = new Date(this.lastupdated + ' UTC');
 				this.convertedDate = moment(localtimezoneDate, "YYYY-MM-DD").format('MMM DD, YYYY hh:mm A');
 				this.calstartDate = data.aggregations.min_date.value_as_string;
 				this.calendDate = data.aggregations.max_date.value_as_string;
@@ -86,10 +77,6 @@ export class AppComponent implements OnInit {
 				this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
 				this.enddate = this.calendDate;
 				this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
-
-				this.productsRegionsData.regions = data.aggregations.availability_regions.buckets;
-				this.productsRegionsData.products = data.aggregations.product_names.buckets;
-
 				var that = this;
 				$('input[name="daterange"]').daterangepicker({
 					locale: {

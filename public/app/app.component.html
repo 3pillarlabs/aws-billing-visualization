@@ -51,7 +51,7 @@
 	</div>
 	<div class="row">
 		<div class="col-lg-12" id="datatable">
-			<aws-billing-datatable [productsRegionsData]="productsRegionsData" [appcomponentdata]="appcomponentdata" (detailReportChange)="onDetailReportChange($event)"></aws-billing-datatable>
+			<aws-billing-datatable [appcomponentdata]="appcomponentdata" (detailReportChange)="onDetailReportChange($event)" (isloading)="isloading=$event"></aws-billing-datatable>
 		</div>
 	</div>
 
