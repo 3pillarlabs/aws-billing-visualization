@@ -207,7 +207,7 @@ export class D3mapComponent implements OnChanges {
                 .attr('class', 'legend')
                 .attr('transform', (d, i) => {
                     var height = this.legendRectSize;
-                    var vert = i * height;
+                    var vert = (4-i) * height;
                     return 'translate(20,' + vert + ')';
                 });
 
