@@ -160,6 +160,10 @@ div.tooltipcss {
   margin:0px !important;
 }
 
+.pagination>li>a, .pagination>li>span{
+  cursor: pointer !important;
+}
+
 @media only screen and (max-width: 860px) {
     /*.navbar {
         background-color: lightblue;
