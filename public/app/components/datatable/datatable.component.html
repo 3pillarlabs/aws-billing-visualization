@@ -1,32 +1,30 @@
 <div class="panel panel-default">
-    <div class="panel-heading">
+    <div class="panel-heading" [ngStyle]="{'min-height': '41px'}">
         <div class="panel-title form-inline">
-            <strong>Detailed Report</strong>
-            <div class="pull-right filter-margin">
-                <a href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter">
-                    <i class="fa fa-eraser"></i>
-                </a>
-                <!--<span class="icon-stack">
-                    <a href="javascript:void(0)" (click)="clearFilter()" title="Clear filter"><img src="images/Data-Clear-Filters-icon.png"></a>
-                </span>-->
-                <div class="form-group">
-                    <select class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
-                        <option value="">Select Product</option>
-                        <option *ngFor="let product of ProductList" [value]="product.key">{{product.key}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" (change)="onChangeRegion($event.target.value)" [(ngModel)]="region">
-                        <option value="">Select Region</option>
-                        <option *ngFor="let region of regionList" [value]="region.key">{{region.key}}</option>
-                    </select>
-                </div>
-                <div class="form-group detailed-report-filter">
+            <strong [ngStyle]="{'padding-left': '0px'}" class="col-md-3">Detailed Report</strong>
+            <div [ngStyle]="{'padding-right': '0px'}" class="filter-margin col-md-9">
+                <div [ngStyle]="{'padding-right': '0px'}" class="form-group detailed-report-filter pull-right col-md-4">
                     <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
                     <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)"
                     />
                     <span id="searchclear" *ngIf="filter!=''" (click)="onClearFilter()" class="glyphicon glyphicon-remove-circle"></span>
                 </div>
+                <div class="form-group pull-right col-md-2">
+                    <select [ngStyle]="{'width': '100%'}" class="form-control" (change)="onChangeRegion($event.target.value)" [(ngModel)]="region">
+                        <option value="">Select Region</option>
+                        <option *ngFor="let region of regionList" [value]="region.key">{{region.key}}</option>
+                    </select>
+                </div>
+                <div class="form-group pull-right col-md-2">
+                    <select [ngStyle]="{'width': '100%'}" class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
+                        <option value="">Select Product</option>
+                        <option *ngFor="let product of ProductList" [value]="product.key">{{product.key}}</option>
+                    </select>
+                </div>
+                 <a class="col-md-2 pull-right" [ngStyle]="{'font-size': '80%','text-decoration':'none', 'text-align': 'right', 'margin-top': '5px'}" href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter" *ngIf="product!='' || region!='' || filter!=''">
+                    <i class="fa fa-minus-circle"></i> Clear Filters
+                </a>
+                &nbsp;
             </div>
         </div>
 
@@ -50,9 +48,9 @@
                 <tbody>
                     <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
                         <td colspan="7"></td>
-                        <td>{{totalQuantity | number:'1.0-2'}} Hrs</td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{totalQuantity | number:'1.0-2'}} Hrs</td>
                         <td></td>
-                        <td>{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
                         <td></td>
                     </tr>
                     <tr *ngFor="let item of data">
@@ -60,15 +58,15 @@
                         <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
                         <td>{{item.Operation}}</td>
                         <td [ngStyle]="{'word-break': 'break-all'}">
-                            <span *ngFor="let tag of tags(item)">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></span>
+                            <p *ngFor="let tag of tags(item)" [ngStyle]="{'margin-bottom': '0px'}">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
                         </td>
                         <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
                         <td>{{item.ItemDescription}}</td>
                         <td>{{item.UsageType}}</td>
-                        <td><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span></td>
-                        <td>{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
-                        <td>{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
-                        <td>
+                        <td [ngStyle]="{'text-align': 'right'}"><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span></td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
+                        <td [ngStyle]="{'text-align': 'right'}">
                             <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
                                 <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMM DD, YYYY hh:mm A' }}</span><br/>
                                 <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMM DD, YYYY hh:mm A' }}</span>
