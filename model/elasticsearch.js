@@ -46,13 +46,6 @@ function getRegionsBillingCost(data) {
                                 "format": "yyyy-MM-dd"
                             }
                         }
-                    },
-                    {
-                        "range": {
-                            "BlendedCost": {
-                                "gt": 0
-                            }
-                        }
                     }
                 ]
             }
@@ -152,13 +145,6 @@ function getResourcesData(data) {
                             }
                         }
                     },
-                    {
-                        "range": {
-                            "BlendedCost": {
-                                "gt": 0
-                            }
-                        }
-                    },
                     filter,
                     productfilter,
                     regionfilter
@@ -243,13 +229,6 @@ function getProductWiseData(postdata) {
                             }
                         }
                     },
-                    {
-                        "range": {
-                            "BlendedCost": {
-                                "gt": 0
-                            }
-                        }
-                    },
                     regionfilter
                 ]
             }
@@ -288,19 +267,6 @@ function getMinMaxDate(indexval) {
         index: indexval,
         size: 0,
         body: {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "range": {
-                                "BlendedCost": {
-                                    "gt": 0
-                                }
-                            }
-                        }
-                    ]
-                }
-            },
             "aggs": {
                 "max_date": { "max": { "field": "UsageEndDate", "format": "YYYY-MM-dd" } },
                 "min_date": { "min": { "field": "UsageStartDate", "format": "YYYY-MM-dd" } },
@@ -370,7 +336,6 @@ function getGroupServicedata(data) {
 
     /* Condition for aggregation start here */
     if (data.product == "" && data.region == "" && data.detailreport == "") {
-
         aggs = {
             "AvailabilityRegion": {
                 "terms": {
@@ -502,13 +467,6 @@ function getGroupServicedata(data) {
                             "UsageEndDate": {
                                 "lte": enddate,
                                 "format": "yyyy-MM-dd HH:mm:ss"
-                            }
-                        }
-                    },
-                    {
-                        "range": {
-                            "BlendedCost": {
-                                "gt": 0
                             }
                         }
                     },
