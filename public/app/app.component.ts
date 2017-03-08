@@ -33,8 +33,9 @@ export class AppComponent implements OnInit {
 	allServiceData: any;
 	inputdata: any;
 	appcomponentdata = { "startdate": '', "enddate": '', 'allServiceData': '', 'inputdata': '' };
-	noProductData:boolean = false;
-	noRegionData:boolean = false;
+	noProductData: boolean = false;
+	noRegionData: boolean = false;
+	productSelectionInfoTxt: string = "Click on bar or product label to select product";
 
 
 
@@ -108,7 +109,7 @@ export class AppComponent implements OnInit {
 
 					this.getAllServiceData();
 				}
-				else{
+				else {
 					this.error = "No data available."
 				}
 
@@ -129,21 +130,21 @@ export class AppComponent implements OnInit {
 			region: this.selectedRegion,
 			detailreport: this.detailReportOption
 		};
-		
+
 
 		this._awsdata.getGroupServicedata(awsdata).subscribe((data) => {
-			if(data.aggregations.AvailabilityRegion) {
-				if(!data.aggregations.AvailabilityRegion.buckets.length){
+			if (data.aggregations.AvailabilityRegion) {
+				if (!data.aggregations.AvailabilityRegion.buckets.length) {
 					this.noRegionData = true;
-				}else{
+				} else {
 					this.noRegionData = false;
 				}
 			}
 
-			if(data.aggregations.product_name) {
-				if(!data.aggregations.product_name.buckets.length){
+			if (data.aggregations.product_name) {
+				if (!data.aggregations.product_name.buckets.length) {
 					this.noProductData = true;
-				}else{
+				} else {
 					this.noProductData = false;
 				}
 			}
@@ -214,6 +215,12 @@ export class AppComponent implements OnInit {
 	}
 
 	onSelectProduct(selectedproduct: string) {
+		if(selectedproduct){
+			this.productSelectionInfoTxt = "Click on selected bar or label to unselect product";
+		}else{
+			this.productSelectionInfoTxt = "Click on bar or product label to select product";
+		}
+		
 		this.isloading = true;
 		this.selectedProduct = selectedproduct;
 		this.selectedRegion = '';

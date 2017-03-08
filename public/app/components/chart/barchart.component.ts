@@ -37,7 +37,7 @@ export class BarchartComponent implements AfterViewInit {
 
     private width;
     private height;
-    private margin = { top: 10, right: 40, bottom: 100, left: 60 };
+    private margin = { top: 10, right: 30, bottom: 100, left: 60 };
     private xScale;
     private yScale;
     private dollarFormatter;
@@ -179,14 +179,20 @@ export class BarchartComponent implements AfterViewInit {
                             .attr("rectClicked", "No")
                             .transition()
                             .duration(500)
-                            .attr("stroke", "none");
+                            .attr("stroke", "none");                        
 
                         D3.select(this)
                             .attr("rectClicked", "Yes")
                             .transition()
                             .duration(500)
                             .attr("stroke", "black")
-                            .attr("stroke-width", 2);
+                            .attr("stroke-width", 2)
+                            .style("opacity", 1);
+
+                        D3.selectAll("[rectClicked=No]")
+                            .transition()
+                            .duration(500)
+                            .style("opacity", .4);
 
                         D3.selectAll("[productClcked=Yes]")
                             .attr("productClcked", "No")
@@ -209,6 +215,11 @@ export class BarchartComponent implements AfterViewInit {
                             .transition()
                             .duration(500)
                             .attr("stroke", "none");
+
+                        D3.selectAll("[rectClicked=No]")
+                            .transition()
+                            .duration(500)
+                            .style("opacity", 1);
 
                         D3.selectAll("[productClcked=Yes]").filter("[txtProductAttrName=" + d.producttag + "]")
                             .attr("productClcked", "No")
@@ -240,7 +251,7 @@ export class BarchartComponent implements AfterViewInit {
                 .style("cursor", "pointer")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
-                .attr("transform", "rotate(-40)")
+                .attr("transform", "rotate(-50)")
                 .on("mousemove", (d, i) => {
                     let toolname = "";
                     if (this.productDataSet.hasOwnProperty(d)) {
@@ -280,7 +291,13 @@ export class BarchartComponent implements AfterViewInit {
                             .transition()
                             .duration(500)
                             .attr("stroke", "black")
-                            .attr("stroke-width", 2);
+                            .attr("stroke-width", 2)
+                            .style("opacity", 1);
+
+                        D3.selectAll("[rectClicked=No]")
+                            .transition()
+                            .duration(500)
+                            .style("opacity", .4);
 
                         that.selectProduct.emit(that.productDataSet[d].orignalname);
 
@@ -297,6 +314,11 @@ export class BarchartComponent implements AfterViewInit {
                             .transition()
                             .duration(500)
                             .attr("stroke", "none");
+
+                        D3.selectAll("[rectClicked=No]")
+                            .transition()
+                            .duration(500)
+                            .style("opacity", 1);
 
                         that.selectProduct.emit("");
                     }
