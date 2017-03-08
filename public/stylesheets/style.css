@@ -141,7 +141,8 @@ div.tooltipcss {
 .ranges li { font-size: 12px!important; }
 
 .datepicker{
-  width: 20em;
+  width: 20.3em;
+  padding: 4px 0 4px;
 }
 
 .dataTables_paginate{
