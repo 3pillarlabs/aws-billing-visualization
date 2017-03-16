@@ -34,13 +34,14 @@ export class DatatableComponent implements OnChanges {
     totalBlendedCost: number = 0;
     totalQuantity: number;
     showingfrom = this.currentPage;
-    showingto = this.rowsOnPage;
+    showingto:number;
     dataTableLenth: any = [10, 25, 50, 100];
     product: string = '';
     region: string = '';
     alltags: string = '';
     regionList:any;
     ProductList:any;
+    public length:number=10;
 
 
     columns: any[] = [
@@ -109,6 +110,7 @@ export class DatatableComponent implements OnChanges {
 
     constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
         this.company = this._config.company;
+        this.showingto=this.length;
     }
 
     ngOnChanges(): void {
@@ -127,7 +129,7 @@ export class DatatableComponent implements OnChanges {
 
     setupInfo(): void {
         this.currentPage = this.appcomponentdata.inputdata.detaildata.start;
-        this.rowsOnPage = this.appcomponentdata.inputdata.detaildata.limit;
+        this.length = this.appcomponentdata.inputdata.detaildata.limit;
         this.product = this.appcomponentdata.inputdata.product;
         this.region = this.appcomponentdata.inputdata.region;
         this.startdate = this.appcomponentdata.startdate;
@@ -195,8 +197,8 @@ export class DatatableComponent implements OnChanges {
     };
 
     pageInfo() {
-        this.showingfrom = ((this.currentPage - 1) * this.rowsOnPage) + 1;
-        var calshowingTo = this.currentPage * this.rowsOnPage;
+        this.showingfrom = ((this.currentPage - 1) * this.length) + 1;
+        var calshowingTo = this.currentPage * this.length;
         this.showingto = calshowingTo > this.totalItems ? this.totalItems : calshowingTo;
     }
 
@@ -231,7 +233,7 @@ export class DatatableComponent implements OnChanges {
             "company": this.company,
             "strdate": this.startdate,
             "enddate": this.enddate,
-            "size": this.rowsOnPage,
+            "size": this.length,
             "currentpage": this.currentPage,
             "filter": this.filter,
             "product": this.product,
@@ -288,7 +290,7 @@ export class DatatableComponent implements OnChanges {
             "company": this.company,
             "strdate": this.startdate,
             "enddate": this.enddate,
-            "size": this.rowsOnPage,
+            "size": this.length,
             "currentpage": this.currentPage,
             "filter": this.filter,
             "product": this.product,
@@ -304,6 +306,12 @@ export class DatatableComponent implements OnChanges {
         this.startdate=stDate.substr(0,10);
         this.enddate=endDate.substr(0,10);
         this.callDetailReportFilter();
+    }
+
+    onlengthChange(tablelen:number):void{
+        this.currentPage = 1;
+        this.length=tablelen;
+        this.clearFilter();
     }
 
 }
