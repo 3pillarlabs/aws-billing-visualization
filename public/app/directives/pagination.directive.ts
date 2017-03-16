@@ -24,6 +24,7 @@ export class PaginationDirective implements ControlValueAccessor, OnChanges{
   @Input("currentPage") cPage:number;
   @Input("maxSize") pageSize:number;
   @Input("boundaryLinks") boundaryLinks:boolean;
+  @Input("length") length:number;
   @Output("pageChanged") pageChanged = new EventEmitter();
   currentpage:number;
   pageList:Array<number> = [];
@@ -46,10 +47,10 @@ export class PaginationDirective implements ControlValueAccessor, OnChanges{
      this.pageList = [];
      var i:number,count:number;
      this.seletedPage = this.currentpage;
-     var remaining = this.totalItems % this.pageSize;
+     var remaining = this.totalItems % this.length;
 
-    var totalSize =((this.totalItems-remaining) / this.pageSize)+(remaining ===0 ? 0 : 1);
-
+    var totalSize =((this.totalItems-remaining) / this.length)+(remaining ===0 ? 0 : 1);
+    console.log('length:'+this.length+' --- totalItems:'+this.totalItems+' ---- pageSize:'+this.pageSize+' --- Remaining:'+remaining+'  ---totalSize:'+totalSize+' --- CurrentPage:'+this.currentpage);
     for (i = (this.currentpage), count=0; i<= totalSize && count<this.pageSize; i++, count++) {
       this.pageList.push(i);
     }
@@ -68,6 +69,7 @@ export class PaginationDirective implements ControlValueAccessor, OnChanges{
       this.previousItemValid = false;
     }
   }
+  
   setCurrentPage(pageNo:number) {
     this.seletedPage = pageNo;
     this.currentpage = pageNo;
