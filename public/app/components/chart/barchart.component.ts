@@ -350,32 +350,4 @@ export class BarchartComponent implements AfterViewInit {
 
         }
     }
-
-    BarChartResize(): void {
-        this.width = parseInt(D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart')).style("width")) - this.margin.left - this.margin.right;
-        this.height = parseInt(D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart')).style("height")) - this.margin.top - this.margin.bottom;
-
-        // Update the range of the scale with new width/height
-        this.xScale.range([0, this.width]);
-        this.yScale.rangeRoundBands([this.height, 0], 0.1);
-
-        // Update the axis and text with the new scale
-        this.svg.select(".x.axis")
-            .call(this.xAxis)
-            .attr("transform", "translate(0," + this.height + ")")
-            .select(".label")
-            .attr("transform", "translate(" + this.width / 2 + "," + this.margin.bottom / 1.5 + ")");
-
-        this.svg.select(".y.axis")
-            .call(this.yAxis);
-
-        // Update the tick marks
-        this.xAxis.ticks(Math.max(this.width / 75, 2), " $");
-
-        // Force D3 to recalculate and update the line
-        this.svg.selectAll(".bar")
-            .attr("width", function (d) { return this.xScale(d["total"]); })
-            .attr("y", function (d) { return this.yScale(d["Name"]); })
-            .attr("height", this.yScale.rangeBand());
-    }
 }
