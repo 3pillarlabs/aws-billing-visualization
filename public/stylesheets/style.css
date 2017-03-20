@@ -173,3 +173,23 @@ div.overlay-text{
     font-weight: bold;
     font-size: 22px;
 }
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+stroke-width: 0;
+}
+
+.bar:hover{
+  fill-opacity: .7;
+  cursor: pointer;
+}
+
+.product-label:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
