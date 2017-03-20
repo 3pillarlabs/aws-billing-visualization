@@ -26,7 +26,7 @@ import * as D3 from 'd3';
                     color: #000;
                     font-weight: bold;
                     z-index: 1200;      
-                }
+                }                
             `]
 })
 
@@ -121,6 +121,12 @@ export class BarchartComponent implements AfterViewInit {
     }
 
 
+    // gridlines in y axis function
+    make_y_gridlines() {
+        return D3.axisLeft(this.yScale)
+    }
+
+
     setup(): void {
         D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart')).html("");
 
@@ -161,6 +167,14 @@ export class BarchartComponent implements AfterViewInit {
             this.yScale.domain([0, D3.max(this.dataset, function (d) { return d.totalcost; })]);
             this.y1Scale.domain([0, D3.max(this.dataset, function (d) { return (d.totalcost / tots); })]);
 
+            // add the Y gridlines
+            this.svg.append("g")
+                .attr("class", "grid")
+                .call(this.make_y_gridlines()
+                    .tickSize(-this.width)
+                    .tickFormat("")
+                )
+
             // append the rectangles for the bar chart
             this.svg.selectAll(".bar")
                 .data(this.dataset)
@@ -179,7 +193,7 @@ export class BarchartComponent implements AfterViewInit {
                             .attr("rectClicked", "No")
                             .transition()
                             .duration(500)
-                            .attr("stroke", "none");                        
+                            .attr("stroke", "none");
 
                         D3.select(this)
                             .attr("rectClicked", "Yes")
@@ -245,13 +259,14 @@ export class BarchartComponent implements AfterViewInit {
                 .attr("transform", "translate(0," + this.height + ")")
                 .call(this.xAxis)
                 .selectAll("text")
+                .attr("class", "product-label")
                 .attr("productClcked", "No")
                 .attr("txtProductAttrName", (d, i) => { return this.productDataSet[d].producttag; })
                 .style("text-anchor", "end")
-                .style("cursor", "pointer")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
                 .attr("transform", "rotate(-50)")
+                .style("font-size","9px")
                 .on("mousemove", (d, i) => {
                     let toolname = "";
                     if (this.productDataSet.hasOwnProperty(d)) {
@@ -333,10 +348,13 @@ export class BarchartComponent implements AfterViewInit {
                 .attr("transform", "translate(" + this.width + "," + "0)")
                 .call(this.yAxisRight);
 
+
+            
+
             /*this.svg.append("g")
                 .attr("class", "y axis")
                 .call(this.yAxis);
-
+    
             this.svg.append("g")
                 .attr("class", "x axis")
                 .call(this.yAxis)
