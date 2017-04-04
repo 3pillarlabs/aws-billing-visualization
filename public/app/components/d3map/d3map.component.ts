@@ -1,7 +1,6 @@
 import { Component, OnInit, OnChanges, ElementRef, EventEmitter,AfterViewInit} from '@angular/core';
 import * as d3 from 'd3';
 import { AwsdataService } from './../../services/awsdata.service';
-import { ConfigService } from './../../services/config.service';
 
 @Component({
     moduleId: module.id,
@@ -40,7 +39,6 @@ export class D3mapComponent implements OnChanges {
     private path: any;
     private tooltipGroup: any;
     private worldMapJson: string = "app/components/d3map/worldmap.json";
-    private company: string;
     private selectionMap: any;
     private legendRectSize:number=22;
 
@@ -53,12 +51,7 @@ export class D3mapComponent implements OnChanges {
     detailReportOption: any;
 
     colorRange = ["#ffe6e6", "#800000"];
-    constructor(private element: ElementRef,
-        private _awsService: AwsdataService,
-        private _config: ConfigService) {
-        this.company = this._config.company;
-        
-    }
+    constructor(private element: ElementRef,private _awsService: AwsdataService) { }
 
     ngAfterViewInit():void{
         this.parentNativeElement = this.element.nativeElement.querySelector('div#awsbillingD3Map');
@@ -111,20 +104,6 @@ export class D3mapComponent implements OnChanges {
                 this.drawMap(regionData);
             }
         }
-    }
-
-    getRegionsData() {
-        let awsdata = {
-            company: this.company,
-            strdate: this.appcomponentdata.startdate,
-            enddate: this.appcomponentdata.enddate
-        };
-        this._awsService.getRegionsData(awsdata).subscribe((regionsData) => {
-            this.parseD3Data(regionsData);
-        }, (error) => {
-            console.log(error);
-            this.isloading.emit(false);
-        })
     }
 
 
@@ -221,7 +200,7 @@ export class D3mapComponent implements OnChanges {
                 .attr("x", this.legendRectSize+10)
                 .attr("y",(d, i)=>{ return i+10; })
                 .style('font-size', '11px')
-                .text(function (d) { return "$" + d; });
+                .text(function (d) { return "≥ " + "$" + d; });
 
             this.selectionMap.enter().append("path")
                 .attr("class", (d) => { return "subunit " + d.id; })

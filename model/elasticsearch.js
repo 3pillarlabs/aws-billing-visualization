@@ -18,6 +18,18 @@ function isIndexExists(indexName) {
 exports.isIndexExists = isIndexExists;
 
 /**
+ * Get All indexes
+ */
+function getAllIndexes() {
+    return elasticClient.indices.stats({
+        index: "_all",
+        level: "indices"
+    });
+}
+exports.getAllIndexes = getAllIndexes;
+
+
+/**
  * Calculate resource cost aggregated on regions within a date range filter
  * @param: @Object data - contains index, start date, end date
  * @return: @Object
