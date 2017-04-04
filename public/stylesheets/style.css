@@ -116,14 +116,6 @@ div.tooltipcss {
   padding: 4px 0 4px;
 }
 
-.pagination{
-  margin:0px !important;
-}
-
-.pagination>li>a, .pagination>li>span{
-  cursor: pointer !important;
-}
-
 div.overlay-text{
     z-index: 1200;
     position: absolute;
@@ -186,19 +178,6 @@ stroke-width: 0;
     margin-bottom: 0px;
 }
 
-.panel-body.vdivide [class*='col-']:not(:last-child):after {
-    background: #e0e0e0;
-    width: 1px;
-    content: "";
-    display:block;
-    position: absolute;
-    top:0;
-    bottom: 0;
-    right: 0;
-    min-height: 70px;
-}
-
-
 ::-ms-clear {
     display: none;
 }
@@ -207,4 +186,57 @@ stroke-width: 0;
     z-index: 10;
     pointer-events: auto;
     cursor: pointer;
+}
+
+.selected-account {
+    text-transform: capitalize;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.selected-account .caret{
+    position: absolute;
+    right: 4px;
+    top: 24px;
+}
+
+.pagination{
+    margin:0px !important;
+}
+
+.pagination>li>a, .pagination>li>span {
+    cursor: pointer !important;
+    padding: 4px 7px !important;
+    font-size: 80%;
+}
+
+@media only screen and (max-width: 992px) {
+    .panel-body.vdivide [class*='col-']:not(:last-child):after {
+        background: #e0e0e0;
+        width: 1px;
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 1px;
+        margin-bottom: 10px;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    .panel-body.vdivide [class*='col-']:not(:last-child):after {
+        background: #e0e0e0;
+        width: 1px;
+        content: "";
+        display:block;
+        position: absolute;
+        top:0;
+        bottom: 0;
+        right: 0;
+        min-height: 70px;
+    }
 }

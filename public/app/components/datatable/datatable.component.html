@@ -7,11 +7,11 @@
                 </a>
             </h4>
             <div class="col-md-9">
-                <div class="row">
+                <div class="row table-filters">
 
                     <div class="col-md-2 clearfix col-xs-12">
                         <a class="pull-right small"
-                           [ngStyle]="{'text-decoration':'none', 'margin-top': '7px', 'margin-bottom': '7px'}"
+                           [ngStyle]="{'text-decoration':'none', 'margin-top': '7px'}"
                            href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter"
                            *ngIf="product!='' || region!='' || filter!=''">
                             <i class="fa fa-minus-circle"></i> Clear Filters
@@ -114,7 +114,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <div *ngIf="data.length > 0" class="row">
+                <div *ngIf="data.length > 0" class="row table-footer">
                     <div class="col-md-2 col-xs-12 per-page">
                         <span>
                             Show:
@@ -124,12 +124,12 @@
                         </span>
                     </div>
 
-                    <div class="col-md-4 col-xs-12 text-right">
+                    <div class="col-md-5 col-xs-12 text-right">
                         <span aria-live="polite">
                             Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries
                         </span>
                     </div>
-                    <div class="col-md-6 col-xs-12 text-right" *ngIf="totalItems > length">
+                    <div class="col-md-5 col-xs-12 text-right" *ngIf="totalItems > length">
                         <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage"
                                        [maxSize]="maxSize" [boundaryLinks]="true" [length]="length"
                                        (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;"
