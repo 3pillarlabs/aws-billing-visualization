@@ -37,6 +37,8 @@ export class AwsdataService {
 		return this._http.post('reports/getGroupServicedata', JSON.stringify(data), { headers: headers }).map(res => res.json());
 	}
 
-
+	getAllIndexes(){
+		return this._http.get('/reports/indexes').map((res)=> res.json());
+	}
 
 }

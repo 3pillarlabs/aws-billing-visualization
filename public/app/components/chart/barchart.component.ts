@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
-import { ConfigService } from './../../services/config.service';
 import * as D3 from 'd3';
 
 
@@ -33,7 +32,6 @@ import * as D3 from 'd3';
 export class BarchartComponent implements AfterViewInit {
     @Input() appcomponentdata: any;
     @Output() selectProduct: EventEmitter<string> = new EventEmitter<string>();
-    company: string;
 
     private width;
     private height;
@@ -53,8 +51,8 @@ export class BarchartComponent implements AfterViewInit {
     private percentFormatter;
     productDataSet = {};
 
-    constructor(private element: ElementRef, private _awsdata: AwsdataService, private _config: ConfigService) {
-        this.company = this._config.company;
+    constructor(private element: ElementRef, private _awsdata: AwsdataService) {
+    
     }
 
     ngOnChanges() {

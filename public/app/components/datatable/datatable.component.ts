@@ -1,7 +1,6 @@
-import { Component, EventEmitter, OnChanges } from '@angular/core';
+import { Component, EventEmitter, OnChanges,Input } from '@angular/core';
 import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
-import { ConfigService } from './../../services/config.service';
 
 @Component({
     moduleId: module.id,
@@ -12,7 +11,7 @@ import { ConfigService } from './../../services/config.service';
     inputs: ['appcomponentdata']
 })
 export class DatatableComponent implements OnChanges {
-    company: string;
+    @Input() company: string;
     detailReportOption: any;
     startdate: string;
     enddate: string;
@@ -108,8 +107,7 @@ export class DatatableComponent implements OnChanges {
         descending: false
     };
 
-    constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
-        this.company = this._config.company;
+    constructor(private http: Http, private _awsdata: AwsdataService) {
         this.showingto=this.length;
     }
 
