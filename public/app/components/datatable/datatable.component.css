@@ -84,4 +84,16 @@ div.dataTable_filter{
     .per-page {
         text-align: right;
     }
+
+    .table-filters [class*='col-']:not(:last-child) {
+        margin-bottom: 5px;
+    }
+
+}
+
+@media only screen and (max-width: 992px) {
+    .table-footer [class*='col-'] {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
 }
