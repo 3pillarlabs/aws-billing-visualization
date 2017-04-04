@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigService } from './services/config.service';
 import { AwsdataService } from './services/awsdata.service';
-declare var $: any;
-declare var moment: any
+declare var $: any; //Define var to access Jquery library
+declare var moment: any //Define var to use moment.js library
 
 @Component({
 	moduleId: module.id,
 	selector: 'my-app',
 	templateUrl: 'app.component.html',
-	inputs: ['selectProduct']
+	inputs: ['selectProduct', 'companyChange']
 })
 
 export class AppComponent implements OnInit {
@@ -22,7 +21,7 @@ export class AppComponent implements OnInit {
 	company: string;
 	error: string;
 	dateRange: string;
-
+	companyChange: string;
 
 	public calstartDate: string;
 	public calendDate: string;
@@ -36,10 +35,10 @@ export class AppComponent implements OnInit {
 	noProductData: boolean = false;
 	noRegionData: boolean = false;
 	productSelectionInfoTxt: string = "Click on bar or product label to select product";
+	indiceslist: any = [];
 
 
-
-	constructor(private _config: ConfigService, private _awsdata: AwsdataService) {
+	constructor(private _awsdata: AwsdataService) {
 		this.inputdata = {
 			'region': this.selectedRegion,
 			'product': this.selectedProduct,
@@ -53,7 +52,7 @@ export class AppComponent implements OnInit {
 			}
 		};
 		this.appcomponentdata.inputdata = this.inputdata;
-		this.company = this._config.company;
+		//this.company = this._config.company;
 		let today = new Date();
 		let year = today.getFullYear();
 		let month = ("0" + (today.getMonth() + 1)).slice(-2);
@@ -68,6 +67,27 @@ export class AppComponent implements OnInit {
 
 	ngOnInit() {
 		this.isloading = true;
+		this._awsdata.getAllIndexes().subscribe((data) => {
+			if (data.indices) {
+				let indxarr = [];
+				for (let indx in data.indices) {
+					indxarr.push(indx);
+				}
+				this.indiceslist = indxarr;
+				this.company = this.indiceslist[0];
+			}
+
+			this.setupData();
+
+		}, (error) => {
+			this.error = "No data available.";//error;
+		})
+
+
+
+	}
+
+	setupData() {
 		this._awsdata.getMinMaxDateRange(this.company).subscribe((data) => {
 			if (data) {
 				this.totalRecord = data.hits.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -117,8 +137,6 @@ export class AppComponent implements OnInit {
 		}, (error) => {
 			this.error = "No data available.";//error;
 		})
-
-
 	}
 
 	getAllServiceData() {
@@ -191,7 +209,7 @@ export class AppComponent implements OnInit {
 				"allServiceData": this.allServiceData
 			}
 			this.getAllServiceData();
-			//this.appcomponentdata=newappcomponentdata;
+
 		} else {
 			//alert()
 		}
@@ -215,12 +233,12 @@ export class AppComponent implements OnInit {
 	}
 
 	onSelectProduct(selectedproduct: string) {
-		if(selectedproduct){
+		if (selectedproduct) {
 			this.productSelectionInfoTxt = "Click on selected bar or label to unselect product";
-		}else{
+		} else {
 			this.productSelectionInfoTxt = "Click on bar or product label to select product";
 		}
-		
+
 		this.isloading = true;
 		this.selectedProduct = selectedproduct;
 		this.selectedRegion = '';
@@ -239,19 +257,9 @@ export class AppComponent implements OnInit {
 	}
 
 	onDetailReportChange(detailData: any) {
-		//console.log(detailData);
 		this.isloading = true;
 		this.startdate = detailData.strdate;
 		this.enddate = detailData.enddate;
-		/*this.selectedProduct=detailData.product;
-		this.selectedRegion=detailData.region;
-		this.detailReportOption={
-			"limit":detailData.size,
-			"start":detailData.currentpage,
-			"shortorder":detailData.shortingorder,
-			"shortfield":detailData.sortingfield,
-			"filtervalue":detailData.filter
-		}*/
 		this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 
 		this.selectedProduct = '';
@@ -276,5 +284,12 @@ export class AppComponent implements OnInit {
 		}
 		this.getAllServiceData();
 
+	}
+
+	onCompanyChange(companyValue: string) {
+		this.isloading = true;
+		this.company = companyValue;
+		this.companyChange = companyValue;
+		this.setupData();
 	}
 }
