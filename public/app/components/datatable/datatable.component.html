@@ -1,42 +1,68 @@
 <div class="panel panel-default">
-    <div class="panel-heading" [ngStyle]="{'min-height': '41px'}">
-        <div class="panel-title form-inline">
-            <strong [ngStyle]="{'padding-left': '0px'}" class="col-md-3">Detailed Report</strong>
-            <div [ngStyle]="{'padding-right': '0px'}" class="filter-margin col-md-9">
-                <div [ngStyle]="{'padding-right': '0px'}" class="form-group detailed-report-filter pull-right col-md-4">
-                    <i id="detailfilter" class="fa fa-search" (click)="filterbyOperation(detailfilterinput.value)"></i>
-                    <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)"
-                    />
-                    <span id="searchclear" *ngIf="filter!=''" (click)="onClearFilter()" class="glyphicon glyphicon-remove-circle"></span>
-                </div>
-                <div class="form-group pull-right col-md-2">
-                    <select [ngStyle]="{'width': '100%'}" class="form-control" (change)="onChangeRegion($event.target.value)" [(ngModel)]="region">
-                        <option value="">Select Region</option>
-                        <option *ngFor="let region of regionList" [value]="region.key">{{region.key}}</option>
-                    </select>
-                </div>
-                <div class="form-group pull-right col-md-2">
-                    <select [ngStyle]="{'width': '100%'}" class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
-                        <option value="">Select Product</option>
-                        <option *ngFor="let product of ProductList" [value]="product.key">{{product.key}}</option>
-                    </select>
-                </div>
-                 <a class="col-md-2 pull-right" [ngStyle]="{'font-size': '80%','text-decoration':'none', 'text-align': 'right', 'margin-top': '5px'}" href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter" *ngIf="product!='' || region!='' || filter!=''">
-                    <i class="fa fa-minus-circle"></i> Clear Filters
+    <div class="panel-heading clearfix" id="headingTwo">
+        <div class="row">
+            <h4 class="panel-title col-md-3">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                    Detailed Report
                 </a>
-                &nbsp;
+            </h4>
+            <div class="col-md-9">
+                <div class="row">
+
+                    <div class="col-md-2 clearfix col-xs-12">
+                        <a class="pull-right small"
+                           [ngStyle]="{'text-decoration':'none', 'margin-top': '7px', 'margin-bottom': '7px'}"
+                           href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter"
+                           *ngIf="product!='' || region!='' || filter!=''">
+                            <i class="fa fa-minus-circle"></i> Clear Filters
+                        </a>
+                    </div>
+
+                    <div class="col-md-3 col-xs-12">
+                        <div class="input-group-sm">
+                            <select [ngStyle]="{'width': '100%'}" class="form-control"
+                                    (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
+                                <option value="">Select Product</option>
+                                <option *ngFor="let product of ProductList" [value]="product.key">{{product.key}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-xs-12">
+                        <div class="input-group-sm">
+                            <select class="form-control" (change)="onChangeRegion($event.target.value)"
+                                    [(ngModel)]="region">
+                                <option value="">Select Region</option>
+                                <option *ngFor="let region of regionList" [value]="region.key">{{region.key}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-xs-12">
+                        <div class="input-group input-group-sm">
+                            <div class="form-group form-group-sm has-feedback has-clear">
+                                <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)" />
+                                <span *ngIf="filter!=''" (click)="onClearFilter()" class="form-control-clear glyphicon glyphicon-remove form-control-feedback"></span>
+                            </div>
+                            <span (click)="filterbyOperation(detailfilterinput.value)" class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                              </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
-
-    <div class="panel-body ">
-        <div class="row table-responsive dataTables_wrapper">
-            <table class="table table-striped table-bordered table-sortable">
-                <thead class="thead-default">
+    <div id="collapseTwo" class="panel-collapse collapse in">
+        <div class="panel-body">
+            <div class="row table-responsive">
+                <table class="table table-striped table-bordered table-sortable">
+                    <thead class="thead-default">
                     <tr>
                         <template ngFor let-column [ngForOf]="columns">
-                            <th *ngIf="column.sortable" [class]="selectedClass(column.variable)" (click)="changeSorting(column.variable)">
+                            <th *ngIf="column.sortable" [class]="selectedClass(column.variable)"
+                                (click)="changeSorting(column.variable)">
                                 {{column.display}}
                             </th>
                             <td *ngIf="!column.sortable">
@@ -44,8 +70,8 @@
                             </td>
                         </template>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
                         <td colspan="7"></td>
                         <td [ngStyle]="{'text-align': 'right'}">{{totalQuantity | number:'1.0-2'}} Hrs</td>
@@ -54,16 +80,23 @@
                         <td></td>
                     </tr>
                     <tr *ngFor="let item of data">
-                        <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)" title="click to select product">{{item.ProductName}}</a></td>
-                        <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
+                        <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)"
+                               title="click to select product">{{item.ProductName}}</a></td>
+                        <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)"
+                               title="click to select region">{{item.__AvailabilityRegion}}</a></td>
                         <td>{{item.Operation}}</td>
                         <td [ngStyle]="{'word-break': 'break-all'}">
-                            <p *ngFor="let tag of tags(item)" [ngStyle]="{'margin-bottom': '0px'}">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
+                            <p *ngFor="let tag of tags(item)" [ngStyle]="{'margin-bottom': '0px'}">{{tag.key}}= <a
+                                    href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
                         </td>
-                        <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a></td>
+                        <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)"
+                                                                       (click)="filterbyOperation(item.ResourceId)"
+                                                                       title="click to filter">{{item.ResourceId}}</a>
+                        </td>
                         <td>{{item.ItemDescription}}</td>
                         <td>{{item.UsageType}}</td>
-                        <td [ngStyle]="{'text-align': 'right'}"><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span></td>
+                        <td [ngStyle]="{'text-align': 'right'}"><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span>
+                        </td>
                         <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
                         <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
                         <td [ngStyle]="{'text-align': 'right'}">
@@ -79,14 +112,31 @@
                             <h3>No Data</h3>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-            <div class="dataTables_length" id="example_length"><label>Show <select name="example_length" (change)="onlengthChange($event.target.value)" [(ngModel)]="length" aria-controls="example" class=""><option *ngFor="let len of dataTableLenth" value="{{len}}">{{len}}</option></select> entries</label></div>
-            <div class="dataTables_info" *ngIf="data.length > 0" id="example_info" role="status" aria-live="polite">Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries</div>
-            <div class="dataTables_paginate paging_simple_numbers" id="example_paginate" *ngIf="totalItems > length">
-                <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true" [length]="length"
-                    (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="First"
-                    last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                    </tbody>
+                </table>
+                <div *ngIf="data.length > 0" class="row">
+                    <div class="col-md-2 col-xs-12 per-page">
+                        <span>
+                            Show:
+                            <select name="example_length" (change)="onlengthChange($event.target.value)" [(ngModel)]="length" aria-controls="example" class="">
+                                <option *ngFor="let len of dataTableLenth" value="{{len}}">{{len}}</option>
+                            </select>
+                        </span>
+                    </div>
+
+                    <div class="col-md-4 col-xs-12 text-right">
+                        <span aria-live="polite">
+                            Showing {{showingfrom}} to {{showingto}} of {{totalItems}} entries
+                        </span>
+                    </div>
+                    <div class="col-md-6 col-xs-12 text-right" *ngIf="totalItems > length">
+                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                                       [maxSize]="maxSize" [boundaryLinks]="true" [length]="length"
+                                       (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;"
+                                       first-text="First"
+                                       last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
