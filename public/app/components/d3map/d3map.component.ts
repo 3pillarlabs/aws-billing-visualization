@@ -208,6 +208,14 @@ export class D3mapComponent implements OnChanges {
                 .attr("fill", "#ccc")
                 .attr("stroke", "#fff");
 
+            this.svg.append("text")
+                .attr("x", (this.width / 2))
+                .attr("y", 31 - (this.margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text("Spends across Geographical regions");
+
             this.svg.append("g")
                 .attr("class", "bubble")
                 .selectAll("circle")
@@ -291,10 +299,6 @@ export class D3mapComponent implements OnChanges {
                         .duration(500)
                         .style("opacity", 0);
                 });
-
         })
-
-
     }
-
 }
