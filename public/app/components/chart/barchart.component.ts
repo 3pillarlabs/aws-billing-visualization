@@ -2,8 +2,6 @@ import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } fro
 import { AwsdataService } from './../../services/awsdata.service';
 import * as D3 from 'd3';
 
-
-
 @Component({
     selector: 'aws-billing-bar-chart',
     template: '<div id="awsbillingbarchartcontainer"><svg id="awsbillingbarchart" (window:resize)="onResize($event)"></svg><div id="barcharttoolTip"></div></div>',
@@ -52,7 +50,7 @@ export class BarchartComponent implements AfterViewInit {
     productDataSet = {};
 
     constructor(private element: ElementRef, private _awsdata: AwsdataService) {
-    
+
     }
 
     ngOnChanges() {
@@ -346,24 +344,13 @@ export class BarchartComponent implements AfterViewInit {
                 .attr("transform", "translate(" + this.width + "," + "0)")
                 .call(this.yAxisRight);
 
-
-            
-
-            /*this.svg.append("g")
-                .attr("class", "y axis")
-                .call(this.yAxis);
-    
-            this.svg.append("g")
-                .attr("class", "x axis")
-                .call(this.yAxis)
-                .attr("transform", "translate(0," + this.height + ")")
-                .append("text")
-                .attr("class", "label")
-                .attr("transform", "translate(" + this.width / 2 + "," + this.margin.bottom / 1.5 + ")")
-                .style("text-anchor", "middle")
-                .text("Sales");*/
-
-
+            this.svg.append("text")
+                .attr("x", (this.width / 2))
+                .attr("y", 8 - (this.margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text("Spends vs Top products used");
         }
     }
 }

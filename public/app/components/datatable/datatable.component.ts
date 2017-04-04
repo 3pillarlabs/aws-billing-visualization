@@ -51,7 +51,7 @@ export class DatatableComponent implements OnChanges {
             sortable: true
         },
         {
-            display: 'Availability Region',
+            display: 'Region',
             variable: '__AvailabilityRegion',
             sortable: true
         },
@@ -81,17 +81,17 @@ export class DatatableComponent implements OnChanges {
             sortable: false
         },
         {
-            display: 'Usage Quantity',
+            display: 'Usage Qty.',
             variable: 'UsageQuantity',
             sortable: false
         },
         {
-            display: 'Blended Rate',
+            display: 'Rate',
             variable: 'BlendedRate',
             sortable: false
         },
         {
-            display: 'Blended Cost',
+            display: 'Cost',
             variable: 'BlendedCost',
             sortable: true
         },

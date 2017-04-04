@@ -11,9 +11,8 @@ body {
 .footer {
   position: absolute;
   bottom: 0;
-  width: 100%;
   /* Set the fixed height of the footer here */
-  height: 60px;
+  height: 35px;
   background-color: #f5f5f5;
 }
 
@@ -26,21 +25,18 @@ body {
   padding: 60px 15px 0;
 }*/
 .container-fluid .text-muted {
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
-.footer > .container-fluid {
-  padding-right: 15px;
-  padding-left: 15px;
-}
 
 code {
   font-size: 80%;
 }
 
 .navbar-brand img {
-  height: 180%;
-  margin-top:-2.5%;
+  height: 145%;
+  margin-top:-2.4%;
+  margin-left: -10px;
   width: auto;
 }
 
@@ -49,12 +45,12 @@ code {
     margin-top: auto  !important;
     margin-left: 10px  !important;
     float: right  !important;
-    font-size: 0.9em  !important;
+    font-size: 0.7em  !important;
     color: #000 !important;
 }
 
 .aws-app-container{
-  padding-top: 65px;
+  padding-top: 60px;
 }
 
 div.tooltipcss {   
@@ -76,10 +72,6 @@ div.tooltipcss {
   fill-opacity: .7;
 }
 
-.well-padding{
-	margin: 0 15px 15px 15px;
-}
-
 .right-extra-pad{
 	padding-right: 8px;
 }
@@ -93,9 +85,6 @@ div.tooltipcss {
       background-color: #fff !important;
 }
 
-#startdemohelp{
-    margin: 10px 15px 0px 20px;
-}
 
 .navbar-fixed-top {
     z-index: 1101;
@@ -114,29 +103,11 @@ div.tooltipcss {
     text-align: center;
 }
 
-#detailfilter {
-    position: relative;
-    z-index: 1;
-    left: 10px;
-    top: 2px;
-    color: #7B7B7B;
-    cursor: pointer;
-    width: 0;
-}
 .aws-panel-padding{
   padding: 15px 0 15px!important;
 }
 
 .daterangepicker table { font-size: 12px!important; }
-
-.form-control {
-    font-size: 12px!important;
-    height: 25px;
-}
-
-#datatable .form-control {
-    height: 25px;
-}
 
 .ranges li { font-size: 12px!important; }
 
@@ -145,11 +116,6 @@ div.tooltipcss {
   padding: 4px 0 4px;
 }
 
-.dataTables_paginate{
-    margin: 0;
-    white-space: nowrap;
-    text-align: right;
-}
 .pagination{
   margin:0px !important;
 }
@@ -192,4 +158,53 @@ stroke-width: 0;
 .product-label:hover{
   text-decoration: underline;
   cursor: pointer;
+}
+
+.panel-heading .accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: left;        /* adjust as needed */
+    color: grey;         /* adjust as needed */
+    padding-right: 5px;
+    font-size: 115%;
+}
+.panel-heading .accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+
+.well {
+    margin-bottom: 10px;
+}
+
+.panel-group .panel{
+    margin-bottom: 10px;
+}
+
+.panel-group {
+    margin-bottom: 0px;
+}
+
+.panel-body.vdivide [class*='col-']:not(:last-child):after {
+    background: #e0e0e0;
+    width: 1px;
+    content: "";
+    display:block;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    right: 0;
+    min-height: 70px;
+}
+
+
+::-ms-clear {
+    display: none;
+}
+
+.form-control-clear {
+    z-index: 10;
+    pointer-events: auto;
+    cursor: pointer;
 }
