@@ -14,6 +14,9 @@
                 <a href="http://www.3pillarglobal.com/" target="_blank">
                     <img src="images/3pg.logo.png">
                 </a>
+                <select [(ngModel)]="indices" (change)="onChangeIndex($event.target.value)">
+                    <option *ngFor="let indx of indiceslist" [value]="indx" >{{indx}}</option>
+                </select>
                 <span class="navbar-text"><strong>AWS Billing Visualization</strong></span>
             </div>
         </div>
