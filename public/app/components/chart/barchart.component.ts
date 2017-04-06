@@ -33,7 +33,7 @@ export class BarchartComponent implements AfterViewInit {
 
     private width;
     private height;
-    private margin = { top: 10, right: 30, bottom: 100, left: 60 };
+    private margin = { top: 20, right: 30, bottom: 100, left: 60 };
     private xScale;
     private yScale;
     private dollarFormatter;
@@ -127,7 +127,7 @@ export class BarchartComponent implements AfterViewInit {
         D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart')).html("");
 
         this.width = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("width")) - this.margin.left - this.margin.right,
-            this.height = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("height")) - this.margin.top - this.margin.bottom;
+        this.height = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("height")) - this.margin.top - this.margin.bottom;
 
         this.xScale = D3.scaleBand().range([0, this.width]).padding(0.1);
         this.yScale = D3.scaleLinear().range([this.height, 0]);
@@ -345,10 +345,10 @@ export class BarchartComponent implements AfterViewInit {
                 .call(this.yAxisRight);
 
             this.svg.append("text")
-                .attr("x", (this.width / 2))
-                .attr("y", 8 - (this.margin.top / 2))
+                .attr("x", (this.width / 2)-5)
+                .attr("y",   -10)
                 .attr("text-anchor", "middle")
-                .style("font-size", "16px")
+                .style("font-size", "14px")
                 .style("text-decoration", "underline")
                 .text("Spends vs Top products used");
         }
