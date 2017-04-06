@@ -27,7 +27,7 @@ export class DatatableComponent implements OnChanges {
 
     public currentPage: number = 1;
     public totalItems: number = 0; // total numbar of page not items 
-    public maxSize: number = 10; // max page size 
+    public maxSize: number = 5; // max page size
     filter: string = '';
     appdataloaded = false;
     totalBlendedCost: number = 0;
