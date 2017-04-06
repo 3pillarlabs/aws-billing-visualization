@@ -1,21 +1,14 @@
-import { Component, OnInit, OnChanges, ElementRef, EventEmitter,AfterViewInit} from '@angular/core';
+import { Component, OnInit, OnChanges, ElementRef, EventEmitter, AfterViewInit } from '@angular/core';
 import * as d3 from 'd3';
 import { AwsdataService } from './../../services/awsdata.service';
 
 @Component({
     moduleId: module.id,
     selector: 'd3-map',
-    template: `<div id="awsbillingD3Map"></div><div id="awsbillingD3MapLegend"></div>`,
+    template: `<div id="awsbillingD3Map" (window:resize)="onResize($event)"></div>`,
     styles: [`#awsbillingD3Map{
-                  width:80%;
-                  height:48%;
-                  float:left;
-                }
-
-                #awsbillingD3MapLegend{
-                    width:20%;
+                    width:100%;
                     height:48%;
-                    float:left;
                 }`],
     inputs: ['appcomponentdata'],
     outputs: ['isloading', 'selectRegion']
@@ -26,10 +19,9 @@ export class D3mapComponent implements OnChanges {
     private enddate: string;
     private isloading = new EventEmitter();
     private parentNativeElement: any;
-    private margin = { top: 80, right: 0, bottom: 0, left: 0 };
+    private margin = { top: 0, right: 0, bottom: 0, left: 0 };
     private width: number;
     private height: number;
-    private legendwidth: number;
     private legendheight: number;
     private rotate: number = 0;//60;
     private maxlat: number = 83;
@@ -40,30 +32,46 @@ export class D3mapComponent implements OnChanges {
     private tooltipGroup: any;
     private worldMapJson: string = "app/components/d3map/worldmap.json";
     private selectionMap: any;
-    private legendRectSize:number=22;
+    private legendRectWidth:number=70;
+    private legendRectSize: number = 22;
+    globalRegionData:any;
+    private toplavelsvgheight:number=20;
+    private labelsvg:any;
 
     appcomponentdata: any;
     appdataloaded = false;
-    parentNativeElementLegend:any;
+    parentNativeElementLegend: any;
     selectedRegion: string;
     selectRegion: EventEmitter<string> = new EventEmitter<string>();
 
     detailReportOption: any;
 
     colorRange = ["#ffe6e6", "#800000"];
-    constructor(private element: ElementRef,private _awsService: AwsdataService) { }
+    constructor(private element: ElementRef, private _awsService: AwsdataService) { }
 
-    ngAfterViewInit():void{
-        this.parentNativeElement = this.element.nativeElement.querySelector('div#awsbillingD3Map');
-        this.parentNativeElementLegend = this.element.nativeElement.querySelector('div#awsbillingD3MapLegend');
-        
-        this.width = this.parentNativeElement.clientWidth-140;
-        this.height = this.parentNativeElement.clientHeight;
-
-        this.legendwidth = this.parentNativeElementLegend.clientWidth;
-        this.legendheight = this.parentNativeElementLegend.clientHeight;
-
+    onResize() {
+        this.setup();
         this.initSvg();
+        this.getProjection();
+        this.getPath();
+        this.getTooltip();
+        this.drawMap(this.globalRegionData);
+        console.log('resize');
+    }
+
+    ngAfterViewInit(): void {
+        this.setup();
+        this.initSvg();
+    }
+
+    setup() {
+        d3.select(this.element.nativeElement.querySelector('div#awsbillingD3Map')).html("");
+        this.parentNativeElement = this.element.nativeElement.querySelector('div#awsbillingD3Map');
+        this.width = parseInt(d3.select(this.element.nativeElement.querySelector('div#awsbillingD3Map')).style("width")) - this.margin.left - this.margin.right;
+        this.height = parseInt(d3.select(this.element.nativeElement.querySelector('div#awsbillingD3Map')).style("height")) - this.margin.top - this.margin.bottom;
+
+        this.legendheight=(this.height/10);
+        
     }
 
     ngOnChanges(): void {
@@ -102,6 +110,7 @@ export class D3mapComponent implements OnChanges {
                 this.getPath();
                 this.getTooltip();
                 this.drawMap(regionData);
+                this.globalRegionData=regionData;
             }
         }
     }
@@ -110,24 +119,27 @@ export class D3mapComponent implements OnChanges {
 
     initSvg(): void {
         if (this.parentNativeElement !== null) {
+            this.labelsvg=d3.select(this.parentNativeElement)
+                .append('svg')
+                .attr("width", this.width)
+                .attr("height", this.legendheight)
+                .append("g")
+                .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+
             this.svg = d3.select(this.parentNativeElement)
                 .append('svg')
-                .attr("width", '100%')
-                .attr("height", '100%')
-                .attr('viewBox', '0 0 ' + Math.min(this.width, this.height) + ' ' + Math.min(this.width, this.height))
-                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .attr("width", this.width)
+                .attr("height", (this.height-(3*this.legendheight)))
                 .append("g")
-                //.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
+                .attr("transform", "translate(" + this.margin.left + "," + (this.margin.top+this.toplavelsvgheight) + ")")
                 .append("g")
                 .attr("width", this.width)
-                .attr("height", this.height);
+                .attr("height", (this.height-(2*this.legendheight)));
 
-            this.legendSvg = d3.select(this.parentNativeElementLegend).append("svg")
+            this.legendSvg = d3.select(this.parentNativeElement).append("svg")
                 .attr("class", "legend")
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .attr('viewBox','0 0 ' + Math.min(this.legendwidth, this.legendheight) + ' ' + Math.min(this.legendwidth, this.legendheight))
-                .attr('preserveAspectRatio', 'xMinYMin meet');
+                .attr("width", this.width)
+                .attr("height",  this.legendheight*2);
         }
     }
 
@@ -171,6 +183,14 @@ export class D3mapComponent implements OnChanges {
         d3.json(this.worldMapJson, (error, collection) => {
             if (error) throw error;
 
+            this.labelsvg.append("text")
+                .attr("x", (this.width / 2))
+                .attr("y", ((this.toplavelsvgheight / 2)+2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("text-decoration", "underline")
+                .text("Spends across Geographical regions");
+
             this.selectionMap = this.svg.selectAll("path")
                 .data(collection.features);
 
@@ -178,28 +198,39 @@ export class D3mapComponent implements OnChanges {
                 .domain([0, data.maxval])
                 .range(this.colorRange);
 
-            this.legendSvg.html('');
             var legendG = this.legendSvg.selectAll("g")
                 .data(color.ticks(5))
                 .enter()
                 .append("g")
                 .attr('class', 'legend')
                 .attr('transform', (d, i) => {
-                    var height = this.legendRectSize;
-                    var vert = (4-i) * height;
-                    return 'translate(20,' + vert + ')';
+                   
+                    var totaltick=color.ticks(5).length;
+                    var calLegendRectWidth=((this.width)/totaltick);
+                    var width = this.legendRectWidth;
+                    if(width*totaltick > this.width){
+                        width=calLegendRectWidth;
+                    }
+                    var calmidd=(totaltick/2)*width;
+                    var x=((this.width/2)+(i * width))-calmidd;
+                    
+                    var y=this.legendheight/2;
+                    //var vert1 = ((this.legendheight - 50) - (this.legendRectSize * i);
+                    //console.log(vert + '-' + vert1);
+                    return 'translate('+x+',' + y + ')';
                 });
 
 
             legendG.append("rect")
-                .attr("width", this.legendRectSize)
+                .attr("width", this.legendRectWidth)
                 .attr("height", this.legendRectSize)
                 .style("fill", function (d, i) { return color(d); });
 
             legendG.append("text")
-                .attr("x", this.legendRectSize+10)
-                .attr("y",(d, i)=>{ return i+10; })
-                .style('font-size', '11px')
+                .attr("x", (this.legendRectWidth/2))
+                .attr("y", (this.legendRectSize+10))
+                .style("text-anchor", "middle")
+                .style('font-size', '10px')
                 .text(function (d) { return "≥ " + "$" + d; });
 
             this.selectionMap.enter().append("path")
@@ -208,13 +239,7 @@ export class D3mapComponent implements OnChanges {
                 .attr("fill", "#ccc")
                 .attr("stroke", "#fff");
 
-            this.svg.append("text")
-                .attr("x", (this.width / 2))
-                .attr("y", 31 - (this.margin.top / 2))
-                .attr("text-anchor", "middle")
-                .style("font-size", "16px")
-                .style("text-decoration", "underline")
-                .text("Spends across Geographical regions");
+            
 
             this.svg.append("g")
                 .attr("class", "bubble")
@@ -251,14 +276,14 @@ export class D3mapComponent implements OnChanges {
                             .duration(500)
                             .attr("stroke", "none");
 
-                        d3.select(this)                            
+                        d3.select(this)
                             .attr("circleClicked", "Yes")
                             .transition()
                             .duration(500)
                             .attr("stroke", "blue")
                             .attr("stroke-width", 2);
 
-                            that.selectRegion.emit(d.id);
+                        that.selectRegion.emit(d.id);
 
                     }
                     else if (d3.select(this).attr("circleClicked") == "Yes") {
@@ -270,7 +295,7 @@ export class D3mapComponent implements OnChanges {
 
                         that.selectRegion.emit("");
                     }
-                    
+
                 })
                 .on("mouseover", (d) => {
                     let tooltext = d.properties.name + "<br/>"
@@ -287,11 +312,11 @@ export class D3mapComponent implements OnChanges {
                         .style("opacity", .9);
                     this.tooltipGroup.html(tooltext)
                         .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY+20) + "px");
+                        .style("top", (d3.event.pageY + 20) + "px");
                 })
                 .on("mousemove", (d) => {
                     this.tooltipGroup
-                        .style("top", (d3.event.pageY+20) + "px")
+                        .style("top", (d3.event.pageY + 20) + "px")
                         .style("left", (d3.event.pageX - 100) + "px");
                 })
                 .on("mouseout", (d) => {
