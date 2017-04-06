@@ -38,7 +38,7 @@ export class AwsdataService {
 	}
 
 	getAllIndexes(){
-		return this._http.get('/reports/indexes').map((res)=> res.json());
+		return this._http.get('reports/indexes').map((res)=> res.json());
 	}
 
 }
