@@ -10,7 +10,6 @@ import { Component } from '@angular/core';
 })
 
 export class FooterComponent{
-    //TODO: USe date function to show year above
     todayDate:any=new Date();
     
 }
