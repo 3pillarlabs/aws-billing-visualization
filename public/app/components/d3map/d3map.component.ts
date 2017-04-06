@@ -32,7 +32,7 @@ export class D3mapComponent implements OnChanges {
     private tooltipGroup: any;
     private worldMapJson: string = "app/components/d3map/worldmap.json";
     private selectionMap: any;
-    private legendRectWidth:number=60;
+    private legendRectWidth:number=70;
     private legendRectSize: number = 22;
     globalRegionData:any;
     private toplavelsvgheight:number=20;
@@ -206,7 +206,7 @@ export class D3mapComponent implements OnChanges {
                 .attr('transform', (d, i) => {
                    
                     var totaltick=color.ticks(5).length;
-                    var calLegendRectWidth=((this.width * 0.8)/totaltick);
+                    var calLegendRectWidth=((this.width)/totaltick);
                     var width = this.legendRectWidth;
                     if(width*totaltick > this.width){
                         width=calLegendRectWidth;
