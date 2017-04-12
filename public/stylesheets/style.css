@@ -19,18 +19,9 @@ body {
 
 /* Custom page CSS
 -------------------------------------------------- */
-/* Not required for template or sticky footer method. */
 
-/*body > .container-fluid {
-  padding: 60px 15px 0;
-}*/
-.container-fluid .text-muted {
+footer .text-muted {
   margin: 10px 0;
-}
-
-
-code {
-  font-size: 80%;
 }
 
 .navbar-brand img {
@@ -72,13 +63,8 @@ div.tooltipcss {
   fill-opacity: .7;
 }
 
-.right-extra-pad{
-	padding-right: 8px;
-}
-
 .input-group-addon{
 	cursor: pointer;
-    padding: 4px 10px;
 }
 
 .form-control[readonly]{
@@ -101,10 +87,6 @@ div.tooltipcss {
     overflow: hidden;
     width: 50%;
     text-align: center;
-}
-
-.aws-panel-padding{
-  padding: 15px 0 15px!important;
 }
 
 .daterangepicker table { font-size: 12px!important; }
