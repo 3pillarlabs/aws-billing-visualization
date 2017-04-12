@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<div class="panel panel-default" id="datatable">
     <div class="panel-heading clearfix" id="headingTwo">
         <div class="row">
             <h4 class="panel-title col-md-3">
@@ -10,15 +10,18 @@
                 <div class="row table-filters">
 
                     <div class="col-md-2 clearfix col-xs-12">
-                        <a class="pull-right small" [ngStyle]="{'text-decoration':'none', 'margin-top': '7px'}" href="javascript:void(0)" (click)="clearFilter()"
-                            title="Clear Filter" *ngIf="product!='' || region!='' || filter!=''">
+                        <a class="pull-right small"
+                           [ngStyle]="{'text-decoration':'none', 'margin-top': '7px'}"
+                           href="javascript:void(0)" (click)="clearFilter()" title="Clear Filter"
+                           *ngIf="product!='' || region!='' || filter!=''">
                             <i class="fa fa-minus-circle"></i> Clear Filters
                         </a>
                     </div>
 
                     <div class="col-md-3 col-xs-12">
                         <div class="input-group-sm">
-                            <select [ngStyle]="{'width': '100%'}" class="form-control" (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
+                            <select [ngStyle]="{'width': '100%'}" class="form-control"
+                                    (change)="onChangeProduct($event.target.value)" [(ngModel)]="product">
                                 <option value="">Select Product</option>
                                 <option *ngFor="let product of ProductList" [value]="product.key">{{product.key}}
                                 </option>
@@ -28,7 +31,8 @@
 
                     <div class="col-md-3 col-xs-12">
                         <div class="input-group-sm">
-                            <select class="form-control" (change)="onChangeRegion($event.target.value)" [(ngModel)]="region">
+                            <select class="form-control" (change)="onChangeRegion($event.target.value)"
+                                    [(ngModel)]="region">
                                 <option value="">Select Region</option>
                                 <option *ngFor="let region of regionList" [value]="region.key">{{region.key}}</option>
                             </select>
@@ -38,8 +42,7 @@
                     <div class="col-md-4 col-xs-12">
                         <div class="input-group input-group-sm">
                             <div class="form-group form-group-sm has-feedback has-clear">
-                                <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)"
-                                />
+                                <input type="text" class="form-control" #detailfilterinput placeholder="Tags Or ResourceId" [(ngModel)]="filter" (keyup.enter)="filterbyOperation(detailfilterinput.value)" />
                                 <span *ngIf="filter!=''" (click)="onClearFilter()" class="form-control-clear glyphicon glyphicon-remove form-control-feedback"></span>
                             </div>
                             <span (click)="filterbyOperation(detailfilterinput.value)" class="input-group-addon">
@@ -56,56 +59,62 @@
             <div class="row table-responsive">
                 <table class="table table-striped table-bordered table-sortable">
                     <thead class="thead-default">
-                        <tr>
-                            <template ngFor let-column [ngForOf]="columns">
-                                <th *ngIf="column.sortable" [class]="selectedClass(column.variable)" (click)="changeSorting(column.variable)">
-                                    {{column.display}}
-                                </th>
-                                <td *ngIf="!column.sortable">
-                                    {{column.display}}
-                                </td>
-                            </template>
-                        </tr>
+                    <tr>
+                        <template ngFor let-column [ngForOf]="columns">
+                            <th *ngIf="column.sortable" [class]="selectedClass(column.variable)"
+                                (click)="changeSorting(column.variable)">
+                                {{column.display}}
+                            </th>
+                            <td *ngIf="!column.sortable">
+                                {{column.display}}
+                            </td>
+                        </template>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
-                            <td colspan="7"></td>
-                            <td [ngStyle]="{'text-align': 'right'}">{{totalQuantity | number:'1.0-2'}} Hrs</td>
-                            <td></td>
-                            <td [ngStyle]="{'text-align': 'right'}">{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
-                            <td></td>
-                        </tr>
-                        <tr *ngFor="let item of data">
-                            <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)" title="click to select product">{{item.ProductName}}</a></td>
-                            <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)" title="click to select region">{{item.__AvailabilityRegion}}</a></td>
-                            <td>{{item.Operation}}</td>
-                            <td [ngStyle]="{'word-break': 'break-all'}">
-                                <p *ngFor="let tag of tags(item)" [ngStyle]="{'margin-bottom': '0px'}">{{tag.key}}= <a href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
-                            </td>
-                            <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)" (click)="filterbyOperation(item.ResourceId)" title="click to filter">{{item.ResourceId}}</a>
-                            </td>
-                            <td>{{item.ItemDescription}}</td>
-                            <td>{{item.UsageType}}</td>
-                            <td [ngStyle]="{'text-align': 'right'}"><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span>
-                            </td>
-                            <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
-                            <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
-                            <td [ngStyle]="{'text-align': 'right'}">
-                                <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
-                                    <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMM DD, YYYY hh:mm A' }}</span><br/>
-                                    <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMM DD, YYYY hh:mm A' }}</span>
-                                </a>
-                            </td>
-                        </tr>
+                    <tr *ngIf="totalBlendedCost > 0" [ngStyle]="{'background-color': '#dcdada','font-weight':'bold'}">
+                        <td colspan="7"></td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{totalQuantity | number:'1.0-2'}} Hrs</td>
+                        <td></td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{totalBlendedCost | currency:'USD':true:'1.0-2' }}</td>
+                        <td></td>
+                    </tr>
+                    <tr *ngFor="let item of data">
+                        <td><a href="javascript:void(0)" (click)="onChangeProduct(item.ProductName)"
+                               title="click to select product">{{item.ProductName}}</a></td>
+                        <td><a href="javascript:void(0)" (click)="onChangeRegion(item.__AvailabilityRegion)"
+                               title="click to select region">{{item.__AvailabilityRegion}}</a></td>
+                        <td>{{item.Operation}}</td>
+                        <td [ngStyle]="{'word-break': 'break-all'}">
+                            <p *ngFor="let tag of tags(item)" [ngStyle]="{'margin-bottom': '0px'}">{{tag.key}}= <a
+                                    href="javascript:void(0)" (click)="filterbyOperation(tag.val)">{{tag.val}}</a></p>
+                        </td>
+                        <td [ngStyle]="{'word-break': 'break-all'}"><a href="javascript:void(0)"
+                                                                       (click)="filterbyOperation(item.ResourceId)"
+                                                                       title="click to filter">{{item.ResourceId}}</a>
+                        </td>
+                        <td>{{item.ItemDescription}}</td>
+                        <td>{{item.UsageType}}</td>
+                        <td [ngStyle]="{'text-align': 'right'}"><span *ngIf="item.UsageQuantity > 0">{{item.UsageQuantity | number:'1.0-2'}} Hrs</span>
+                        </td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedRate | currency:'USD':true:'1.0-2'}}</td>
+                        <td [ngStyle]="{'text-align': 'right'}">{{item.BlendedCost | currency:'USD':true:'1.0-2'}}</td>
+                        <td [ngStyle]="{'text-align': 'right'}">
+                            <a href="javascript:void(0)" (click)="onDateSelect(item.UsageStartDate,item.UsageEndDate)">
+                                <span title="{{item.UsageStartDate}}">{{item.UsageStartDate | moment:'MMM DD, YYYY hh:mm A' }}</span><br/>
+                                <span title="{{item.UsageEndDate}}">{{item.UsageEndDate | moment:'MMM DD, YYYY hh:mm A' }}</span>
+                            </a>
+                        </td>
+                    </tr>
 
-                        <tr *ngIf="data.length == 0">
-                            <td colspan="11" [ngStyle]="{'text-align':'center'}">
-                                <h3>No Data</h3>
-                            </td>
-                        </tr>
+                    <tr *ngIf="data.length == 0">
+                        <td colspan="11" [ngStyle]="{'text-align':'center'}">
+                            <h3>No Data</h3>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
-                <div *ngIf="data.length > 0" class="table-footer">
+                <div *ngIf="data.length > 0" class="row table-footer">
                     <div class="col-md-2 col-xs-12 per-page">
                         <span>
                             Show:
@@ -121,9 +130,11 @@
                         </span>
                     </div>
                     <div class="col-md-5 col-xs-12 text-right" *ngIf="totalItems > length">
-                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" [boundaryLinks]="true"
-                            [length]="length" (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;"
-                            first-text="First" last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
+                        <ng-pagination *ngIf="data.length > 0" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                                       [maxSize]="maxSize" [boundaryLinks]="true" [length]="length"
+                                       (pageChanged)="pageChanged($event)" previous-text="&lsaquo;" next-text="&rsaquo;"
+                                       first-text="First"
+                                       last-text="Last" [ngStyle]="{'text-align':center}"></ng-pagination>
                     </div>
                 </div>
             </div>
