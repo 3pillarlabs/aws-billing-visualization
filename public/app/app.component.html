@@ -24,10 +24,10 @@
 			</div>
 			<div id="collapseOne" class="panel-collapse collapse in">
 				<div class="panel-body vdivide">
-					<div class="col-md-6 col-xs-12">
+					<div class="col-md-6 col-xs-12" id="d3barchart">
 						<aws-billing-bar-chart [appcomponentdata]="appcomponentdata" (selectProduct)="onSelectProduct($event)"></aws-billing-bar-chart>
 					</div>
-					<div class="col-md-6 col-xs-12">
+					<div class="col-md-6 col-xs-12" id="d3map">
 						<d3-map [appcomponentdata]="appcomponentdata" (selectRegion)='onSelectRegion($event)'></d3-map>
 					</div>
 				</div>
