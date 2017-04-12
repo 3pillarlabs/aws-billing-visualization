@@ -1,5 +1,6 @@
 .table-sortable{
     font-size: 90%;
+    margin-bottom: 15px;
 }
 
 .table-sortable > thead > tr > th {
@@ -45,39 +46,8 @@
     width:12%;
 }
 
-div.dataTable_filter{
-    float: right;
-    margin-top: -1px;
-}
-
-#searchclear {
-    position: relative;
-    right: 24px;
-    top: 4px;
-    bottom: 0;
-    height: 14px;
-    margin: auto;
-    font-size: 14px;
-    cursor: pointer;
-    color: #ccc;
-    width: 0px;
-}
-
-.panel-body > .table-responsive{
-    padding: 0px 12px;
-}
-
 .has-feedback .form-control {
     padding-right: 30px !important;
-}
-
-.dataTables_wrapper .dataTables_info {
-    float: left;
-    padding-left: 15px;
-}
-
-.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-    padding: 5px;
 }
 
 @media only screen and (max-width : 992px) {

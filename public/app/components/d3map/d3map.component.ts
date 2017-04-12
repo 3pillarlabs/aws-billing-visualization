@@ -56,7 +56,7 @@ export class D3mapComponent implements OnChanges {
         this.getPath();
         this.getTooltip();
         this.drawMap(this.globalRegionData);
-        console.log('resize');
+        //console.log('resize');
     }
 
     ngAfterViewInit(): void {
