@@ -30,10 +30,22 @@ export class HeaderComponent implements OnChanges{
             var tour = new Tour({
                 steps: [
                     {
-                        element: "#available-data",
-                        title: "Available Data",
+                        element:"#helpdropdown",
+                        title:"Help & FAQ",
+                        placement: "left",
+                        content: "Quick Tour and FAQ"
+                    },
+                    {
+                        element:"#datasetsdropdown",
+                        title:"Data Set Info",
                         placement: "bottom",
-                        content: "A quick overview of current system being visualized"
+                        content: "Data set info"
+                    },
+                    {
+                        element:'#multiaccountdropdown',
+                        title:"Multiaccount list",
+                        placement:"bottom",
+                        content: "Listing of different account."
                     },
                     {
                         element: "#datefilter",
@@ -42,16 +54,16 @@ export class HeaderComponent implements OnChanges{
                         content: "Select a date range to filter the data and simply hit \"Go\". Will only allow selection of date where data is avialable."
                     },
                     {
-                        element: "#d3map",
-                        title: "Regional usage distribution",
+                        element: "#d3barchart",
+                        title: "Usage by product categories",
                         placement: "right",
-                        content: "In the selected date range, show the usage in each geographical region. A region in green represent low usage whereas red is the region with high usage of resoruces."
+                        content: "In selected date range and for selected region (if clicked from geographical map), represents usage distribution among various products."
                     },
                     {
-                        element: "#d3piechart",
-                        title: "Usage by product categories",
+                        element: "#d3map",
+                        title: "Regional usage distribution",
                         placement: "left",
-                        content: "In selected date range and for selected region (if clicked from geographical map), represents usage distribution among various products."
+                        content: "In the selected date range, show the usage in each geographical region. A region in green represent low usage whereas red is the region with high usage of resoruces."
                     },
                     {
                         element: "#datatable",
