@@ -514,6 +514,27 @@ function getGroupServicedata(data) {
 
 exports.getGroupServicedata = getGroupServicedata;
 
+function isSetup() {
+    return false;
+}
+exports.isSetup = isSetup;
+
+/*function verifyAndSaveElasticData(data) {
+    return data;
+}
+exports.verifyAndSaveElasticData = verifyAndSaveElasticData;
+*/
+
+function isElasticConnected() {
+    return elasticClient.ping({
+        // ping usually has a 3000ms timeout
+        requestTimeout: Infinity,
+        // undocumented params are appended to the query string
+        hello: "elasticsearch!"
+    })
+}
+exports.isElasticConnected = isElasticConnected;
+
 
 function debugQuery(query) {
     console.log('--------------------Query Log-------------------------------');

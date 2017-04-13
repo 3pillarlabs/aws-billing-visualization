@@ -1,0 +1,18 @@
+.ng-valid[required], .ng-valid.required  {
+  border-left: 5px solid #42A948; /* green */
+}
+.ng-invalid:not(form)  {
+  border-left: 5px solid #a94442; /* red */
+}
+.error-msg{
+    color: red;
+    margin-left: 10px;
+}
+.aws-app-container{
+  padding-top:50px;
+}
+
+.list-group-item {
+    background-color: #f5f5f5;
+    margin: 10px 0px;
+}
