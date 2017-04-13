@@ -37,6 +37,8 @@ export class AppComponent implements OnInit {
 	productSelectionInfoTxt: string = "Click on bar or product label to select product";
 	indiceslist: any = [];
 
+	firstTimeSetup:boolean = false;
+
 
 	constructor(private _awsdata: AwsdataService) {
 		this.inputdata = {
@@ -80,11 +82,9 @@ export class AppComponent implements OnInit {
 			this.setupData();
 
 		}, (error) => {
-			this.error = "No data available.";//error;
+			//this.error = "No data available.";//error;
+			this.firstTimeSetup=true;
 		})
-
-
-
 	}
 
 	setupData() {
@@ -131,11 +131,13 @@ export class AppComponent implements OnInit {
 				}
 				else {
 					this.error = "No data available."
+					
 				}
 
 			}
 		}, (error) => {
-			this.error = "No data available.";//error;
+			//this.error = "No data available.";//error;
+			this.firstTimeSetup=true;
 		})
 	}
 
@@ -288,8 +290,15 @@ export class AppComponent implements OnInit {
 
 	onCompanyChange(companyValue: string) {
 		this.isloading = true;
-		this.company = companyValue;
-		this.companyChange = companyValue;
-		this.setupData();
+		if(companyValue=='AddIndex'){
+			this.firstTimeSetup=true;
+			this.isloading = false;
+		}else{
+			this.company = companyValue;
+			this.companyChange = companyValue;
+			this.setupData();
+			this.firstTimeSetup=false;
+		}
+		
 	}
 }

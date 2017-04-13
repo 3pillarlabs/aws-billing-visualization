@@ -31,7 +31,7 @@
                             <a href="#">{{indx}}</a>
                         </li>
                         <li class="divider"></li>
-                        <li><a href="#">-- Add a new account --</a></li>
+                        <li (click)="onChangeIndex('AddIndex')" [ngClass]="{'active': indices == 'AddIndex'}"><a href="#">-- Add a new account --</a></li>
                     </ul>
                 </li>
 
