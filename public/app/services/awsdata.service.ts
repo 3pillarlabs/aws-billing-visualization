@@ -41,4 +41,22 @@ export class AwsdataService {
 		return this._http.get('reports/indexes').map((res)=> res.json());
 	}
 
+	getSetupStatus() {
+		return this._http.get('reports/issetup').map((res) => res.json());
+	}
+
+	verifyAndSaveAWSData(data: any) {
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('reports/verifyAndSaveAWSData', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	verifyElasticConnection() {
+		return this._http.get('reports/isElasticConnected').map((res) => res.json());
+	}
+
+	verifyElasticIndex(index:string){
+		return this._http.get('reports/isIndexExists/'+index).map((res) => res.json());
+	}
+
 }
