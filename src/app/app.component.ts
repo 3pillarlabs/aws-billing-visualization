@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
 	selectedRegion: string = "";
 	selectedProduct: string = "";
 	detailReportOption: any = "";
-
+    selectProduct: any;
 	company: string;
 	error: string;
 	dateRange: string;
@@ -220,7 +220,7 @@ export class AppComponent implements OnInit {
 		}else{
 			this.productSelectionInfoTxt = "Click on bar or product label to select product";
 		}
-		
+
 		this.isloading = true;
 		this.selectedProduct = selectedproduct;
 		this.selectedRegion = '';
