@@ -16,7 +16,7 @@ export class HeaderComponent implements OnChanges {
     @Input() company: string;
     @Output() companyChange: EventEmitter<string> = new EventEmitter<string>();
 
-    indices: string;
+    @Input() indices: string;
 
     constructor(private _awsdata: AwsdataService) {
         this.indices = this.company;
