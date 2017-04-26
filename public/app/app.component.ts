@@ -293,6 +293,7 @@ export class AppComponent implements OnInit {
 		if(companyValue=='AddIndex'){
 			this.firstTimeSetup=true;
 			this.isloading = false;
+			this.company="";
 		}else{
 			this.company = companyValue;
 			this.companyChange = companyValue;
@@ -301,4 +302,12 @@ export class AppComponent implements OnInit {
 		}
 		
 	}
+	//Function will be called from chiled setup component when first time setup complete
+	onSetupComplete(isSetupDone:boolean){
+		this.isloading=true;
+		this.firstTimeSetup=false;
+		this.company=this.indiceslist[0];
+		this.isloading = false;
+	}
+
 }
