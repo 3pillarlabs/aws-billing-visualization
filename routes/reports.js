@@ -156,6 +156,33 @@ router.post('/verifyAndSaveAWSData', function (req, res) {
     }
 });
 
+/* Upload sample file to aws bucket */
+router.post('/uploadSampleFile',function(req,res){
+    var path="app/components/setup";
+    var file = req.body.file;
+    var bucketname = req.body.awsdata.awsbucket;
+    AWS.config.update({
+        accessKeyId: req.body.awsdata.awskey,
+        secretAccessKey: req.body.awsdata.awssecret
+    });
+    var s3bucket = new AWS.S3({params: {Bucket: bucketname}});
+    s3bucket.createBucket(function() {
+        var params = {
+            Key: 'samplefile.csv',
+            Body: path+"/"+file
+        };
+        s3bucket.upload(params, function(err, data) {
+            if (err) {
+                res.status(500);
+                res.json({'error':err});
+            } else {
+                res.status(200);
+                res.json({'success':true,'data':data});
+            }
+        });
+    });
+});
+
 /* get setup status */
 /** @param: @Path: 
 * @param: @callback

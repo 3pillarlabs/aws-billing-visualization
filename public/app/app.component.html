@@ -1,8 +1,8 @@
 
 
-<aws-billing-header [totalRecord]="totalRecord" [lastupdated]="convertedDate" [indiceslist]="indiceslist" [company]="company" (companyChange)="onCompanyChange($event)"></aws-billing-header>
+<aws-billing-header [totalRecord]="totalRecord" [lastupdated]="convertedDate" [indiceslist]="indiceslist" [company]="company"  (companyChange)="onCompanyChange($event)"></aws-billing-header>
 <!-- Begin page content -->
-<firest-time-setup *ngIf="firstTimeSetup"></firest-time-setup>
+<firest-time-setup *ngIf="firstTimeSetup" (setupDone)="onSetupComplete($event)"></firest-time-setup>
 <div class="container-fluid aws-app-container" *ngIf="!error" [hidden]="firstTimeSetup">
 	<!-- 3. Display the application -->
 	<div class="well well-sm form-inline" id="datefilter">

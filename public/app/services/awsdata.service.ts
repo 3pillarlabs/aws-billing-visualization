@@ -59,4 +59,10 @@ export class AwsdataService {
 		return this._http.get('reports/isIndexExists/'+index).map((res) => res.json());
 	}
 
+	uploadSampleFile(data:any){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('reports/uploadSampleFile', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
 }
