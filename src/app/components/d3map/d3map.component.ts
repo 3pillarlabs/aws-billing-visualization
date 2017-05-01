@@ -71,7 +71,6 @@ export class D3mapComponent implements OnChanges {
         this.height = parseInt(d3.select(this.element.nativeElement.querySelector('div#awsbillingD3Map')).style("height")) - this.margin.top - this.margin.bottom;
 
         this.legendheight=(this.height/10);
-
     }
 
     ngOnChanges(): void {
