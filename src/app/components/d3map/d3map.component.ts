@@ -8,7 +8,7 @@ import { AwsdataService } from './../../services/awsdata.service';
     template: `<div id="awsbillingD3Map" (window:resize)="onResize($event)"></div>`,
     styles: [`#awsbillingD3Map{
                     width:100%;
-                    height:48%;
+                    height:300px;
                 }`],
     inputs: ['appcomponentdata'],
     outputs: ['isloading', 'selectRegion']
