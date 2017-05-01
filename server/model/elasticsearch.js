@@ -18,6 +18,18 @@ function isIndexExists(indexName) {
 exports.isIndexExists = isIndexExists;
 
 /**
+ * Get All indexes
+ */
+function getAllIndexes() {
+    return elasticClient.indices.stats({
+        index: "_all",
+        level: "indices"
+    });
+}
+exports.getAllIndexes = getAllIndexes;
+
+
+/**
  * Calculate resource cost aggregated on regions within a date range filter
  * @param: @Object data - contains index, start date, end date
  * @return: @Object
@@ -501,6 +513,27 @@ function getGroupServicedata(data) {
 }
 
 exports.getGroupServicedata = getGroupServicedata;
+
+function isSetup() {
+    return false;
+}
+exports.isSetup = isSetup;
+
+/*function verifyAndSaveElasticData(data) {
+    return data;
+}
+exports.verifyAndSaveElasticData = verifyAndSaveElasticData;
+*/
+
+function isElasticConnected() {
+    return elasticClient.ping({
+        // ping usually has a 3000ms timeout
+        requestTimeout: Infinity,
+        // undocumented params are appended to the query string
+        hello: "elasticsearch!"
+    })
+}
+exports.isElasticConnected = isElasticConnected;
 
 
 function debugQuery(query) {
