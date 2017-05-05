@@ -11,5 +11,11 @@ node_modules
 .vscode
 
 #exclude .js and .map files in app folder
-public/app/**/*.js
-public/app/**/*.map
+src/app/**/*.js
+src/app/**/*.map
+
+# editor config files
+.idea
+
+#Distribution
+dist
