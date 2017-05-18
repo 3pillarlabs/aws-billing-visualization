@@ -1,9 +1,6 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
-import { ConfigService } from './../../services/config.service';
 import * as D3 from 'd3';
-
-
 
 @Component({
     selector: 'aws-billing-bar-chart',
@@ -33,11 +30,10 @@ import * as D3 from 'd3';
 export class BarchartComponent implements AfterViewInit {
     @Input() appcomponentdata: any;
     @Output() selectProduct: EventEmitter<string> = new EventEmitter<string>();
-    company: string;
 
     private width;
     private height;
-    private margin = { top: 10, right: 30, bottom: 100, left: 60 };
+    private margin = { top: 20, right: 30, bottom: 100, left: 60 };
     private xScale;
     private yScale;
     private dollarFormatter;
@@ -54,8 +50,8 @@ export class BarchartComponent implements AfterViewInit {
     productDataSet = {};
     tickformat:any='';
 
-    constructor(private element: ElementRef, private _awsdata: AwsdataService, private _config: ConfigService) {
-        this.company = this._config.company;
+    constructor(private element: ElementRef, private _awsdata: AwsdataService) {
+
     }
 
     ngOnChanges() {
@@ -132,7 +128,7 @@ export class BarchartComponent implements AfterViewInit {
         D3.select(this.element.nativeElement.querySelector('svg#awsbillingbarchart')).html("");
 
         this.width = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("width")) - this.margin.left - this.margin.right,
-            this.height = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("height")) - this.margin.top - this.margin.bottom;
+        this.height = parseInt(D3.select(this.element.nativeElement.querySelector('div#awsbillingbarchartcontainer')).style("height")) - this.margin.top - this.margin.bottom;
 
         this.xScale = D3.scaleBand().range([0, this.width]).padding(0.1);
         this.yScale = D3.scaleLinear().range([this.height, 0]);
@@ -349,24 +345,13 @@ export class BarchartComponent implements AfterViewInit {
                 .attr("transform", "translate(" + this.width + "," + "0)")
                 .call(this.yAxisRight);
 
-
-            
-
-            /*this.svg.append("g")
-                .attr("class", "y axis")
-                .call(this.yAxis);
-    
-            this.svg.append("g")
-                .attr("class", "x axis")
-                .call(this.yAxis)
-                .attr("transform", "translate(0," + this.height + ")")
-                .append("text")
-                .attr("class", "label")
-                .attr("transform", "translate(" + this.width / 2 + "," + this.margin.bottom / 1.5 + ")")
-                .style("text-anchor", "middle")
-                .text("Sales");*/
-
-
+            this.svg.append("text")
+                .attr("x", (this.width / 2)-5)
+                .attr("y",   -10)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("text-decoration", "underline")
+                .text("Spends vs Top products used");
         }
     }
 }

@@ -4,5 +4,10 @@
 // The list of which env maps to which file can be found in `angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  elastic_search: {
+    host : "atg.3pillarglobal.com",
+    port : "80",
+    path : "es"
+  }
 };
