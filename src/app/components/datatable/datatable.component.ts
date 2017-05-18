@@ -1,7 +1,6 @@
-import { Component, EventEmitter, OnChanges } from '@angular/core';
+import { Component, EventEmitter, OnChanges,Input } from '@angular/core';
 import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
-import { ConfigService } from './../../services/config.service';
 
 @Component({
     moduleId: module.id,
@@ -12,7 +11,7 @@ import { ConfigService } from './../../services/config.service';
     inputs: ['appcomponentdata']
 })
 export class DatatableComponent implements OnChanges {
-    company: string;
+    @Input() company: string;
     detailReportOption: any;
     startdate: string;
     enddate: string;
@@ -28,7 +27,7 @@ export class DatatableComponent implements OnChanges {
 
     public currentPage: number = 1;
     public totalItems: number = 0; // total numbar of page not items 
-    public maxSize: number = 10; // max page size 
+    public maxSize: number = 5; // max page size
     filter: string = '';
     appdataloaded = false;
     totalBlendedCost: number = 0;
@@ -52,7 +51,7 @@ export class DatatableComponent implements OnChanges {
             sortable: true
         },
         {
-            display: 'Availability Region',
+            display: 'Region',
             variable: '__AvailabilityRegion',
             sortable: true
         },
@@ -82,17 +81,17 @@ export class DatatableComponent implements OnChanges {
             sortable: false
         },
         {
-            display: 'Usage Quantity',
+            display: 'Usage Qty.',
             variable: 'UsageQuantity',
             sortable: false
         },
         {
-            display: 'Blended Rate',
+            display: 'Rate',
             variable: 'BlendedRate',
             sortable: false
         },
         {
-            display: 'Blended Cost',
+            display: 'Cost',
             variable: 'BlendedCost',
             sortable: true
         },
@@ -108,8 +107,7 @@ export class DatatableComponent implements OnChanges {
         descending: false
     };
 
-    constructor(private http: Http, private _awsdata: AwsdataService, private _config: ConfigService) {
-        this.company = this._config.company;
+    constructor(private http: Http, private _awsdata: AwsdataService) {
         this.showingto=this.length;
     }
 

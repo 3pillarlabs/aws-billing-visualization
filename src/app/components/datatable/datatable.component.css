@@ -1,5 +1,6 @@
 .table-sortable{
     font-size: 90%;
+    margin-bottom: 15px;
 }
 
 .table-sortable > thead > tr > th {
@@ -41,79 +42,28 @@
     width: 10%;
 }
 
-/*.table-sortable > thead > tr > td:nth-child(5){*/
-    /*width: 20%;*/
-/*}*/
-
-div.dataTables_length,dataTables_length_info{
-    float: left;
-}
-
-div.dataTables_length label {
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
-}
-
-
-div.dataTables_length select {
-    width: 75px;
-    display: inline-block;
-}
-
-
 .thead-default td:last-child{
-    width:13%;
+    width:12%;
 }
 
-.detailed-report-filter input{
-    text-indent: 20px;
-    width: 95%;
+.has-feedback .form-control {
+    padding-right: 30px !important;
 }
 
-div.dataTable_filter{
-    float: right;
-    margin-top: -1px;
+@media only screen and (max-width : 992px) {
+    .per-page {
+        text-align: right;
+    }
+
+    .table-filters [class*='col-']:not(:last-child) {
+        margin-bottom: 5px;
+    }
+
 }
 
-#searchclear {
-    position: relative;
-    right: 24px;
-    top: 4px;
-    bottom: 0;
-    height: 14px;
-    margin: auto;
-    font-size: 14px;
-    cursor: pointer;
-    color: #ccc;
-    width: 0px;
-}
-
-.panel-body > .table-responsive{
-    padding: 0px 12px;
-}
-
-.filter-margin{
-    margin-top: -2px;
-}
-
-.form-control{
-    padding:4px;
-}
-
-.dataTables_wrapper .dataTables_info {
-    float: left;
-    padding-left: 15px;
-}
-
-
-@media screen and (max-width: 767px) {
-    .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate,.dataTables_wrapper .dataTables_length {
-        float: none;
-        text-align: center;
+@media only screen and (max-width: 992px) {
+    .table-footer [class*='col-'] {
+        margin-top: 3px;
+        margin-bottom: 3px;
     }
 }
-
-
-
-
