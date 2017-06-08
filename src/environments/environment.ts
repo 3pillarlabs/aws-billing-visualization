@@ -5,9 +5,5 @@
 
 export const environment = {
   production: false,
-  elastic_search: {
-    host : "atg.3pillarglobal.com",
-    port : "80",
-    path : "es"
-  }
+  serverless: false
 };

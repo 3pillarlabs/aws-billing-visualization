@@ -108,16 +108,6 @@ export class BarchartComponent implements AfterViewInit {
         }
     }
 
-
-    public getProduct(awsdata: any) {
-        this._awsdata.getUniqueProduct(awsdata).subscribe((data) => {
-            this.parsePieChartData(data);
-        }, (error) => {
-            console.log(error);
-        });
-    }
-
-
     // gridlines in y axis function
     make_y_gridlines() {
         return D3.axisLeft(this.yScale)

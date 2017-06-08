@@ -1,6 +1,7 @@
 var elasticsearch = require('elasticsearch');
 
 var elasticClient = new elasticsearch.Client({
+  //host:"http://search-aws-data-billing-yvt6nhmmg7eptqivxchpio2xk4.us-east-1.es.amazonaws.com/"
   host: "http://atg.3pillarglobal.com/es/"
   //host: "http://172.20.38.132:9200/"
   //host: "http://" + environment.elastic_search.host + ":" + environment.elastic_search.port + "/" + environment.elastic_search.path
@@ -491,9 +492,7 @@ exports.getGroupServicedata = getGroupServicedata;
 function isElasticConnected() {
   return elasticClient.ping({
     // ping usually has a 3000ms timeout
-    requestTimeout: Infinity,
-    // undocumented params are appended to the query string
-    hello: "elasticsearch!"
+    requestTimeout: Infinity
   })
 }
 exports.isElasticConnected = isElasticConnected;
