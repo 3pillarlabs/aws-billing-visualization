@@ -1,6 +1,6 @@
 {
-  "name": "aws-billing-lambda",
-  "version": "1.5.0",
+  "name": "s3-csv-to-es-importer",
+  "version": "1.0.0",
   "licenses": [
     {
       "type": "MIT",
