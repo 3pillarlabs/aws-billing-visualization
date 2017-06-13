@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import { AwsdataService } from './../../services/awsdata.service';
 
 @Component({
-    moduleId: module.id,
     selector: 'd3-map',
     template: `<div id="awsbillingD3Map" (window:resize)="onResize($event)"></div>`,
     styles: [`#awsbillingD3Map{
@@ -103,8 +102,7 @@ export class D3mapComponent implements OnChanges {
                 priceArr.sort(function (a, b) { return a - b });
                 regionData['pricedata'] = priceArr;
 
-                this.svg.html("");
-                this.legendSvg.html("");
+                this.clearSvg();
                 this.getProjection();
                 this.getPath();
                 this.getTooltip();
@@ -114,7 +112,10 @@ export class D3mapComponent implements OnChanges {
         }
     }
 
-
+    clearSvg(): void {
+      this.svg.html("");
+      this.legendSvg.html("");
+    }
 
     initSvg(): void {
         if (this.parentNativeElement !== null) {
