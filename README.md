@@ -26,7 +26,8 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
     * Choose Blank function Blueprint by selecting runtime "Node.js 6.10".
     * Click Next button on Configure triggers.
     * Enter lambda function name and description and choose option "upload a zip file" from code entry type.
-    * Upload lambda package zip
+    * Go to <Project ROOT>/lambdas/s3-csv-to-es-importer, run npm install and create zip file to be used lambda zip package. Make sure zip file does not have a folder inside it, zip content should be direct content of s3-csv-to-es-importer directory including node_modules. 
+    * Upload lambda zip package.
     * Enter Environment variables key:host and value will be elastic search domain endpoint.
     * Select appropriate role who have sufficient permission to call other lambda function and s3 bucket.
     * Click "Advanced Settings" and set memory value to 512.
@@ -37,7 +38,7 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
     * Enter domain name value and select Elastic Search version 5.3 and hit Next button.
     * Choose Instance count and instance type as per your uses and hit Next.
     * Once the domain is ready click on domain name that you have created.
-    * Go to the kibana by clicking on link on kibana.
+    * Go to the Kibana by clicking on link on Kibana.
     * Select the dev tools
     * To create index and mapping copy given below json and paste in dev tool console and run.
     * Add mappings   
@@ -68,7 +69,7 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
       				"BlendedCost": {
       					"type": "double"
       				},
-                      "UsageQuantity": {
+                  "UsageQuantity": {
           				"type": "double"
       				},
       				"__CreatedDate": {
