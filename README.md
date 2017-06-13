@@ -1,6 +1,6 @@
 ## AWS billing visualization
 
-![AWS billing visualization](/sample.png?raw=true "Sample view after setup on a account")
+![AWS billing visualization](../raw/dev/sample.png "Sample view after setup on a account")
 
 This aims help you to analyze AWS usage details, analyze how/where you can reduce costs and present a beautiful view of AWS resources usage in your account.
 in product view, geographical view and data table view within date range.
