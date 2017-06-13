@@ -37,3 +37,16 @@ function readJsonFile(filePath) {
 }
 
 exports.readJsonFile=readJsonFile;
+
+function writeJsonFile(fileNameWithPath,obj){
+    return new Promise((fulfill,reject)=>{
+        jsonfile.writeFile(fileNameWithPath, obj, function (err) {
+            if(err){
+                reject(err);
+            }else{
+                fulfill('data has been written to json file.');
+            }
+        })
+    })
+}
+exports.writeJsonFile=writeJsonFile;

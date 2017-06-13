@@ -339,7 +339,12 @@ router.post('/setupLambdaApiWebsite', function (req, res) {
 
   //Code End: For Creating Role and Policy with attaching policy with the created Role
 
-
+  var apiUrlObj={
+    getBilling:"",
+    getIndexes:"",
+    getGroupedRecord:"",
+    getRecordInfo:""
+  };
 
   //Creating Bucket for Lambda function upload
   awslibrary.createBucket(lambdaBucket).then(function (result) {
@@ -354,17 +359,23 @@ router.post('/setupLambdaApiWebsite', function (req, res) {
           fs.readdir(lambdaZipDir, (err, files) => {
             var enviromentHost = host;
             //Iterate lambda function container files
-            var memmorysize=128;
+            var memmorysize = 128;
             files.forEach((file) => {
               if (file === 'processBillingCsv.zip') {
                 enviromentHost = host + '/' + indexName + '/' + doctype;
-                memmorysize=512;
+                memmorysize = 512;
               }
-              var lambdaFunName = file.slice(0, -4) + 'test';
-              var desc = file.slice(0, -4);
+              var funName = file.slice(0, -4);
+              var lambdaFunName = funName + 'test';
+              var desc = funName;
               //Creating Lambda function
-              awslibrary.createFunction(lambdaBucket, file, lambdaFunName, roleARN, desc, enviromentHost,memmorysize).then(function (result) {
+              awslibrary.createFunction(lambdaBucket, file, lambdaFunName, roleARN, desc, enviromentHost, memmorysize).then(function (result) {
                 //Condition for process billing csv file
+                var lambdafunArn = result.FunctionArn;
+                var lambdafunArnArr = lambdafunArn.split(":");
+                var region = lambdafunArnArr[3];
+                var accountId = lambdafunArnArr[4];
+
                 if (file === 'processBillingCsv.zip') {
                   ProcessBillingCSVLambdaARN = result.FunctionArn;
                   //Creating Bucket For Billing CSV File
@@ -377,8 +388,8 @@ router.post('/setupLambdaApiWebsite', function (req, res) {
                         var samplefile = 'billingsample.csv';
                         var filepath = './';
                         awslibrary.uploadfileInBucket(samplefile, filepath, billingCsvbucket).then(function (result) {
-                          res.status(200);
-                          res.json(result);
+                          //res.status(200);
+                          //res.json(result);
                         }, function (error) {
                           res.json(error);
                         })
@@ -392,6 +403,90 @@ router.post('/setupLambdaApiWebsite', function (req, res) {
                     res.json(error);
                   });
                 }
+
+                var apiGName = '';
+                var apiDesc = '';
+                switch (funName) {
+                  case 'detailReportData':
+                    apiGName = 'getBilling';
+                    apiDesc = 'Get aws billing data from elasticsearch. Created for AWS Billing Visualization.';
+                    break;
+                  case 'getIndexes':
+                    apiGName = 'getIndexes';
+                    apiDesc = 'Get all stored indexed in elasticsearch. Created for AWS Billing Visualization.';
+                    break;
+                  case 'groupedServiceData':
+                    apiGName = 'getGroupedRecord';
+                    apiDesc = 'Get product and region wise group data from elasticsearch. Created for AWS Billing Visualization.';
+                    break;
+                  case 'recordInfo':
+                    apiGName = 'getRecordInfo';
+                    apiDesc = 'Get total number of record and last imported billing file info. Created for AWS Billing Visualization.';
+                    break;
+                }
+                /*Api Gateway Start Here*/
+                var tempapiName = apiGName + 'test';
+                awslibrary.createRestApi(tempapiName, apiDesc).then(function (result) {
+                  var apiName = result.name;
+                  var apiId = result.id;
+                  awslibrary.getResources(apiId).then(function (result) {
+                    var rootId = result.items[0].id;
+                    var path = result.items[0].path;
+                    awslibrary.createResource(rootId, apiGName, apiId).then(function (result) {
+                      var resourceId = result.id;
+                      var resourcePath = result.path;
+                      var resourcePathPart = result.pathPart;
+                      var resourceParentid = result.parentId;
+                      awslibrary.putMethod('NONE', 'POST', resourceId, apiId).then(function (result) {
+                        var uniqueIdentifier = 'arn:aws:apigateway:' + region + ':lambda:path/2015-03-31/functions:' + lambdafunArn + '/invocations';
+                        awslibrary.putIntegration('POST', resourceId, apiId, 'AWS', uniqueIdentifier).then(function (result) {
+                          var responsemodel = {
+                            "application/json": "Empty"
+                          }
+                          awslibrary.putMethodResponse('POST', resourceId, apiId, responsemodel).then(function (result) {
+                            var responseTemplate = {
+                              "application/json": ""
+                            };
+                            awslibrary.putIntegrationResponse('POST', resourceId, apiId, responseTemplate).then(function (result) {
+                              var stage='prod';
+                              awslibrary.createDeployment(apiId,stage).then(function (result) {
+                                var apiGatewayArn='arn:aws:execute-api:'+region+':'+accountId+':'+apiId+'/*/POST/'+apiGName;
+                                awslibrary.addPermission(apiGatewayArn,lambdaFunName).then(function(result){
+                                  awslibrary.getApiInvokeUrl(apiId,region,stage).then(function(result){
+                                    apiUrlObj.funName=result;
+                                    console.log(result);
+                                  },function(error){
+                                    console.log(error);
+                                  })
+                                },function(error){
+                                  res.json(error);
+                                })
+                              }, function (error) {
+                                res.json(error);
+                              })
+                            }, function (error) {
+                              res.json(error);
+                            })
+                          }, function (error) {
+                            res.json(error);
+                          })
+                        }, function (error) {
+                          res.json(error);
+                        })
+                      }, function (error) {
+                        res.json(error);
+                      })
+                    }, function (error) {
+                      res.json(error);
+                    })
+                  }, function (error) {
+                    res.json(error);
+                  })
+                }, function (error) {
+                  res.json(error);
+                })
+                /*Api Gateway End Here*/
+
               }, function (error) {
                 res.json(error);
               })
@@ -407,6 +502,14 @@ router.post('/setupLambdaApiWebsite', function (req, res) {
     })
   }, function (error) {
     res.json(error);
+  })
+
+
+  var pathForApiJsonFile='./src/awsApi.json';
+  jsonfile.writeJsonFile(pathForApiJsonFile,apiUrlObj).then(function(result){
+    console.log(result);
+  },function(error){
+    console.log(error);
   })
 })
 

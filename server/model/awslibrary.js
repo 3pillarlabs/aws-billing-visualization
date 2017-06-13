@@ -1,7 +1,7 @@
 var AWS = require('aws-sdk');
 var S3 = require('s3');
 
-var s3, es, iam, lambda, cloudwatchlogs;
+var s3, es, iam, lambda, cloudwatchlogs,apigateway;
 /**
  * update aws keys
  */
@@ -12,6 +12,7 @@ function updateConfig() {
 	iam = new AWS.IAM(); //Create IAM service interface object
 	lambda = new AWS.Lambda(); //Create lambda service interface object
 	cloudwatchlogs = new AWS.CloudWatchLogs(); //Create Cloud Watch log instance
+	apigateway = new AWS.APIGateway(); //Create new api gateway response
 }
 exports.updateConfig = updateConfig;
 
@@ -324,7 +325,7 @@ exports.getRole = getRole;
  * @param {*} resource 
  * @param {*} resourceArn  
  */
-function createPolicy(policyDocumentNo,resource,resourceArn) {
+function createPolicy(policyDocumentNo, resource, resourceArn) {
 	var policyDocument = '';
 	var policyName = '';
 	switch (policyDocumentNo) {
@@ -364,7 +365,7 @@ function createPolicy(policyDocumentNo,resource,resourceArn) {
 				{
 					"Effect": "Allow",
 					"Action": "logs:CreateLogGroup",
-					"Resource": resource+"*"
+					"Resource": resource + "*"
 				},
 				{
 					"Effect": "Allow",
@@ -429,7 +430,7 @@ exports.attachRolePolicy = attachRolePolicy;
  * @param {*} desc //Description of lambda function
  * @param {*} esHost //
  */
-function createFunction(bucketName, keyName, funName, role, desc, esHost,memorySize=128) {
+function createFunction(bucketName, keyName, funName, role, desc, esHost, memorySize = 128) {
 	var params = {
 		Code: {
 			S3Bucket: bucketName,
@@ -438,7 +439,7 @@ function createFunction(bucketName, keyName, funName, role, desc, esHost,memoryS
 		FunctionName: funName,
 		Handler: 'index.handler',
 		Role: role,
-		MemorySize:memorySize,
+		MemorySize: memorySize,
 		Runtime: 'nodejs6.10',
 		Description: desc,
 		Environment: {
@@ -492,9 +493,9 @@ function describeLogGroups(logGroupName) {
 
 	return new Promise((fulfill, reject) => {
 		cloudwatchlogs.describeLogGroups(params, function (err, data) {
-			if(err){
+			if (err) {
 				reject(err);
-			}else{
+			} else {
 				fulfill(data);
 			}
 		});
@@ -503,6 +504,258 @@ function describeLogGroups(logGroupName) {
 
 exports.describeLogGroups = describeLogGroups;
 
+/**
+ * Create Rest Api 
+ * @param {*} apiName 
+ * @param {*} desc 
+ */
+function createRestApi(apiName,desc) {
+	var params = {
+		name: apiName,
+		description: desc
+	};
+
+	return new Promise((fulfill,reject)=>{
+		apigateway.createRestApi(params, function (err, data) {
+			if (err){
+				reject(err);
+			}else{
+				fulfill(data);
+			} 
+		});
+	})
+	
+}
+exports.createRestApi=createRestApi;
+
+/**
+ * Get resource of api gateway
+ * @param {*} apiId 
+ */
+
+function getResources(apiId){
+	var params = {
+	  restApiId: apiId
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.getResources(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{
+		  	resolve(data);
+		  }
+		});
+	});
+}
+exports.getResources=getResources;
+
+/**
+ * Create new resource for API Gateway
+ * @param {*} parentId 
+ * @param {*} pathPart 
+ * @param {*} apiId 
+ */
+function createResource(parentId,pathPart,apiId){
+	var params = {
+	  parentId: parentId,
+	  pathPart: pathPart, 
+	  restApiId: apiId 
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.createResource(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{
+		  	resolve(data); 
+		  }         
+		});
+	});
+}
+exports.createResource=createResource;
+
+/**
+ * Add method to Api Gateway resource
+ * @param {*} authorizationType 
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} restApiId 
+ */
+function putMethod(authorizationType='NONE',httpMethod,resourceId,restApiId){
+	var params = {
+	  authorizationType: authorizationType, 
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId, 
+	  restApiId: restApiId
+	};
+	return new Promise((resolve, reject) => {
+		apigateway.putMethod(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	resolve(data); 
+		  }
+		});
+	});
+}
+exports.putMethod=putMethod;
+
+/**
+ * Set the integration point 
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} type 
+ * @param {*} uniqueIdentifier 
+ */
+function putIntegration(httpMethod,resourceId,apiId,type,uniqueIdentifier){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId,
+	  restApiId: apiId, 
+	  type: type,
+	  integrationHttpMethod:'POST',
+	  uri: uniqueIdentifier
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.putIntegration(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	resolve(data); 
+		  }  
+		});
+	});
+}
+exports.putIntegration=putIntegration;
+
+/**
+ * Set the method Response
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} responseModel 
+ */
+function putMethodResponse(httpMethod,resourceId,apiId,responseModel){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId, 
+	  restApiId: apiId, 
+	  statusCode: "200", 
+	  responseModels: responseModel
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.putMethodResponse(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	resolve(data); 
+		  }
+		});
+	});
+}
+exports.putMethodResponse=putMethodResponse;
+
+/**
+ * Set method integration response
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} responseTemplate 
+ */
+function putIntegrationResponse(httpMethod,resourceId,apiId,responseTemplate){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId, 
+	  restApiId: apiId, 
+	  statusCode: "200",
+	  responseTemplates: responseTemplate
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.putIntegrationResponse(params, function(err, data) {
+		  if (err){
+		  	reject(data);
+		  }else{
+		  	resolve(data);
+		  }               		
+		});
+	});
+	
+}
+exports.putIntegrationResponse=putIntegrationResponse;
+
+/**
+ * Deploy API
+ * @param {*} apiId 
+ * @param {*} stageName 
+ */
+function createDeployment(apiId,stageName='prod'){
+	var params = {
+	  restApiId: apiId, 
+	  stageName: stageName
+	};
+
+	return new Promise((resolve, reject) => {
+		apigateway.createDeployment(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	resolve(data); 
+		  }
+		});
+	});
+}
+exports.createDeployment=createDeployment;
+
+/**
+ * Grant permission that allow amazone api gateway to invoke the lambda function
+ * @param {*} apiGatewayArn 
+ * @param {*} functionName 
+ */
+function addPermission(apiGatewayArn, functionName) {
+	var date = new Date();
+	var uniqueid = date.getMilliseconds().toString();
+
+	var params = {
+		Action: 'lambda:InvokeFunction',
+		FunctionName: functionName,
+		Principal: 'apigateway.amazonaws.com',
+		StatementId: uniqueid,
+		SourceArn: apiGatewayArn
+	};
+	return new Promise((fulfill, reject) => {
+		lambda.addPermission(params, function (err, data) {
+			if (err) {
+				reject(err);
+			} else {
+				fulfill(data);
+			}
+		});
+	});
+}
+exports.addPermission=addPermission;
+/**
+ * Get Api gateway endpoint URL
+ * @param {*} apiId 
+ * @param {*} region 
+ * @param {*} stage 
+ */
+function getApiInvokeUrl(apiId,region,stage){
+	var apiUrl='';
+	return new Promise((fulfill,reject)=>{
+		if(apiId!=='' && region!=='' && stage!==''){
+			apiUrl="https://"+apiId+".execute-api."+region+".amazonaws.com/"+stage+"/";
+			fulfill(apiUrl);
+		}else{
+			reject('Required param missing.');
+		}
+	});
+}
+exports.getApiInvokeUrl=getApiInvokeUrl;
 
 
 

@@ -10,6 +10,19 @@ export class AwsdataService {
 	serverless:boolean;
 	constructor(private _http: Http) { 
 		this.serverless=environment.serverless;
+		/*this.getApiJson().subscribe((data)=>{
+			console.log('get api json data');
+			console.log(data);
+		},(error)=>{
+			console.log(error);
+		})*/
+
+	}
+
+	getApiJson(){
+		return this._http.get('./../../tsconfig.json').map((res)=>{
+			res.json();
+		})
 	}
 
 	getAllAwsResource(awsdata: any) {
