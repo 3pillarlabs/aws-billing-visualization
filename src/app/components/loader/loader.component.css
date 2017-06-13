@@ -1,0 +1,11 @@
+#loader {
+   z-index: 1200;
+   width: 100%;
+}
+
+#loader i {
+    position: absolute;
+    left: 47.5%;
+    top: 50%;
+    color: white;
+}
