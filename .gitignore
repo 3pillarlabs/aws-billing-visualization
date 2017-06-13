@@ -1,0 +1,24 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules
+
+# other directory
+.vagrant
+.vscode
+
+#exclude .js and .map files in app folder
+src/app/**/*.js
+src/app/**/*.map
+
+# editor config files
+.idea
+
+#Distribution
+dist
+
+#coverage
+coverage
