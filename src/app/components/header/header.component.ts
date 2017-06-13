@@ -4,7 +4,6 @@ import { AwsdataService } from './../../services/awsdata.service';
 declare var Tour: any;
 
 @Component({
-    moduleId: module.id,
     selector: 'aws-billing-header',
     templateUrl: 'header.component.html'
 })
