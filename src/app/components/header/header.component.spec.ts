@@ -36,4 +36,29 @@ describe('Header Component',()=>{
         expect(HeaderComponent).toBeTruthy();
     });
 
+
+    describe('onChangeIndex', ()=>{
+        it('should update indices as "Add a new account" if input is "AddIndex"', () => {
+            comp.onChangeIndex('AddIndex');
+            expect(comp.indices).toEqual('-- Add a new account --');
+        });
+
+        it('should update indices as the provided input if input is other than "AddIndex"', () => {
+            comp.onChangeIndex('otherIndex');
+            expect(comp.indices).toEqual('otherIndex');
+        });
+    })
+
+
+    describe('ngOnChanges', ()=>{
+        it('company should equal to indices', () => {
+            comp.company = 'test-comp';
+            comp.ngOnChanges();
+            expect(comp.indices).toEqual('test-comp');
+        });
+    })
+
+
+
+
 })
