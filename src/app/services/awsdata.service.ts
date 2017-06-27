@@ -8,46 +8,71 @@ import 'rxjs/add/operator/map';
 
 export class AwsdataService {
 	serverless:boolean;
+	apiUrls:any={
+		detailReportData:"",
+		getIndexes:"",
+		groupedServiceData:"",
+		recordInfo:""
+	};
 	constructor(private _http: Http) { 
 		this.serverless=environment.serverless;
-		/*this.getApiJson().subscribe((data)=>{
-			console.log('get api json data');
+		this.getApiUrls().subscribe((data)=>{
 			console.log(data);
+			this.apiUrls=data;
 		},(error)=>{
 			console.log(error);
-		})*/
+		})
 
 	}
 
-	getApiJson(){
-		return this._http.get('./../../tsconfig.json').map((res)=>{
-			res.json();
-		})
+	getApiUrls(){
+		var awsApiFile="/assets/awsApi.json";
+		return this._http.get(awsApiFile).map(data => data.json());
 	}
 
 	getAllAwsResource(awsdata: any) {
-		
-		var detailReportApiUrl=this.serverless ? "https://w0bclzi0hb.execute-api.us-east-1.amazonaws.com/prod/detailreport" : "api/getalldata";
+		var detailReportApiUrl=this.serverless ? this.apiUrls.detailReportData : "api/getalldata";
 		var headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 		return this._http.post(detailReportApiUrl, JSON.stringify(awsdata), { headers: headers }).map(data => data.json());
 	}
 
 	getMinMaxDateRange(index: string) {
-		var getRecordInfoApiUrl=this.serverless ? "https://he6ltrs6rj.execute-api.us-east-1.amazonaws.com/prod/getrecordinfo?index="+ index : "api/getMinMaxDate/"+ index;
-		return this._http.get(getRecordInfoApiUrl).map((res) => res.json());
+		if(this.serverless){
+			var data={
+				indexValue:index
+			};
+			var getRecordInfoApiUrl=this.apiUrls.recordInfo;
+			var headers = new Headers();
+			headers.append('Content-Type', 'application/json');
+			return this._http.post(getRecordInfoApiUrl, JSON.stringify(data), { headers: headers }).map(data => data.json());
+		}else{
+			return this._http.get("api/getMinMaxDate/"+index).map((res) => res.json());
+		}
 	}
 
 	getGroupServicedata(data: any) {
-		var getGroupServiceDataApiUrl=this.serverless ? "https://427mmwiwse.execute-api.us-east-1.amazonaws.com/prod/groupedservicedata" : "api/getGroupServicedata";
+		var getGroupServiceDataApiUrl=this.serverless ? this.apiUrls.groupedServiceData : "api/getGroupServicedata";
 		var headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 		return this._http.post(getGroupServiceDataApiUrl, JSON.stringify(data), { headers: headers }).map(res => res.json());
 	}
 
 	getAllIndexes(){
-		var getIndexApiUrl=this.serverless ? "https://39th8ocsog.execute-api.us-east-1.amazonaws.com/prod/indexes" : "api/indexes";
-		return this._http.get(getIndexApiUrl).map((res)=> res.json());
+		console.log(this.serverless);
+		console.log('get all indexes');
+		var getIndexApiUrl=this.serverless ? this.apiUrls.getIndexes : "api/indexes";
+		console.log('URL:'+getIndexApiUrl);
+		if(this.serverless){
+			var data={
+				index:'aws-billing'
+			};
+			var headers = new Headers();
+			headers.append('Content-Type', 'application/json');
+			return this._http.post(getIndexApiUrl, JSON.stringify(data), { headers: headers }).map(res => res.json());
+		}else{
+			return this._http.get(getIndexApiUrl).map((res)=> res.json());
+		}
 	}
 
 	verifyAndSaveAWSData(data: any) {
@@ -121,9 +146,43 @@ export class AwsdataService {
 		return this._http.post('api/createESIndex', JSON.stringify(data), { headers: headers }).map(res => res.json());
 	}
 
-	uploadLambdaAndSeupWebsite(data){
+	createLambdasForSetup(data){
 		var headers = new Headers();
 		headers.append('Content-Type', 'application/json');
-		return this._http.post('api/setupLambdaApiWebsite', JSON.stringify(data), { headers: headers }).map(res => res.json());
+		return this._http.post('api/createLambdasForSetup', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	createAwsRole(){
+		return this._http.get('api/createRolewithPermission').map(res=>res.json());
+	}
+
+	createApisForSetup(data){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('api/createApisForSetup', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	creatApisJsonFile(data){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('api/creatApisJsonFile', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	setupAwsStaticWebsite(data){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('api/setupAwsStaticWebsite', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	setupAwsBillingCSVBucket(data){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('api/setupBillingBucket', JSON.stringify(data), { headers: headers }).map(res => res.json());
+	}
+
+	enableCorsForApi(data){
+		var headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		return this._http.post('api/enableCorsForApi', JSON.stringify(data), { headers: headers }).map(res => res.json());
 	}
 }

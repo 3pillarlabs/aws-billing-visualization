@@ -36,10 +36,8 @@ export class DashboardComponent implements OnInit {
 	noRegionData: boolean = false;
 	productSelectionInfoTxt: string = "Click on bar or product label to select product";
 	indiceslist: any = [];
-
-	firstTimeSetup:boolean = false;
-
-
+	isAwsApiUrlSet:any;
+	
 	constructor(private _awsdata: AwsdataService) {
 		this.inputdata = {
 			'region': this.selectedRegion,
@@ -68,6 +66,18 @@ export class DashboardComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.isAwsApiUrlSet=setInterval(()=>{
+			this._awsdata.getApiUrls().subscribe((data)=>{
+				if(data.hasOwnProperty('detailReportData') && data.detailReportData!=""){
+					console.log('get indexes called');
+					this.getIndexes();
+				}
+			})
+		},2000);
+	}
+
+	getIndexes(){
+		clearInterval(this.isAwsApiUrlSet);
 		this.isloading = true;
 		this._awsdata.getAllIndexes().subscribe((data) => {
 			if (data.indices) {
@@ -84,8 +94,7 @@ export class DashboardComponent implements OnInit {
 			this.setupData();
 
 		}, (error) => {
-			//this.error = "No data available.";//error;
-			this.firstTimeSetup=true;
+			this.error = "No data available.";
 		})
 	}
 
@@ -138,8 +147,7 @@ export class DashboardComponent implements OnInit {
 
 			}
 		}, (error) => {
-			//this.error = "No data available.";//error;
-			this.firstTimeSetup=true;
+			this.error = "No data available.";//error;
 		})
 	}
 
@@ -288,23 +296,14 @@ export class DashboardComponent implements OnInit {
 	onCompanyChange(companyValue: string) {
 		this.isloading = true;
 		if(companyValue=='AddIndex'){
-			this.firstTimeSetup=true;
 			this.isloading = false;
 			this.company="";
 		}else{
 			this.company = companyValue;
 			this.companyChange = companyValue;
 			this.setupData();
-			this.firstTimeSetup=false;
 		}
 		
-	}
-	//Function will be called from chiled setup component when first time setup complete
-	onSetupComplete(isSetupDone:boolean){
-		this.isloading=true;
-		this.firstTimeSetup=false;
-		this.company=this.indiceslist[0];
-		this.isloading = false;
 	}
 
 }

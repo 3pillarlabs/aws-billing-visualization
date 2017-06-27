@@ -30,7 +30,14 @@ export class FullsetupComponent {
         websiteSetupbucket: ""
     }
     intervalId: any;
-    intervalValue:number=60000;
+    intervalValue: number = 60000;
+    awsApiUrls: any = {
+        detailReportData: "",
+        groupedServiceData: "",
+        getIndexes: "",
+        recordInfo: ""
+    };
+    websiteEndPoint:string="";
     constructor(private _awsdata: AwsdataService) { }
 
     moveTo(step: number) {
@@ -52,7 +59,6 @@ export class FullsetupComponent {
             this.isloading = false;
             this.errorMessage = '';
         }, error => {
-            console.log(error);
             this.isloading = false;
             this.errorMessage = 'Wrong Keys value.';
         })
@@ -73,7 +79,6 @@ export class FullsetupComponent {
             //Domain take approx 14 min to be ready
             this.intervalId = setInterval(() => {
                 this.getESEndPoint();
-                console.log('function getEs point called');
             }, this.intervalValue);
         }, err => {
             this.isloading = false;
@@ -113,64 +118,6 @@ export class FullsetupComponent {
         }
     }
 
-    createTempESIndexAndMapping(){
-        let data = {
-                'DomainId': "356967975209/testing-aws-billing",
-                'ARN': "arn:aws:es:us-east-1:356967975209:domain/testing-aws-billing",
-                'domainName': "testing-aws-billing",
-                'Endpoint': "search-testing-aws-billing-ov7obkvwgtl6e5hwrzyqcg74ey.us-east-1.es.amazonaws.com",
-                'indexName': "awsbilling",
-                'doctype': "aws-billing"
-            }
-            this.esDomainStatus={
-                "Endpoint":"search-testing-aws-billing-ov7obkvwgtl6e5hwrzyqcg74ey.us-east-1.es.amazonaws.com"
-            };
-            this.es={
-                "index":"awsbilling",
-                "doctype":"aws-billing"
-            };
-            this._awsdata.createESIndex(data).subscribe(res => {
-                this.stepValue = 3;
-                this.isloading = false;
-            }, err => {
-                this.isloading = false;
-                this.errorMessage = 'Problem in creating index for elastic search.';
-            })
-    }
-
-    createTempSave(){
-        this.isloading = true;
-        this.awsbuckets={
-            "lambdazipbucket": "testingawslambdafunction",
-            "billingCsvbucket": "testingawsbilling",
-            "websiteSetupbucket": "testing-aws-billing"
-        }
-        this.es={
-                "index":"awsbilling",
-                "doctype":"aws-billing"
-            };
-        this.esDomainStatus={
-                "Endpoint":"search-testing-aws-billing-ov7obkvwgtl6e5hwrzyqcg74ey.us-east-1.es.amazonaws.com"
-            };
-        let data = {
-            'buckets': this.awsbuckets,
-            'indexName': this.es.index,
-            'doctype': this.es.doctype,
-            'esHost': this.esDomainStatus.Endpoint
-        }
-
-        this._awsdata.uploadLambdaAndSeupWebsite(data).subscribe(res => {
-            console.log(res);
-            this.stepValue = 4;
-            this.isloading = false;
-        }, function (err) {
-            console.log(err);
-            this.isloading = false;
-            this.errorMessage = 'Problem in upload lambda and seup website.';
-        })
-
-    }
-
     validateBuckets() {
         if (this.awsbuckets.lambdazipbucket !== '' && this.awsbuckets.billingCsvbucket !== '' && this.awsbuckets.websiteSetupbucket !== '') {
             return false;
@@ -180,23 +127,127 @@ export class FullsetupComponent {
     }
 
     save() {
-        let data = {
-            'buckets': this.awsbuckets,
-            'indexName': this.es.index,
-            'doctype': this.es.doctype,
-            'esHost': this.esDomainStatus.DomainStatus.Endpoint
-        }
-
-        this._awsdata.uploadLambdaAndSeupWebsite(data).subscribe(res => {
-            console.log(res);
-            this.stepValue = 4;
+        this.isloading = true;
+        this._awsdata.createAwsRole().subscribe(res => {
+            var roleARN = res.roleARN;
+            var roleId = res.roleId;
+            let data = {
+                'buckets': this.awsbuckets,
+                'indexName': this.es.index,
+                'doctype': this.es.doctype,
+                'esHost': this.esDomainStatus.DomainStatus.Endpoint,
+                'roleARN': roleARN,
+                'roleId': roleId
+            };
+            this._awsdata.createLambdasForSetup(data).subscribe(res => {
+                if (res.length > 0) {
+                    this.createAwsApi(res, res.length, 0);
+                }
+            }, function (err) {
+                this.isloading = false;
+                this.errorMessage = 'Problem in upload lambda and seup website.';
+            })
+        }, error => {
             this.isloading = false;
-        }, function (err) {
-            console.log(err);
-            this.isloading = false;
-            this.errorMessage = 'Problem in upload lambda and seup website.';
+            this.errorMessage = 'Problem in creating Role and Policy.';
         })
 
+    }
 
+    createAwsApi(lambdaFuns: any, limit: number, start: number) {
+        let lambdafunArn = lambdaFuns;
+        setTimeout(() => {
+            if (start < limit) {
+                var funName = lambdaFuns[start].funName;
+                var lambdafunArn = lambdaFuns[start].arn;
+                
+                if(funName==='processBillingCsvtest'){
+                    let data={
+                        arn: lambdafunArn,
+                        bucket: this.awsbuckets.billingCsvbucket
+                    };
+
+                    this._awsdata.setupAwsBillingCSVBucket(data).subscribe((data)=>{
+
+                    },function(error){
+                        this.isloading = false;
+                        this.errorMessage = 'Problem in setup aws billing Bucket.';
+                    })
+                }else{
+                    let data = {
+                        funName: funName,
+                        arn: lambdafunArn
+                    };
+                    this._awsdata.createApisForSetup(data).subscribe(res => {
+                        var apiUrl=res.url;
+                        var apiId=res.apiId;
+                        var resourceId=res.resourceId;
+                        switch (funName) {
+                            case 'detailReportDatatest':
+                                this.awsApiUrls.detailReportData = apiUrl+"getBillingtest";
+                                break;
+                            case 'groupedServiceDatatest':
+                                this.awsApiUrls.groupedServiceData = apiUrl+"getGroupedRecordtest";
+                                break;
+                            case 'getIndexestest':
+                                this.awsApiUrls.getIndexes = apiUrl+"getIndexestest";
+                                break;
+                            case 'recordInfotest':
+                                this.awsApiUrls.recordInfo = apiUrl+"getRecordInfotest";
+                                break;
+                        }
+                        let data={
+                            apiId:apiId,
+                            resourceId:resourceId
+                        };
+                        this._awsdata.enableCorsForApi(data).subscribe(res=>{ 
+                        })
+                    });
+                }
+                
+                let newstart = start + 1;
+                this.createAwsApi(lambdaFuns, limit, newstart);
+            } else {
+                this.writeApiJson();
+            }
+        }, this.intervalValue);
+    }
+
+    writeApiJson(){
+        let data={
+            apiUrls: this.awsApiUrls
+        };
+        this._awsdata.creatApisJsonFile(data).subscribe((data)=>{
+            this.setupAwsStaticWebsite();
+        },function(error){
+            this.isloading = false;
+            this.errorMessage = 'Problem in creating API Json file.';
+        })
+    }
+
+    setupAwsStaticWebsite() {
+        var data = {
+            websiteBucket: this.awsbuckets.websiteSetupbucket
+        };
+        this._awsdata.setupAwsStaticWebsite(data).subscribe(res => {
+            this.stepValue = 4;
+            this.isloading = false;
+            this.websiteEndPoint=res;
+        }, error => {
+            this.isloading = false;
+            this.errorMessage = 'Problem in setup AWS static Website.';
+        })
+    }
+
+    enableCors(resourceId='gg3opf',apiId='oykjk3y3ah'){
+        let data={
+            apiId:apiId,
+            resourceId:resourceId
+        };
+        this._awsdata.enableCorsForApi(data).subscribe(res=>{ 
+            console.log(res);
+        },error=>{
+            console.log(error);
+        })
     }
 }

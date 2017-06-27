@@ -21,7 +21,7 @@
     </div>
   </div>
   <!--<div class="row">
-    <button type="button" (click)="createTempSave()">test</button>
+    <button type="button" (click)="enableCors()">test</button>
   </div>-->
   <div class="row" *ngIf="errorMessage">
     <div class="col-xs-6 col-md-offset-3">
@@ -106,6 +106,11 @@
     <div class="col-xs-6 col-md-offset-3">
       <div class="col-md-12">
         <h3> Step 4: Website URL</h3>
+        <form *ngIf="websiteEndPoint">
+        <div class="form-group">
+          <div><a [attr.href]="websiteEndPoint" target="_blank">{{websiteEndPoint}}</a></div>
+        </div>
+        </form>
       </div>
     </div>
   </div>

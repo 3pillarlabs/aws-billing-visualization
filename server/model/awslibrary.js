@@ -123,6 +123,66 @@ function uploadDirInBucket(bucketName, dirPath, accessKeyId, secretAccessKey) {
 
 exports.uploadDirInBucket = uploadDirInBucket;
 
+
+/**
+ * Set AWS S3 bucket as website
+ * @param {*} bucketName ,errDocument,IndexDocument
+ */
+function configureBucketAsWebsite(bucketName,errDocument='error.html',IndexDocument='index.html'){
+	var params = {
+	  Bucket: bucketName,
+	  WebsiteConfiguration: { 
+	    ErrorDocument: {
+	      Key: errDocument 
+	    },
+	    IndexDocument: {
+	      Suffix: IndexDocument
+	    }
+	  }
+	};
+	return new Promise((resolve, reject) => {
+		s3.putBucketWebsite(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{
+		  	resolve(data);
+		  }     
+		});
+	});
+}
+exports.configureBucketAsWebsite = configureBucketAsWebsite;
+/**
+ * Set bucket policy
+ * @param {*} bucketName
+ */
+function putBucketPolicy(bucketName){
+	var policyobj={
+		  "Version":"2012-10-17",
+		  "Statement":[{
+			"Sid":"PublicReadGetObject",
+		      "Effect":"Allow",
+			  "Principal": "*",
+		      "Action":["s3:GetObject"],
+		      "Resource":["arn:aws:s3:::"+bucketName+"/*"]
+		    }
+		  ]
+		}
+	var params = {
+	  Bucket: bucketName, 
+	  Policy: JSON.stringify(policyobj)
+	};
+	return new Promise((resolve, reject) => {
+		s3.putBucketPolicy(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{
+		  	resolve(data);
+		  }
+		});
+	});
+}
+exports.putBucketPolicy = putBucketPolicy;
+
 /**
  * Create Bucket Notification
  * @param {*} bucketName 
@@ -163,7 +223,7 @@ exports.putBucketNotificationConfiguration = putBucketNotificationConfiguration;
  * @param {*} bucketName 
  */
 
-function addPermission(lambdaFunArn, bucketName) {
+function addPermissionToS3(lambdaFunArn, bucketName) {
 	var extractedSoruce = lambdaFunArn.split(":");
 	var sourceAccountId = extractedSoruce[4];
 	var SourceArn = "arn:aws:s3:::" + bucketName;
@@ -188,7 +248,7 @@ function addPermission(lambdaFunArn, bucketName) {
 	});
 }
 
-exports.addPermission = addPermission;
+exports.addPermissionToS3 = addPermissionToS3;
 
 /**
  * Create Elasticsearch domain
@@ -224,12 +284,12 @@ function createESDomain(domainName) {
 		},
 		ElasticsearchVersion: '5.1'
 	};
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		es.createElasticsearchDomain(params, function (err, data) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(data);
+				fulfill(data);
 			}
 		});
 	});
@@ -246,12 +306,12 @@ function describeElasticsearchDomain(domainName) {
 		DomainName: domainName
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		es.describeElasticsearchDomain(params, function (err, data) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(data);
+				fulfill(data);
 			}
 		});
 	});
@@ -284,12 +344,12 @@ function createRole(roleName, path) {
 		Path: path
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		iam.createRole(params, function (err, data) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(data);
+				fulfill(data);
 			}
 		});
 	});
@@ -306,12 +366,12 @@ function getRole(roleName) {
 		RoleName: roleName
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		iam.getRole(params, function (err, data) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(data);
+				fulfill(data);
 			}
 		});
 	});
@@ -449,12 +509,12 @@ function createFunction(bucketName, keyName, funName, role, desc, esHost, memory
 		}
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		lambda.createFunction(params, function (err, data) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(data);
+				fulfill(data);
 			}
 		});
 	});
@@ -523,7 +583,7 @@ function createRestApi(apiName,desc) {
 				fulfill(data);
 			} 
 		});
-	})
+	});
 	
 }
 exports.createRestApi=createRestApi;
@@ -538,12 +598,12 @@ function getResources(apiId){
 	  restApiId: apiId
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.getResources(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{
-		  	resolve(data);
+		  	fulfill(data);
 		  }
 		});
 	});
@@ -563,12 +623,12 @@ function createResource(parentId,pathPart,apiId){
 	  restApiId: apiId 
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.createResource(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{
-		  	resolve(data); 
+		  	fulfill(data); 
 		  }         
 		});
 	});
@@ -589,12 +649,12 @@ function putMethod(authorizationType='NONE',httpMethod,resourceId,restApiId){
 	  resourceId: resourceId, 
 	  restApiId: restApiId
 	};
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.putMethod(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{ 
-		  	resolve(data); 
+		  	fulfill(data); 
 		  }
 		});
 	});
@@ -619,17 +679,46 @@ function putIntegration(httpMethod,resourceId,apiId,type,uniqueIdentifier){
 	  uri: uniqueIdentifier
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.putIntegration(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{ 
-		  	resolve(data); 
+		  	fulfill(data); 
 		  }  
 		});
 	});
 }
 exports.putIntegration=putIntegration;
+
+
+/**
+ * Set the integration point 
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} type 
+ * @param {*} uniqueIdentifier 
+ */
+function putIntegrationForCors(httpMethod,resourceId,apiId,type,requestTemplate){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId,
+	  restApiId: apiId, 
+	  type: type,
+	  requestTemplates: requestTemplate
+	};
+	return new Promise((fulfill, reject) => {
+		apigateway.putIntegration(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	fulfill(data); 
+		  }  
+		});
+	});
+}
+exports.putIntegrationForCors=putIntegrationForCors;
 
 /**
  * Set the method Response
@@ -638,26 +727,57 @@ exports.putIntegration=putIntegration;
  * @param {*} apiId 
  * @param {*} responseModel 
  */
-function putMethodResponse(httpMethod,resourceId,apiId,responseModel){
+function putMethodResponse(httpMethod,resourceId,apiId,responseModel,responseParameters){
 	var params = {
 	  httpMethod: httpMethod, 
 	  resourceId: resourceId, 
 	  restApiId: apiId, 
 	  statusCode: "200", 
-	  responseModels: responseModel
+	  responseModels: responseModel,
+	  responseParameters:responseParameters
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.putMethodResponse(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{ 
-		  	resolve(data); 
+		  	fulfill(data); 
 		  }
 		});
 	});
 }
 exports.putMethodResponse=putMethodResponse;
+
+/**
+ * Set the method Response
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} responseModel
+ * @param {*} responseParameters 
+ */
+function putMethodResponseForCors(httpMethod,resourceId,apiId,responseModel,responseParameters){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId, 
+	  restApiId: apiId, 
+	  statusCode: "200", 
+	  responseModels: responseModel,
+	  responseParameters:responseParameters
+	};
+
+	return new Promise((fulfill, reject) => {
+		apigateway.putMethodResponse(params, function(err, data) {
+		  if (err){
+		  	reject(err);
+		  }else{ 
+		  	fulfill(data); 
+		  }
+		});
+	});
+}
+exports.putMethodResponseForCors=putMethodResponseForCors;
 
 /**
  * Set method integration response
@@ -666,27 +786,60 @@ exports.putMethodResponse=putMethodResponse;
  * @param {*} apiId 
  * @param {*} responseTemplate 
  */
-function putIntegrationResponse(httpMethod,resourceId,apiId,responseTemplate){
+function putIntegrationResponse(httpMethod,resourceId,apiId,responseTemplate,responseParameters){
 	var params = {
 	  httpMethod: httpMethod, 
 	  resourceId: resourceId, 
 	  restApiId: apiId, 
 	  statusCode: "200",
-	  responseTemplates: responseTemplate
+	  responseTemplates: responseTemplate,
+	  responseParameters:responseParameters
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.putIntegrationResponse(params, function(err, data) {
 		  if (err){
 		  	reject(data);
 		  }else{
-		  	resolve(data);
+		  	fulfill(data);
 		  }               		
 		});
 	});
 	
 }
 exports.putIntegrationResponse=putIntegrationResponse;
+
+
+/**
+ * Set method integration response
+ * @param {*} httpMethod 
+ * @param {*} resourceId 
+ * @param {*} apiId 
+ * @param {*} responseTemplate 
+ * @param {*} responseParameters
+ */
+function putIntegrationResponseForCors(httpMethod,resourceId,apiId,responseTemplate,responseParameters){
+	var params = {
+	  httpMethod: httpMethod, 
+	  resourceId: resourceId, 
+	  restApiId: apiId, 
+	  statusCode: "200",
+	  responseTemplates: responseTemplate,
+	  responseParameters:responseParameters
+	};
+
+	return new Promise((fulfill, reject) => {
+		apigateway.putIntegrationResponse(params, function(err, data) {
+		  if (err){
+		  	reject(data);
+		  }else{
+		  	fulfill(data);
+		  }               		
+		});
+	});
+	
+}
+exports.putIntegrationResponseForCors=putIntegrationResponseForCors;
 
 /**
  * Deploy API
@@ -699,12 +852,12 @@ function createDeployment(apiId,stageName='prod'){
 	  stageName: stageName
 	};
 
-	return new Promise((resolve, reject) => {
+	return new Promise((fulfill, reject) => {
 		apigateway.createDeployment(params, function(err, data) {
 		  if (err){
 		  	reject(err);
 		  }else{ 
-		  	resolve(data); 
+		  	fulfill(data); 
 		  }
 		});
 	});
@@ -746,14 +899,10 @@ exports.addPermission=addPermission;
  */
 function getApiInvokeUrl(apiId,region,stage){
 	var apiUrl='';
-	return new Promise((fulfill,reject)=>{
-		if(apiId!=='' && region!=='' && stage!==''){
-			apiUrl="https://"+apiId+".execute-api."+region+".amazonaws.com/"+stage+"/";
-			fulfill(apiUrl);
-		}else{
-			reject('Required param missing.');
-		}
-	});
+	if(apiId!=='' && region!=='' && stage!==''){
+		apiUrl="https://"+apiId+".execute-api."+region+".amazonaws.com/"+stage+"/";
+	}
+	return apiUrl;
 }
 exports.getApiInvokeUrl=getApiInvokeUrl;
 
