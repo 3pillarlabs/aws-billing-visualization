@@ -4,7 +4,6 @@ import { AwsdataService } from './../../services/awsdata.service';
 declare var Tour: any;
 
 @Component({
-    moduleId: module.id,
     selector: 'aws-billing-header',
     templateUrl: 'header.component.html'
 })
@@ -33,19 +32,19 @@ export class HeaderComponent implements OnChanges {
                     element: "#helpdropdown",
                     title: "Help & FAQ",
                     placement: "left",
-                    content: "Quick Tour and FAQ"
+                    content: "This is to help users understand the system, You will see Quick Tour and FAQ in there."
                 },
                 {
                     element: "#datasetsdropdown",
                     title: "Data Set Info",
                     placement: "bottom",
-                    content: "Data set info"
+                    content: "This gives you information about the dataset in currently selected account, like total records and last import date."
                 },
                 {
                     element: '#multiaccountdropdown',
-                    title: "Multiaccount list",
+                    title: "Accounts List",
                     placement: "bottom",
-                    content: "Listing of different account."
+                    content: "Here, you can select a active account from a list og account if you have many. All visualization and details on page are related to selected account in this section."
                 },
                 {
                     element: "#datefilter",
@@ -55,7 +54,7 @@ export class HeaderComponent implements OnChanges {
                 },
                 {
                     element: "#d3barchart",
-                    title: "Usage by product categories",
+                    title: "Usage by Products",
                     placement: "right",
                     content: "In selected date range and for selected region (if clicked from geographical map), represents usage distribution among various products."
                 },
