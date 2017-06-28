@@ -38,6 +38,7 @@ export class FullsetupComponent {
         recordInfo: ""
     };
     websiteEndPoint:string="";
+    awsApiDetails:any=[];
     constructor(private _awsdata: AwsdataService) { }
 
     moveTo(step: number) {
@@ -200,17 +201,36 @@ export class FullsetupComponent {
                             apiId:apiId,
                             resourceId:resourceId
                         };
-                        this._awsdata.enableCorsForApi(data).subscribe(res=>{ 
-                        })
+                        this.awsApiDetails.push(data);
                     });
                 }
                 
                 let newstart = start + 1;
                 this.createAwsApi(lambdaFuns, limit, newstart);
             } else {
+                this.enableApisCors(0,this.awsApiDetails.length);
                 this.writeApiJson();
             }
         }, this.intervalValue);
+    }
+
+    enableApisCors(start:number,limit:number){
+        if(this.awsApiDetails.length > 0 && start < limit){
+            setTimeout(()=>{
+                var data=this.awsApiDetails[start];
+                console.log(data);
+                this._awsdata.enableCorsForApi(data).subscribe(res=>{ 
+                    
+                },function(error){
+
+                })
+                let newstart=start+1;
+                this.enableApisCors(newstart,limit);
+            },this.intervalValue);
+        }else{
+            this.stepValue = 4;
+            this.isloading = false;
+        }
     }
 
     writeApiJson(){
@@ -230,24 +250,10 @@ export class FullsetupComponent {
             websiteBucket: this.awsbuckets.websiteSetupbucket
         };
         this._awsdata.setupAwsStaticWebsite(data).subscribe(res => {
-            this.stepValue = 4;
-            this.isloading = false;
             this.websiteEndPoint=res;
         }, error => {
             this.isloading = false;
             this.errorMessage = 'Problem in setup AWS static Website.';
-        })
-    }
-
-    enableCors(resourceId='gg3opf',apiId='oykjk3y3ah'){
-        let data={
-            apiId:apiId,
-            resourceId:resourceId
-        };
-        this._awsdata.enableCorsForApi(data).subscribe(res=>{ 
-            console.log(res);
-        },error=>{
-            console.log(error);
         })
     }
 }

@@ -1,6 +1,6 @@
 var AWS = require('aws-sdk');
 var S3 = require('s3');
-
+var fs = require("fs");
 var s3, es, iam, lambda, cloudwatchlogs,apigateway;
 /**
  * update aws keys
@@ -63,7 +63,7 @@ exports.listBucket = listBucket;
 function uploadfileInBucket(fileName, filePath, bucketName) {
 	var params = {
 		Key: fileName,
-		Body: filePath
+		Body: fs.createReadStream(fileName)
 	};
 	var s3bucket = new AWS.S3({ params: { Bucket: bucketName } });
 	return new Promise((fulfill, reject) => {
