@@ -3,7 +3,6 @@ import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
 
 @Component({
-    moduleId: module.id,
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
@@ -26,7 +25,7 @@ export class DatatableComponent implements OnChanges {
     public sortOrder = "asc";
 
     public currentPage: number = 1;
-    public totalItems: number = 0; // total numbar of page not items 
+    public totalItems: number = 0; // total numbar of page not items
     public maxSize: number = 5; // max page size
     filter: string = '';
     appdataloaded = false;
@@ -137,7 +136,6 @@ export class DatatableComponent implements OnChanges {
     }
 
     parseDetailData(data: any): void {
-     
         var jsondata: any = [];
         if (data.aggregations) {
             if (data.aggregations.total_cost) {

@@ -19,3 +19,6 @@ src/app/**/*.map
 
 #Distribution
 dist
+
+#coverage
+coverage
