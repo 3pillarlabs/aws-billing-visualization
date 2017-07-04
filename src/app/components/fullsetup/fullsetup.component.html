@@ -1,0 +1,120 @@
+<aws-billing-header></aws-billing-header>
+<div class="container-fluid aws-app-container">
+  <div class="stepwizard col-md-offset-3">
+    <div class="stepwizard-row setup-panel">
+      <div class="stepwizard-step">
+        <a href="javascript:void(0);" (click)="moveTo(1)" type="button" [ngClass]="stepValue==1 ? 'btn-primary btn btn-circle' : 'btn-default btn btn-circle'">1</a>
+        <p>Step 1</p>
+      </div>
+      <div class="stepwizard-step">
+        <a href="javascript:void(0);" (click)="moveTo(2)" type="button" [ngClass]="stepValue==2 ? 'btn-primary btn btn-circle' : 'btn-default btn btn-circle'">2</a>
+        <p>Step 2</p>
+      </div>
+      <div class="stepwizard-step">
+        <a href="javascript:void(0);" (click)="moveTo(3)" type="button" [ngClass]="stepValue==3 ? 'btn-primary btn btn-circle' : 'btn-default btn btn-circle'">3</a>
+        <p>Step 3</p>
+      </div>
+      <div class="stepwizard-step">
+        <a href="javascript:void(0);" (click)="moveTo(4)" type="button" [ngClass]="stepValue==4 ? 'btn-primary btn btn-circle' : 'btn-default btn btn-circle'">4</a>
+        <p>Step 4</p>
+      </div>
+    </div>
+  </div>
+  <!--<div class="row">
+    <button type="button" (click)="enableCors()">test</button>
+  </div>-->
+  <div class="row" *ngIf="errorMessage">
+    <div class="col-xs-6 col-md-offset-3">
+      <div class="col-md-12">
+        <div class="alert alert-danger" role="alert">
+          {{errorMessage}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row setup-content" id="step-1" *ngIf="stepValue==1">
+    <div class="col-xs-6 col-md-offset-3">
+      <div class="col-md-12">
+        <h3> Step 1: AWS Account Information</h3>
+        <form>
+          <div class="form-group">
+            <label class="control-label">Access Key</label>
+            <input type="text" required="required" [(ngModel)]="awskeys.accesskey" name="accesskey" class="form-control" placeholder="Enter Access Key"
+            />
+          </div>
+          <div class="form-group">
+            <label class="control-label">Secret key</label>
+            <input type="text" required="required" [(ngModel)]="awskeys.secretkey" name="secretkey" class="form-control" placeholder="Enter Secret Key"
+            />
+          </div>
+          <div class="form-group">
+            <label class="control-label">Region</label>
+            <input type="text" required="required" class="form-control" [(ngModel)]="awskeys.region" name="bucketname" class="form-control"
+              placeholder="Enter region">
+          </div>
+          <button class="btn btn-primary nextBtn btn-lg pull-right" [disabled]="validateAwsKey()" type="button" (click)="savekeys()">Next</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="row setup-content" id="step-2" *ngIf="stepValue==2">
+    <div class="col-xs-6 col-md-offset-3">
+      <div class="col-md-12">
+        <h3> Step 2: Create Elasticsearch Service Domain</h3>
+        <form>
+        <div class="form-group">
+          <label class="control-label">Domain Name</label>
+          <input maxlength="200" type="text" name="domainName" [(ngModel)]="es.domainName" required="required" class="form-control" placeholder="Enter domain Name" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">Index</label>
+          <input maxlength="200" type="text" name="index" [(ngModel)]="es.index" required="required" class="form-control" placeholder="Enter index value" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">Document type</label>
+          <input maxlength="200" type="text" name="doctype" [(ngModel)]="es.doctype" required="required" class="form-control" placeholder="Enter document type" />
+        </div>
+        <button class="btn btn-primary nextBtn btn-lg pull-right" [disabled]="validateESValues()" type="button" (click)="createESDomain()">Next</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="row setup-content" id="step-3" *ngIf="stepValue==3">
+    <div class="col-xs-6 col-md-offset-3">
+      <div class="col-md-12">
+        <h3> Step 3: Setup Lambda</h3>
+        <form>
+        <div class="form-group">
+          <label class="control-label">Bucket Name(Lambda)</label>
+          <input maxlength="200" type="text" name="lambdazipbucket" [(ngModel)]="awsbuckets.lambdazipbucket" required="required" class="form-control" placeholder="Enter bucket Name for lambda zip" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">Bucket Name(Billing CSV)</label>
+          <input maxlength="200" type="text" name="billingCsvbucket" [(ngModel)]="awsbuckets.billingCsvbucket" required="required" class="form-control" placeholder="Enter bucket Name for process billing csv file" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">Bucket Name(Website)</label>
+          <input maxlength="200" type="text" name="websiteSetupbucket" [(ngModel)]="awsbuckets.websiteSetupbucket" required="required" class="form-control" placeholder="Enter bucket Name for setup website" />
+        </div>
+        <button class="btn btn-success btn-lg pull-right" [disabled]="validateBuckets()" type="button" (click)="save()">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row setup-content" id="step-4" *ngIf="stepValue==4">
+    <div class="col-xs-6 col-md-offset-3">
+      <div class="col-md-12">
+        <h3> Step 4: Website URL</h3>
+        <form *ngIf="websiteEndPoint">
+        <div class="form-group">
+          <div><a [attr.href]="websiteEndPoint" target="_blank">{{websiteEndPoint}}</a></div>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+<aws-billing-footer></aws-billing-footer>
+<aws-billing-loader [isloading]="isloading"></aws-billing-loader>

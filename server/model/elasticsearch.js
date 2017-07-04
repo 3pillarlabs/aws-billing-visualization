@@ -489,9 +489,7 @@ exports.getGroupServicedata = getGroupServicedata;
 function isElasticConnected() {
   return elasticClient.ping({
     // ping usually has a 3000ms timeout
-    requestTimeout: Infinity,
-    // undocumented params are appended to the query string
-    hello: "elasticsearch!"
+    requestTimeout: Infinity
   })
 }
 exports.isElasticConnected = isElasticConnected;

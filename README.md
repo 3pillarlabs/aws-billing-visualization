@@ -92,7 +92,10 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
   * Browse to http://<YOUR-SERVER-IP>:3000 to view in browser.
   
 * Automated Install
-  * This is still in development and is queued for next release.
+  * Go to  http://<YOUR-SERVER-IP>:3000/setup page.
+  * Enter your aws access key and screet key
+  * Process all the step 
+  * At the end step you will get an URl of newly setup website.
 
 
 ## Unit testing
