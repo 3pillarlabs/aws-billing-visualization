@@ -5,7 +5,7 @@ import { BarchartComponent } from './barchart.component';
 import { HttpModule } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
 
-describe('Barchart Component', ()=>{
+describe('Barchart Component inline template',()=>{
     let comp:BarchartComponent;
     let fixer:ComponentFixture<BarchartComponent>;
     let el: HTMLElement;
