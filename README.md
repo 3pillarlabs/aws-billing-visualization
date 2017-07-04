@@ -92,10 +92,12 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
   * Browse to http://<YOUR-SERVER-IP>:3000 to view in browser.
   
 * Automated Install
-  * Go to  http://<YOUR-SERVER-IP>:3000/setup page.
+  * Change serverless value to true in <project-root>/src/environments/environment.prod.ts
+  * Start in production mode using, npm run build-prod
+  * Go to  http://YOUR-SERVER-IP:3000/setup page.
   * Enter your aws access key and screet key
-  * Process all the step 
-  * At the end step you will get an URl of newly setup website.
+  * Process all the steps 
+  * At the end step you will get an URL of newly setup website.
 
 
 ## Unit testing
