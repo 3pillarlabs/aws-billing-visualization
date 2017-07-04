@@ -1,10 +1,7 @@
 var elasticsearch = require('elasticsearch');
 
 var elasticClient = new elasticsearch.Client({
-  //host:"http://search-aws-data-billing-yvt6nhmmg7eptqivxchpio2xk4.us-east-1.es.amazonaws.com/"
-  host: "http://atg.3pillarglobal.com/es/"
-  //host: "http://172.20.38.132:9200/"
-  //host: "http://" + environment.elastic_search.host + ":" + environment.elastic_search.port + "/" + environment.elastic_search.path
+  host: "ELASTIC-SEARCH-HOST:PORT"
 });
 
 /**

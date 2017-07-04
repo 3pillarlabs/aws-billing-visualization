@@ -483,23 +483,23 @@ router.post('/createApisForSetup', function (req, res) {
               var responsemodel = {
                 "application/json": "Empty"
               }
-              var responseParameters={
-                "method.response.header.Access-Control-Allow-Origin":false
+              var responseParameters = {
+                "method.response.header.Access-Control-Allow-Origin": false
               };
-              awslibrary.putMethodResponse('POST', resourceId, apiId, responsemodel,responseParameters).then(function (result) {
+              awslibrary.putMethodResponse('POST', resourceId, apiId, responsemodel, responseParameters).then(function (result) {
                 var responseTemplate = {
                   "application/json": ""
                 };
-                var responseParameters={
-                  "method.response.header.Access-Control-Allow-Origin":'\'*\'',
+                var responseParameters = {
+                  "method.response.header.Access-Control-Allow-Origin": '\'*\'',
                 };
-                awslibrary.putIntegrationResponse('POST', resourceId, apiId, responseTemplate,responseParameters).then(function (result) {
+                awslibrary.putIntegrationResponse('POST', resourceId, apiId, responseTemplate, responseParameters).then(function (result) {
                   var stage = 'prod';
                   awslibrary.createDeployment(apiId, stage).then(function (result) {
                     var apiGatewayArn = 'arn:aws:execute-api:' + region + ':' + accountId + ':' + apiId + '/*/POST/' + tempapiName;
                     awslibrary.addPermission(apiGatewayArn, lambdaFunName).then(function (result) {
                       var apiUrl = awslibrary.getApiInvokeUrl(apiId, region, stage);
-                      res.status(200).json({ url: apiUrl,apiId:apiId,resourceId:resourceId });
+                      res.status(200).json({ url: apiUrl, apiId: apiId, resourceId: resourceId });
                     }, function (error) {
                       res.status(500).json(error);
                     })
@@ -533,51 +533,51 @@ router.post('/createApisForSetup', function (req, res) {
 
 router.post('/enableCorsForApi', function (req, res) {
   awslibrary.updateConfig();
-  var apiId=req.body.apiId;
-  var resourceId=req.body.resourceId;
-  var httpMethod='OPTIONS';
+  var apiId = req.body.apiId;
+  var resourceId = req.body.resourceId;
+  var httpMethod = 'OPTIONS';
 
-  awslibrary.putMethod('NONE',httpMethod,resourceId,apiId).then(function(result){
-    var requestTemplates={
-      "application/json":"{\"statusCode\": 200}"
+  awslibrary.putMethod('NONE', httpMethod, resourceId, apiId).then(function (result) {
+    var requestTemplates = {
+      "application/json": "{\"statusCode\": 200}"
     };
-    awslibrary.putIntegrationForCors(httpMethod,resourceId,apiId,'MOCK',requestTemplates).then(function(result){
+    awslibrary.putIntegrationForCors(httpMethod, resourceId, apiId, 'MOCK', requestTemplates).then(function (result) {
       var responsemodel = {
         "application/json": "Empty"
       };
-      var responseParameters={
-        "method.response.header.Access-Control-Allow-Headers":false,
-        "method.response.header.Access-Control-Allow-Origin":false,
-        "method.response.header.Access-Control-Allow-Methods":false,
+      var responseParameters = {
+        "method.response.header.Access-Control-Allow-Headers": false,
+        "method.response.header.Access-Control-Allow-Origin": false,
+        "method.response.header.Access-Control-Allow-Methods": false,
       };
-      awslibrary.putMethodResponseForCors(httpMethod,resourceId,apiId,responsemodel,responseParameters).then(function(result){
+      awslibrary.putMethodResponseForCors(httpMethod, resourceId, apiId, responsemodel, responseParameters).then(function (result) {
         var responseTemplate = {
           "application/json": ""
         };
 
-        var responseParameters={
-          "method.response.header.Access-Control-Allow-Headers":'\'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token\'',
-          "method.response.header.Access-Control-Allow-Origin":'\'*\'',
-          "method.response.header.Access-Control-Allow-Methods":'\'*\''
+        var responseParameters = {
+          "method.response.header.Access-Control-Allow-Headers": '\'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token\'',
+          "method.response.header.Access-Control-Allow-Origin": '\'*\'',
+          "method.response.header.Access-Control-Allow-Methods": '\'*\''
         };
 
-        awslibrary.putIntegrationResponseForCors(httpMethod,resourceId,apiId,responseTemplate,responseParameters).then(function(result){
-            var stage = 'prod';
-            awslibrary.createDeployment(apiId, stage).then(function (result) {
-              res.status(200).json(result);
-            },function(error){
-               res.status(500).json(error);
-            })
-        },function(error){
+        awslibrary.putIntegrationResponseForCors(httpMethod, resourceId, apiId, responseTemplate, responseParameters).then(function (result) {
+          var stage = 'prod';
+          awslibrary.createDeployment(apiId, stage).then(function (result) {
+            res.status(200).json(result);
+          }, function (error) {
+            res.status(500).json(error);
+          })
+        }, function (error) {
           res.status(500).json(error);
         })
-      },function(error){
+      }, function (error) {
         res.status(500).json(error);
       })
-    },function(error){
+    }, function (error) {
       res.status(500).json(error);
     })
-  },function(error){
+  }, function (error) {
     res.status(500).json(error);
   })
 })
