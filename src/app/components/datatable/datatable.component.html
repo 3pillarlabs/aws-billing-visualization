@@ -60,7 +60,7 @@
                 <table class="table table-striped table-bordered table-sortable table-responsive table-condensed cf">
                     <thead class="thead-default cf">
                     <tr>
-                        <template ngFor let-column [ngForOf]="columns">
+                        <ng-template ngFor let-column [ngForOf]="columns">
                             <th *ngIf="column.sortable" [class]="selectedClass(column.variable)"
                                 (click)="changeSorting(column.variable)">
                                 {{column.display}}
@@ -68,7 +68,7 @@
                             <td *ngIf="!column.sortable">
                                 {{column.display}}
                             </td>
-                        </template>
+                        </ng-template>
                     </tr>
                     </thead>
                     <tbody>

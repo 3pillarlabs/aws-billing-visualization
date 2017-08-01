@@ -1,4 +1,4 @@
-import { TestBed,ComponentFixture, inject } from '@angular/core/testing';
+import { TestBed, ComponentFixture, inject } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 import { DatatableComponent } from './datatable.component';
