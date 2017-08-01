@@ -1,0 +1,97 @@
+<aws-billing-header></aws-billing-header>
+
+<div class="container-fluid aws-app-container">
+    <div class="row setup-content" id="step-1">
+        <div class="col-xs-6 col-md-offset-3">
+            <div class="col-md-12">
+                <h3> AWS Billing Upload</h3>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <!-- <h1 class="text-left">Upload Billing CSV</h1>-->
+            <div class="col-xs-8 col-sm-6 col-md-offset-3">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-xs-10 text-left">
+                                <label>Elastic search connectivity</label>
+                                <span class="error-msg" *ngIf="stepstaps.one.msg!=''">{{stepstaps.one.msg}}</span>
+                            </div>
+                            <div class="col-xs-2 text-right">
+                                <i class="fa fa-spinner fa-2x fa-spin" aria-hidden="true" *ngIf="stepstaps.one.error==true"></i>
+                                <i class="fa fa-check fa-2x" aria-hidden="true" *ngIf="stepstaps.one.error==false"></i>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <!--<div class="row">
+                            <div class="col-md-3">
+                                <h3>Select files</h3>
+                            </div>
+                        </div>-->
+
+                        <br /><br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <input type="file" class="form-control" name="single" ng2FileSelect [uploader]="uploader" />
+                                        <button type="button" class="btn btn-success btn-s"
+                                                (click)="upload($event)" [disabled]="!uploader.getNotUploadedItems().length">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="uploader.queue.length>0">
+                            <div class="col-md-12">
+                                <br /><br />
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Size</th>
+                                           <!-- <th>Progress</th>-->
+                                            <th class="text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of uploader.queue">
+                                            <td><strong class="pull-left">{{ item.file.name }}</strong></td>
+                                            <td nowrap><span class="pull-left">{{ item.file.size/1024/1024 | number:'.2' }} MB </span></td>
+                                            <!--<td>
+                                                <div class="progress" style="margin-bottom: 0;">
+                                                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }"></div>
+                                                </div>
+                                            </td>-->
+                                            <td class="text-center">
+                                                <span *ngIf="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                                <span *ngIf="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                                <span *ngIf="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!--<div>
+                                    Queue progress:
+                                    <div class="progress" style="">
+                                        <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
+                                    </div>
+                                </div>-->
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <aws-billing-loader [isloading]="isloading" (isloading)="isloading=$event"></aws-billing-loader>
+</div>
+<aws-billing-footer></aws-billing-footer>

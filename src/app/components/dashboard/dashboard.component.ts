@@ -36,7 +36,8 @@ export class DashboardComponent implements OnInit {
 	noRegionData: boolean = false;
 	productSelectionInfoTxt: string = "Click on bar or product label to select product";
 	indiceslist: any = [];
-	isAwsApiUrlSet:any;
+    isAwsApiUrlSet: any;
+    isServerless: boolean;
 	
 	constructor(private _awsdata: AwsdataService) {
 		this.inputdata = {
@@ -62,18 +63,23 @@ export class DashboardComponent implements OnInit {
 		this.enddate = year + '-' + month + '-' + day;
 		this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 		this.isloading = false;
-
+        this.isServerless = this._awsdata.isServerless();
 	}
 
-	ngOnInit() {
-		this.isAwsApiUrlSet=setInterval(()=>{
-			this._awsdata.getApiUrls().subscribe((data)=>{
-				if(data.hasOwnProperty('detailReportData') && data.detailReportData!=""){
-					console.log('get indexes called');
-					this.getIndexes();
-				}
-			})
-		},2000);
+    ngOnInit() {
+        if (this.isServerless) {
+            this.isAwsApiUrlSet = setInterval(() => {
+                this._awsdata.getApiUrls().subscribe((data) => {
+                    if (data.hasOwnProperty('detailReportData') && data.detailReportData != "") {
+                        console.log('get indexes called');
+                        this.getIndexes();
+                    }
+                })
+            }, 2000);
+        } else {
+            this.getIndexes();
+        }
+		
 	}
 
 	getIndexes(){
