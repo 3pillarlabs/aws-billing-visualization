@@ -20,29 +20,6 @@ describe('Service: Awsdata', () => {
             expect(service).toBeTruthy();
         }));
 
-        it('should get regions data', inject([ConnectionBackend, AwsdataService],
-            (backend: MockBackend,
-             service: AwsdataService) => {
-                // Arrange
-                let items = null;
-                let data = {data: 'test'};
-                backend.connections.subscribe((c: MockConnection) => {
-                    expect(c.request.url).toEqual('api/regions');
-                    c.mockRespond(new Response(new ResponseOptions({body: '[{"item":"Test"}]'})));
-                });
-
-                var returnData = service.getRegionsData(data);
-
-                // Act
-                returnData.subscribe((q) => {
-                    items = q;
-                });
-
-                // Assert
-                backend.verifyNoPendingRequests();
-                expect(items).toEqual([{item:'Test'}]);
-        }));
-
         it('should get all aws resource', inject([ConnectionBackend, AwsdataService],
             (backend: MockBackend,
              service: AwsdataService) => {
@@ -66,28 +43,6 @@ describe('Service: Awsdata', () => {
                 expect(items).toEqual([{item:'Test'}]);
         }));
 
-        it('should get unique product', inject([ConnectionBackend, AwsdataService],
-            (backend: MockBackend,
-             service: AwsdataService) => {
-                // Arrange
-                let items = null;
-                let data = {data: 'test'};
-                backend.connections.subscribe((c: MockConnection) => {
-                    expect(c.request.url).toEqual('api/getProductWiseData');
-                    c.mockRespond(new Response(new ResponseOptions({body: '[{"item":"Test"}]'})));
-                });
-
-                var returnData = service.getUniqueProduct(data);
-
-                // Act
-                returnData.subscribe((q) => {
-                    items = q;
-                });
-
-                // Assert
-                backend.verifyNoPendingRequests();
-                expect(items).toEqual([{item:'Test'}]);
-        }));
 
         it('should get min max date range', inject([ConnectionBackend, AwsdataService],
             (backend: MockBackend,
