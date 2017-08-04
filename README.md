@@ -43,47 +43,50 @@ The core of system us build using Node JS, Angular2, ElasticSearch, D3, AWS lamb
     * To create index and mapping copy given below json and paste in dev tool console and run.
     * Add mappings   
       PUT /aws-billing 
-      {
-          "settings": {
-      		"index.mapping.ignore_malformed": true
-      	},
-      	"mappings": {
-      		"atg-line-items-resources-tags": {
-      			"properties": {
-      				"ProductName": {
-      					"type": "string",
-      					"index": "not_analyzed"
-      				},
-      				"AvailabilityZone": {
-      					"type": "string",
-      					"index": "not_analyzed"
-      				},
-      				"UsageStartDate": {
-      					"type": "date",
-      					"format": "yyyy-MM-dd HH:mm:ss"
-      				},
-      				"UsageEndDate": {
-      					"type": "date",
-      					"format": "yyyy-MM-dd HH:mm:ss"
-      				},
-      				"BlendedCost": {
-      					"type": "double"
-      				},
-                  "UsageQuantity": {
-          				"type": "double"
-      				},
-      				"__CreatedDate": {
-      					"type": "date",
-      					"format": "yyyy-MM-dd HH:mm:ss"
-      				},
-      				"__AvailabilityRegion": {
-      					"type": "string",
-      					"index": "not_analyzed"
-      				}
-      			}
-      		}
-      	}
-      }
+  {
+    "settings": {
+    "index.mapping.ignore_malformed": true
+   },
+ "mappings": {
+  "atg-line-items-resources-tags": {
+   "properties": {
+    "ProductName": {
+     "type": "string",
+     "index": "not_analyzed"
+    },
+    "AvailabilityZone": {
+     "type": "string",
+     "index": "not_analyzed"
+    },
+    "UsageStartDate": {
+     "type": "date",
+     "format": "yyyy-MM-dd HH:mm:ss",
+      "index": "not_analyzed"
+    },
+    "UsageEndDate": {
+     "type": "date",
+     "format": "yyyy-MM-dd HH:mm:ss",
+      "index": "not_analyzed"
+    },
+    "BlendedCost": {
+     "type": "double"
+    },
+    "UsageQuantity": {
+    "type": "double"
+    },
+    "__CreatedDate": {
+     "type": "date",
+     "format": "yyyy-MM-dd HH:mm:ss",
+    "index": "not_analyzed"
+    },
+    "__AvailabilityRegion": {
+     "type": "string",
+     "index": "not_analyzed"
+    }
+   }
+  }
+ }
+}
   * Change host url of elastic-search in <project-root>/server/model/elasticsearch.js 
   * If needed you can change the port in server.js, default is 3000
   * In project folder, run npm install to get dependencies  
