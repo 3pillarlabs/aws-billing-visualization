@@ -4,6 +4,7 @@ import { Http, Headers } from '@angular/http';
 const URL = './';
 import { Observable } from 'rxjs';
 import { FileUploader } from 'ng2-file-upload';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-upload-csv',
@@ -48,11 +49,16 @@ export class UploadCsvComponent {
     }
 
     @Output() setupDone: EventEmitter<boolean> = new EventEmitter<boolean>();
-    constructor(private _awsdata: AwsdataService, private _http: Http) {
+    constructor(private _awsdata: AwsdataService, private _http: Http, private router: Router) {
         this.isloading = false;
 
         this.uploader.onCompleteAll = () => {
             this.showloader(false);
+        };
+
+        this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+            console.log("uploaded:", item, status);
+            this.router.navigate(['']);
         };
 
         this._awsdata.verifyElasticConnection().subscribe((response) => {

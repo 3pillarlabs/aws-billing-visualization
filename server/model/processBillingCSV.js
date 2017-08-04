@@ -11,7 +11,7 @@ var multer = require('multer');
 
 var batch = [];
 
-
+var batches = [];
 function processBillingCsv(filePath) {
     return new Promise((resolve, reject) => {
         csv()
@@ -24,21 +24,66 @@ function processBillingCsv(filePath) {
         })
         .on('done', (error) => {
             console.log('done');
-            client.bulk(
-                {
-                    body: batch
-                }, function (err, resp) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(resp);
-                        console.log("Bulk insert response- time Taken: " + resp.took + "ms, errors: " + resp.errors);
-                    }
-                });
 
+            var records = 50000;
+            if (batch.length > records) {
+                batches = split(batch, records);
+                for (var i = 0; i < batches.length; i++) {
+                    console.log("batch count", i + 1, batches[i].length);
+                }
+                insertBulk(reject, resolve);
+            } else {
+                client.bulk(
+                    {
+                        body: batch
+                    }, function (err, resp) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(resp);
+                            console.log("Bulk insert response- time Taken: " + resp.took + "ms, errors: " + resp.errors);
+                        }
+                    });
+            }
         });
     })
 }
+
+function split(arr, n) {
+    var res = [];
+    while (arr.length) {
+        res.push(arr.splice(0, n));
+    }
+    return res;
+}
+
+function insertBulk(reject, resolve) {
+    var data = batches.next();
+    if (data) {
+        console.log("bulk Data", data.length);
+        client.bulk(
+               {
+                   body: data
+               }, function (err, resp) {
+                   if (err) {
+                       reject(err);
+                   } else {
+                       insertBulk(reject, resolve);
+                       //resolve(resp);
+                       console.log("Bulk insert response- time Taken: " + resp.took + "ms, errors: " + resp.errors);
+                   }
+               });
+    } else {
+        resolve("All records uploaded");
+    }
+}
+
+Array.prototype.current = -1;
+Array.prototype.next = function () {
+    var item = ++this.current;
+    console.log("Current", item);
+    return this[item];
+};
 
 
 var storage = multer.diskStorage({ //multers disk storage settings
