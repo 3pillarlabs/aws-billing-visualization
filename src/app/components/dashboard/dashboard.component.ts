@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit {
     isAwsApiUrlSet: any;
     isServerless: boolean;
 	
-	constructor(private _awsdata: AwsdataService) {
+    constructor(private _awsdata: AwsdataService) {
 		this.inputdata = {
 			'region': this.selectedRegion,
 			'product': this.selectedProduct,
@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit {
 		this.appcomponentdata.inputdata = this.inputdata;
 		//this.company = this._config.company;
 		let today = new Date();
-		let year = today.getFullYear();
+        let year = today.getFullYear();
 		let month = ("0" + (today.getMonth() + 1)).slice(-2);
 		let day = new Date(year, +month, 0).getDate();
 
@@ -113,9 +113,10 @@ export class DashboardComponent implements OnInit {
 				this.convertedDate = moment(localtimezoneDate, "YYYY-MM-DD").format('MMM DD, YYYY hh:mm A');
 				this.calstartDate = data.aggregations.min_date.value_as_string;
 				this.calendDate = data.aggregations.max_date.value_as_string;
-				if (this.calstartDate && this.calendDate) {
+                if (this.calstartDate && this.calendDate) {
 					let datesplitearr = this.calendDate.split("-");
-					this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
+					//this.startdate = datesplitearr[0] + '-' + datesplitearr[1] + '-01';
+                    this.startdate = this.calstartDate;
 					this.enddate = this.calendDate;
 					this.dateRange = moment(this.startdate, "YYYY-MM-DD").format('MMMM D, YYYY') + " - " + moment(this.enddate, "YYYY-MM-DD").format('MMMM D, YYYY');
 					var that = this;
@@ -311,5 +312,4 @@ export class DashboardComponent implements OnInit {
 		}
 		
 	}
-
 }

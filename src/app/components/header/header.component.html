@@ -19,8 +19,8 @@
         </div>
 
         <div id="navbar" class="collapse navbar-collapse" *ngIf="indiceslist">
-            <ul class="nav navbar-nav navbar-right">
-
+                <ul class="nav navbar-nav navbar-right">
+               
                 <li class="dropdown" id="multiaccountdropdown">
                     <a href="#" class="dropdown-toggle selected-account" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false"><i class="fa fa-arrows-v"></i> <strong>{{indices ||
@@ -47,7 +47,9 @@
                             available"}}</a></li>
                     </ul>
                 </li>
-
+                <li>
+                  <a (click)="importPage($event)" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle selected-account" href="javascript:void(0);" role="button">Import Data</a>
+                </li>
                 <li class="dropdown" id="helpdropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false"><i class="fa fa-question-circle"></i> Help <span class="caret"></span></a>

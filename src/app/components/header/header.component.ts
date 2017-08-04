@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, EventEmitter, Output } from '@angular/core';
 import { AwsdataService } from './../../services/awsdata.service';
+import { Router } from '@angular/router';
 
 declare var Tour: any;
 
@@ -17,7 +18,7 @@ export class HeaderComponent implements OnChanges {
 
     @Input() indices: string;
 
-    constructor(private _awsdata: AwsdataService) {
+    constructor(private _awsdata: AwsdataService, private router: Router) {
         this.indices = this.company;
     }
 
@@ -89,5 +90,9 @@ export class HeaderComponent implements OnChanges {
              this.indices=indexval;
         }
         this.companyChange.emit(indexval);
+    }
+
+    importPage(event) {
+        this.router.navigate(['billingupload']);
     }
 }
