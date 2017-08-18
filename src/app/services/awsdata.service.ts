@@ -187,4 +187,10 @@ export class AwsdataService {
         headers.append('Content-Type', 'application/json');
         return this._http.post('api/enableCorsForApi', JSON.stringify(data), { headers: headers }).map(res => res.json());
     }
+
+    getDetailData(awsdata: any) {
+        var headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this._http.post('api/getDetailedData', JSON.stringify(awsdata), { headers: headers }).map(data => data.json());
+    }
 }

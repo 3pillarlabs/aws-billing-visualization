@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnChanges,Input } from '@angular/core';
+import { Component, EventEmitter, OnChanges, Input } from '@angular/core';
 import { Http } from '@angular/http';
 import { AwsdataService } from './../../services/awsdata.service';
 
@@ -6,7 +6,7 @@ import { AwsdataService } from './../../services/awsdata.service';
     selector: 'aws-billing-datatable',
     templateUrl: 'datatable.component.html',
     styleUrls: ['datatable.component.css'],
-    outputs: ['detailReportChange','isloading'],
+    outputs: ['detailReportChange', 'isloading'],
     inputs: ['appcomponentdata']
 })
 export class DatatableComponent implements OnChanges {
@@ -17,8 +17,9 @@ export class DatatableComponent implements OnChanges {
 
     appcomponentdata: any; //Data from App Component
     detailReportChange: EventEmitter<any> = new EventEmitter<string>();
-    isloading:EventEmitter<boolean>=new EventEmitter<boolean>();
+    isloading: EventEmitter<boolean> = new EventEmitter<boolean>();
     public data: any[] = [];
+    public products: any[] = [];
     public filterQuery = "";
     public rowsOnPage = 10;
     public sortBy = "blandedcost";
@@ -32,14 +33,14 @@ export class DatatableComponent implements OnChanges {
     totalBlendedCost: number = 0;
     totalQuantity: number;
     showingfrom = this.currentPage;
-    showingto:number;
+    showingto: number;
     dataTableLenth: any = [10, 25, 50, 100];
     product: string = '';
     region: string = '';
     alltags: string = '';
-    regionList:any;
-    ProductList:any;
-    public length:number=10;
+    regionList: any;
+    ProductList: any;
+    public length: number = 10;
 
 
     columns: any[] = [
@@ -107,16 +108,26 @@ export class DatatableComponent implements OnChanges {
     };
 
     constructor(private http: Http, private _awsdata: AwsdataService) {
-        this.showingto=this.length;
+        this.showingto = this.length;
+
+        let param = {
+            "company": this.company
+        }
+        this._awsdata.getDetailData(param).subscribe((response) => {
+            this.parseData(response);
+        }, (error) => {
+            console.log(error);
+            this.isloading.emit(false);
+        })
     }
 
     ngOnChanges(): void {
-        let data=this.appcomponentdata.allServiceData;
-        if(data.aggregations && data.aggregations.product_name && data.aggregations.product_name.buckets.length > 0){
-            this.ProductList=data.aggregations.product_name.buckets;
+        let data = this.appcomponentdata.allServiceData;
+        if (data.aggregations && data.aggregations.product_name && data.aggregations.product_name.buckets.length > 0) {
+            this.ProductList = data.aggregations.product_name.buckets;
         }
-        if(data.aggregations && data.aggregations.AvailabilityRegion && data.aggregations.AvailabilityRegion.buckets.length > 0){
-            this.regionList=data.aggregations.AvailabilityRegion.buckets;
+        if (data.aggregations && data.aggregations.AvailabilityRegion && data.aggregations.AvailabilityRegion.buckets.length > 0) {
+            this.regionList = data.aggregations.AvailabilityRegion.buckets;
         }
         if (this.appcomponentdata.allServiceData) {
             this.setupInfo();
@@ -144,8 +155,8 @@ export class DatatableComponent implements OnChanges {
             if (data.aggregations.total_quantity) {
                 this.totalQuantity = data.aggregations.total_quantity.value;
             }
-
         }
+
         if (data.hits.total) {
             this.totalItems = data.hits.total;
         }
@@ -153,8 +164,28 @@ export class DatatableComponent implements OnChanges {
             jsondata.push(hit._source);
         }
 
+
         this.data = jsondata;
         this.pageInfo();
+    }
+
+    parseData(data: any): void {
+        var products = data.aggregations.product_names.buckets;
+
+        products.forEach((pro, index) => {
+
+            pro.totalCost = 0;
+
+            pro.Instances.buckets.forEach((instance, index) => {
+                if (instance.key == '') {
+                    instance.key = "Miscellaneous";
+                }
+                instance.Usage_Type.buckets.forEach((usage, index) => {
+                    pro.totalCost += parseFloat(usage.total_blended_cost.value);
+                });
+            });
+        });
+        this.products = products;
     }
 
     filterbyOperation(val: string) {
@@ -299,15 +330,14 @@ export class DatatableComponent implements OnChanges {
     }
 
     onDateSelect(stDate: string, endDate: string) {
-        this.startdate=stDate.substr(0,10);
-        this.enddate=endDate.substr(0,10);
+        this.startdate = stDate.substr(0, 10);
+        this.enddate = endDate.substr(0, 10);
         this.callDetailReportFilter();
     }
 
-    onlengthChange(tablelen:number):void{
+    onlengthChange(tablelen: number): void {
         this.currentPage = 1;
-        this.length=tablelen;
+        this.length = tablelen;
         this.clearFilter();
     }
-
 }

@@ -640,8 +640,21 @@ router.post('/upload', function (req, res) {
             console.log(error);
         });
     }, function (err) {
+        
         console.log(err);
     })
+});
+
+router.post('/getDetailedData', function (req, res) {
+    var data = req.body;
+    elastic.getDetailedData(data).then(function (result) {
+        res.json(result);
+    }, function (error) {
+        res.status(error.status || 500);
+        res.json({
+            'error': error.message
+        });
+    });
 });
 
 module.exports = router;

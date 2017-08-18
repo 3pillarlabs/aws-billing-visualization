@@ -19,6 +19,7 @@ export class UploadCsvComponent {
     availableAccountName: string;
     accountNameLoader: boolean;
     isloading: boolean;
+    counter: number = 0;
 
     stepstaps: any = {
         'one': {
@@ -53,12 +54,17 @@ export class UploadCsvComponent {
         this.isloading = false;
 
         this.uploader.onCompleteAll = () => {
+            this.uploader.progress = 100;
             this.showloader(false);
+            (function (router) {
+                setTimeout(function () {
+                    router.navigate(['']);
+                }, 100)
+            })(this.router);
         };
 
         this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
             console.log("uploaded:", item, status);
-            this.router.navigate(['']);
         };
 
         this._awsdata.verifyElasticConnection().subscribe((response) => {
@@ -75,8 +81,15 @@ export class UploadCsvComponent {
 
     upload(event) {
         this.showloader(true);
+        this.uploader.progress = 0;
+        for (var j = 0; j <= 60; j++) {
+            if (this.uploader.progress < 100) {
+                this.uploader.progress = j + 0.1;
+            }
+        } 
+
         this.uploader.uploadAll();
-    }
+    }   
 
     showloader(flag: boolean) {
         this.isloading = flag;

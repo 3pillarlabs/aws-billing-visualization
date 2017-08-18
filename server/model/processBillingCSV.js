@@ -19,8 +19,13 @@ function processBillingCsv(filePath) {
         .on('json', (data) => {
             var dataString = JSON.stringify(data);
             var recordId = crypto.createHash('md5').update(dataString).digest("hex");
-            batch.push({ "index": { "_index": "aws-billing", "_type": "billing", "_id": recordId } });
-            batch.push(data);
+            if (data.ProductName != '') {
+                if (data.AvailabilityZone && data.AvailabilityZone != "") {
+                    data.__AvailabilityRegion = data.AvailabilityZone;
+                }
+                batch.push({ "index": { "_index": "aws-billing", "_type": "billing", "_id": recordId } });
+                batch.push(data);
+            }
         })
         .on('done', (error) => {
             console.log('done');
